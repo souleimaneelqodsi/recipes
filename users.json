@@ -1,0 +1,71 @@
+[
+    {
+        "username": "midou",
+        "email": "zeroual.md1@gmail.com",
+        "password": "$2y$10$MgOQ1CCmsCg1jULjRCvBp.dWdvCye6\/lLFOn4vfZ1x8A0yWrMYjcm"
+    },
+    {
+        "username": "souleimane",
+        "email": "souleimane@gmail.com",
+        "password": "$2y$10$JNU\/nTGOLVslfO7kTR\/1gegSOx\/1n8NTmlVRrZQCLu5WY42kvHXSa"
+    },
+    {
+        "username": "moahmmed",
+        "email": "zeroual@gmail.com",
+        "password": "$2y$10$rjQQltY7IH7..kxstGK15eeiu.DGbyAckdG1Gu7krJQ5FBqVHYLWS"
+    },
+    {
+        "username": "Massyl",
+        "email": "massyl@gmail.com",
+        "password": "$2y$10$8oadCG0HaH70RC24q4C8uewIu8\/CetUQ11nja6YMyUGaFyeNlauA2",
+        "role": "cuisinier"
+    },
+    {
+        "username": "massi",
+        "email": "massi@gmail.com",
+        "password": "$2y$10$hyPtH105a79lsdQd5idip.IkxOIusYU5QFZDp5DHuFXTSqOY.qmkq",
+        "role": "cuisinier"
+    },
+    {
+        "username": "kader",
+        "email": "kader@gmail.com",
+        "password": "$2y$10$BoztL0UOZds21rDu5Zww2eZpVp7XC1FhXS8kNob.s0mYnLJprU3li",
+        "role": "cuisinier"
+    },
+    {
+        "username": "youcef",
+        "email": "youcef@gmail.com",
+        "password": "$2y$10$GBaJ704wBGvLd6dpOvr\/QuRGI8ZiOYZcj7k1Lyx2hnk2HIIgAvulq",
+        "role": "cuisinier"
+    },
+    {
+        "username": "bedro",
+        "email": "bedro@gmail.com",
+        "password": "$2y$10$ki7WV5IBE3tXyVU8gEATneQOIOauUbFV8Sox.zfpf6HjJrWBJIPRO",
+        "role": "cuisinier"
+    },
+    {
+        "username": "mati",
+        "email": "mati@gmail.com",
+        "password": "$2y$10$lpwkDxphr.xFEymKq571J.XkVyEbjW9419yjEHShSU7PUGkZ.39kW",
+        "role": "cuisinier"
+    },
+    {
+        "username": "tac",
+        "email": "tac@gmail.com",
+        "password": "$2y$10$qTAQmKubQlrl\/ecea.sUkOiMT0iO9YVWl1tpSqgnstl5sNn\/1N9.m",
+        "role": "cuisinier"
+    },
+    {
+        "username": "ab",
+        "email": "ab@gmail.com",
+        "password": "$2y$10$n67SITmYIKHZ7NSvIl5YY.\/ZcMh0rwJ6KWucgqImBHXkGCr18wJ8G",
+        "role": "cuisinier"
+    },
+    {
+        "username": "mehdi",
+        "email": "mehdi@gmail.com",
+        "password": "$2y$10$G1fyIcY0GVbFRynPq1aQyOuP065IIEs.o3NpxRzmCcnbrJSEI9pSe",
+        "role": "cuisinier"
+    }
+]
