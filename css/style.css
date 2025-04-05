@@ -2147,3 +2147,137 @@ form label {
   text-decoration: underline;
 }
 
+/*.info {
+  background-color: #FBE9E7; 
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+  border-left: 5px solid #FF8A65; 
+}
+
+.info p {
+  margin: 10px 0;
+  font-size: 16px;
+}
+
+.info strong {
+  color: #D84315; 
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  margin: 10px 0 5px;
+  font-weight: bold;
+  color: #5D4037;
+}
+
+input[type="password"] {
+  padding: 10px;
+  border: 1px solid #D7CCC8;
+  border-radius: 6px;
+  background-color: #FAFAFA;
+  font-size: 14px;
+}
+
+button[type="submit"] {
+  margin-top: 20px;
+  padding: 12px;
+  background-color: #FF7043;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button[type="submit"]:hover {
+  background-color: #F4511E;
+}
+
+
+.message {
+  margin-top: 20px;
+  padding: 12px 16px;
+  background-color: #FFE0B2;
+  color: #5D4037;
+  border-left: 5px solid #FB8C00;
+  border-radius: 6px;
+  font-size: 14px;
+}*/
+
+.container-1 {
+  width: 80%;
+  margin: 30px auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Titres */
+
+
+/* Section des informations */
+.info-1 p {
+  color: #7f5f3d; /* Marron */
+  font-size: 1.1em;
+  margin: 10px 0;
+}
+
+.info-1 strong {
+  color: #e57373; /* Orange clair */
+}
+
+/* Formulaire */
+form {
+  margin-top: 20px;
+}
+
+form label {
+  display: block;
+  font-size: 1.2em;
+  color: #7f5f3d; /* Marron */
+  margin-bottom: 8px;
+}
+
+form input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border: 2px solid #e57373; /* Orange clair */
+  border-radius: 5px;
+  font-size: 1em;
+  color: #555;
+  background-color: #f9f3e4; /* Crème doux */
+}
+
+form input:focus {
+  outline: none;
+  border-color: #7f5f3d; /* Marron */
+  background-color: #fff;
+}
+
+
+
+/* Message */
+.message-1 {
+  margin-top: 20px;
+  font-size: 1.1em;
+  color: #e57373; /* Orange clair */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container-1 {
+      width: 90%;
+      padding: 15px;
+  }
+ 
+ 
+}

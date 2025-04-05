@@ -51,13 +51,13 @@ $isConnected = isset($_SESSION['user']);
 				
 				<div class="row" style="display: flex;">
 					<div class="col-sm-4 col-xs-12" style="flex: 1;">
-						<div id="gtco-logo" style="padding-top: 13px;"><a href="index.html">SaveurHub <em>.</em></a></div>
+						<div id="gtco-logo" style="padding-top: 13px;"><a href="index.php">SaveurHub <em>.</em></a></div>
 					</div>
 	
 					<div class="col-sm-4 col-xs-12" style="flex: 2;">
 						<form class="navbar-form" role="search" action="search.php" method="GET" style="display: flex;">	
 							<input type="text" class="form-control" name="query" placeholder="Rechercher une recette..." style="flex-grow: 1; padding: 2px; font-size: 16px; width: 100%;">
-							<button class="btn-cta" type="submit" style="padding: 1px 1px; font-size: 14px;">Rechercher</button>
+							<button class="btn-cta" type="submit" style="height: 45px; font-size: 14px;">Rechercher</button>
 						</form>
 					</div>
 	
@@ -65,7 +65,7 @@ $isConnected = isset($_SESSION['user']);
 					<div class="col-xs-8 text-right menu-1" style="flex: 1;"  >
 						<ul style="padding-top: 13px;">
 							<li><a href="menu.html">Menu</a></li>
-							<li><a href="contact.html">Contact</a></li>
+							<li><a href="contact.php">Contact</a></li>
 							<li class="has-dropdown">
 								<?php if (!$isConnected): ?>
 									<a href="connexion.php">Se connecter</a>
@@ -76,8 +76,8 @@ $isConnected = isset($_SESSION['user']);
 								<?php else: ?>
 									<a href="user.php"><?php echo htmlspecialchars($_SESSION['user']['username']); ?></a>
 									<ul class="dropdown">
-										<li><a href="connexion.php">Profil</a></li>
-										<li><a href="inscription.php">Se deconnecter</a></li>
+										<li><a href="user.php">Profil</a></li>
+										<li><a href="deconnexion.php">Se deconnecter</a></li>
 									</ul>
 								<?php endif; ?>
 

@@ -2,6 +2,9 @@
 session_start();
 $isConnected = isset($_SESSION['user']);
 ?>
+
+
+
 <!DOCTYPE HTML>
 
 <html>
@@ -33,7 +36,6 @@ $isConnected = isset($_SESSION['user']);
 
 	<script src="js/modernizr-2.6.2.min.js"></script>
 	<script src="script.js"></script>
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 	
 
 	</head>
@@ -44,7 +46,7 @@ $isConnected = isset($_SESSION['user']);
 	<div id="page">
 
 	
-	<nav class="gtco-nav" role="navigation">
+		<nav class="gtco-nav" role="navigation">
 			<div class="gtco-container">
 				
 				<div class="row" style="display: flex;">
@@ -87,72 +89,89 @@ $isConnected = isset($_SESSION['user']);
 				
 			</div>
 		</nav>
+	
         <header id="gtco-header" class="gtco-cover gtco-cover-md" role="banner" style="background-image: url(images/img_bg_1.jpg); height:90px;" data-stellar-background-ratio="0.5">
 		<div class="overlay"></div>
 		
 	    </header>
 
-        <div class="form-container">
-    <h2>Connexion</h2>
+
 
     <?php
-	/*if(!$isConnected)
-    	session_start();*/
 
-    $jsonFile = 'users.json';
 
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        $username = trim($_POST["username"]);
-        $password = $_POST["password"];
+$jsonFile = 'users.json'; 
 
-        if (empty($username) || empty($password)) {
-            $error = "Tous les champs doivent être remplis.";
-        } else {
-            $users = file_exists($jsonFile) ? json_decode(file_get_contents($jsonFile), true) : [];
-            
-            $userFound = false;
-            foreach ($users as $user) {
-                if ($user['username'] === $username && password_verify($password, $user['password'])) {
-                    $userFound = true;
-                    $_SESSION['user'] = [
-                        "username" => $user['username'],
-                        "email" => $user['email'],
-						"role" => $user['role']
-                    ];
-                    header("Location: index.php");
-                    exit();
-                }
-            }
+if (!isset($_SESSION['user'])) {
+    header('Location: login.php');
+    exit();
+}
 
-            if (!$userFound) {
-                $error = "Nom d'utilisateur ou mot de passe incorrect.";
+$currentUsername = $_SESSION['user']['username'];
+$users = json_decode(file_get_contents($jsonFile), true);
+$message = '';
+
+$found = false;
+foreach ($users as &$user) {
+    if ($user['username'] === $currentUsername) {
+        $found = true;
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $ancien = $_POST['ancien_mdp'] ?? '';
+            $nouveau = $_POST['nouveau_mdp'] ?? '';
+            $confirmation = $_POST['confirmation'] ?? '';
+
+            if (!password_verify($ancien, $user['password'])) {
+                $message = "❌ Ancien mot de passe incorrect.";
+            } elseif ($nouveau !== $confirmation) {
+                $message = "❌ Le nouveau mot de passe et la confirmation ne correspondent pas.";
+            } else {
+                $user['password'] = password_hash($nouveau, PASSWORD_DEFAULT);
+                file_put_contents($jsonFile, json_encode($users, JSON_PRETTY_PRINT));
+                $message = "✅ Mot de passe changé avec succès.";
             }
         }
+
+        break;
     }
-    ?>
+}
 
-    <?php if (isset($error)): ?>
-        <p class="error"><?php echo $error; ?></p>
-    <?php endif; ?>
+if (!$found) {
+    $message = "❌ Utilisateur introuvable.";
+}
+?>
 
-    <form action="connexion.php" method="post">
-        <label>Nom d'utilisateur :</label>
-        <input type="text" name="username" required>
 
-        <label>Mot de passe :</label>
-        <input type="password" name="password" required>
+<div class="container-1" style="width: 80%; margin: 30px auto; padding: 20px; background-color: #fff; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+    <h2 style="color: #7f5f3d; font-size: 1.8em; margin-bottom: 20px; font-weight: bold;">Mon Profil</h2>
+    <div class="info-1">
+        <p style="color: #7f5f3d; font-size: 1.1em; margin: 10px 0;"><strong style="color: #ff7043;">Nom d'utilisateur :</strong> <?= htmlspecialchars($_SESSION['user']['username']) ?></p>
+        <p style="color: #7f5f3d; font-size: 1.1em; margin: 10px 0;"><strong style="color: #ff7043;">Email :</strong> <?= htmlspecialchars($_SESSION['user']['email']) ?></p>
+        <p style="color: #7f5f3d; font-size: 1.1em; margin: 10px 0;"><strong style="color: #ff7043;">Rôle :</strong> <?= htmlspecialchars($_SESSION['user']['role']) ?></p>
+    </div>
 
-        <button type="submit">Se connecter</button>
+    <h3 style="color: #7f5f3d; font-size: 1.8em; margin-bottom: 20px; font-weight: bold;">Changer le mot de passe</h3>
+    <form method="POST" style="margin-top: 20px;">
+        <label for="ancien_mdp" style="display: block; font-size: 1.2em; color: #7f5f3d; margin-bottom: 8px;">Ancien mot de passe :</label>
+        <input type="password" name="ancien_mdp" required style="width: 100%; padding: 10px; margin-bottom: 20px; border: 2px solid #ff7043; border-radius: 5px; font-size: 1em; color: #555; background-color: #f9f3e4;">
+
+        <label for="nouveau_mdp" style="display: block; font-size: 1.2em; color: #7f5f3d; margin-bottom: 8px;">Nouveau mot de passe :</label>
+        <input type="password" name="nouveau_mdp" required style="width: 100%; padding: 10px; margin-bottom: 20px; border: 2px solid #ff7043; border-radius: 5px; font-size: 1em; color: #555; background-color: #f9f3e4;">
+
+        <label for="confirmation" style="display: block; font-size: 1.2em; color: #7f5f3d; margin-bottom: 8px;">Confirmer le nouveau mot de passe :</label>
+        <input type="password" name="confirmation" required style="width: 100%; padding: 10px; margin-bottom: 20px; border: 2px solid #ff7043; border-radius: 5px; font-size: 1em; color: #555; background-color: #f9f3e4;">
+
+        <button type="submit" style="width: 100%; padding: 12px; background-color: #ff7043; color: white; border: none; border-radius: 5px; font-size: 1.1em; cursor: pointer; transition: background-color 0.3s;">Changer le mot de passe</button>
     </form>
 
-    <p>Vous n'avez pas de compte ? <a href="inscription.php">Inscrivez-vous ici</a></p>
+    <?php if ($message): ?>
+        <p class="message-1" style="margin-top: 20px; font-size: 1.1em; color: #ff7043;"><?= $message ?></p>
+    <?php endif; ?>
 </div>
-    
 
 
 
-
-        <footer id="gtco-footer" role="contentinfo" style="background-image: url(images/img_bg_1.jpg)" data-stellar-background-ratio="0.5">
+<footer id="gtco-footer" role="contentinfo" style="background-image: url(images/img_bg_1.jpg)" data-stellar-background-ratio="0.5">
 		<div class="overlay"></div>
 		<div class="gtco-container">
 			<div class="row row-pb-md">
@@ -187,45 +206,31 @@ $isConnected = isset($_SESSION['user']);
 
 			</div>
 
-
-            
-
-
 			
 
 		</div>
 	</footer>
-    </div>
+
+	</div>
 
 	<div class="gototop js-top">
 		<a href="#" class="js-gotop"><i class="icon-arrow-up"></i></a>
 	</div>
 	
-	<!-- jQuery -->
 	<script src="js/jquery.min.js"></script>
-	<!-- jQuery Easing -->
 	<script src="js/jquery.easing.1.3.js"></script>
-	<!-- Bootstrap -->
 	<script src="js/bootstrap.min.js"></script>
-	<!-- Waypoints -->
 	<script src="js/jquery.waypoints.min.js"></script>
-	<!-- Carousel -->
 	<script src="js/owl.carousel.min.js"></script>
-	<!-- countTo -->
 	<script src="js/jquery.countTo.js"></script>
-
-	<!-- Stellar Parallax -->
 	<script src="js/jquery.stellar.min.js"></script>
-
-	<!-- Magnific Popup -->
 	<script src="js/jquery.magnific-popup.min.js"></script>
 	<script src="js/magnific-popup-options.js"></script>
-	
 	<script src="js/moment.min.js"></script>
 	<script src="js/bootstrap-datetimepicker.min.js"></script>
 
 
-	<!-- Main -->
 	<script src="js/main.js"></script>
-    </body>
-</html>      
+
+	</body>
+</html>

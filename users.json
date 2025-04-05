@@ -67,5 +67,23 @@
         "email": "mehdi@gmail.com",
         "password": "$2y$10$G1fyIcY0GVbFRynPq1aQyOuP065IIEs.o3NpxRzmCcnbrJSEI9pSe",
         "role": "cuisinier"
+    },
+    {
+        "username": "seif",
+        "email": "seif@gmail.com",
+        "password": "$2y$10$BsVeMFPBHJOvaEUkpaWnWOCKL4FrjjTdJRnz.CEfMmSG5eaZtUSIG",
+        "role": "cuisinier"
+    },
+    {
+        "username": "aa",
+        "email": "aa@gmail.com",
+        "password": "$2y$10$8.MSBTh4yzxh90oyuRlUw.SJ1v.pt7NxQHN6wp0kjUF3mRjvjadzu",
+        "role": "cuisinier"
+    },
+    {
+        "username": "ll",
+        "email": "ll@gmail.com",
+        "password": "$2y$10$9qYvPXJc\/nBdO2C6tQclk.gTAtxnUrS9bDnO5ASj0ghT505fPCNs6",
+        "role": "cuisinier"
     }
 ]
