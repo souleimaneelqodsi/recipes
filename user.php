@@ -150,6 +150,15 @@ if (!$found) {
         <p style="color: #7f5f3d; font-size: 1.1em; margin: 10px 0;"><strong style="color: #ff7043;">Rôle :</strong> <?= htmlspecialchars($_SESSION['user']['role']) ?></p>
     </div>
 
+	<div style="margin-top: 20px;">
+		<button onclick="changerRole('demande traducteur')" style="margin-right: 10px; padding: 10px 20px; background-color: #7f5f3d; color: white; border: none; border-radius: 5px; cursor: pointer;">
+			Demande Traducteur
+		</button>
+		<button onclick="changerRole('demande chef')" style="padding: 10px 20px; background-color: #7f5f3d; color: white; border: none; border-radius: 5px; cursor: pointer;">
+			Demande Chef
+		</button>
+	</div>
+
     <h3 style="color: #7f5f3d; font-size: 1.8em; margin-bottom: 20px; font-weight: bold;">Changer le mot de passe</h3>
     <form method="POST" style="margin-top: 20px;">
         <label for="ancien_mdp" style="display: block; font-size: 1.2em; color: #7f5f3d; margin-bottom: 8px;">Ancien mot de passe :</label>
@@ -231,6 +240,26 @@ if (!$found) {
 
 
 	<script src="js/main.js"></script>
+	<script>
+			function changerRole(nouveauRole) {
+				fetch('changer_role.php', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({ role: nouveauRole })
+				})
+				.then(response => response.json())
+				.then(data => {
+					if (data.success) {
+						alert("✅ Rôle mis à jour : " + nouveauRole);
+						location.reload(); 
+					} else {
+						alert("❌ Erreur :  " + data.message);
+					}
+				});
+			}
+</script>
 
 	</body>
 </html>
