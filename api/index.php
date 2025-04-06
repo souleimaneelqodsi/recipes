@@ -1,6 +1,7 @@
 <?php
 
 spl_autoload_register(function ($class) {
+    //TODO: doesn't work, fix needed
     $lowerClass = strtolower($class);
     if (str_contains($class, 'Controller')) {
         require_once 'controllers/' . substr($lowerClass, 0, strpos($lowerClass, "controller")) . "_controller.php";
