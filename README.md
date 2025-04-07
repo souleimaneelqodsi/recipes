@@ -7,6 +7,8 @@
 
 ![Tech Stack](https://skillicons.dev/icons?i=html,css,js,jquery,php)
 
+TODO: rajouter un tutoriel d'installation/exécution
+
 
 ## Overview
 This web application enables users to manage cooking recipes in French and English. It supports multiple user roles—cooks, chefs, translators, and administrators—each with distinct permissions to create, edit, translate, and oversee recipes. The platform offers a modern, responsive interface with features like searching, filtering, commenting, and photo uploads.
