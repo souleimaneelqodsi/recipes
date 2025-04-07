@@ -7,7 +7,7 @@
 
 ![Tech Stack](https://skillicons.dev/icons?i=html,css,js,jquery,php)
 
-TODO: rajouter un tutoriel d'installation/exécution
+TODO: add installation/running tutorial
 
 
 ## Overview
