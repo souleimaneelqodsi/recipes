@@ -2147,3 +2147,28 @@ form label {
   text-decoration: underline;
 }
 
+
+
+/* style du boutton d'affichage de recette traduit */
+<style>
+  #btn-anglais {
+    background-color: black;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  #btn-anglais:hover:enabled {
+    background-color: #333;
+  }
+
+  #btn-anglais:disabled {
+    background-color: #aaa;
+    cursor: not-allowed;
+  }
+</style>
+
