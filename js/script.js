@@ -186,3 +186,64 @@ function chargerRecettes() {
       
   });
   
+
+
+  //redirection vers la page de recherche 
+  function redirigerVersRecherche() {
+    const motCle = document.getElementById('searchInput').value.trim();
+    if (motCle !== '') {
+      window.location.href = `rechercher_recette.html?query=${encodeURIComponent(motCle)}`;
+    } else {
+      alert('Veuillez entrer un mot-clé');
+    }
+  }
+  
+
+  //chzrgement des recettte à partir de la barre de recherche
+
+  function chargerRecettesRecherche() {
+    const params = new URLSearchParams(window.location.search);
+    const motCle = params.get('query');
+  
+    if (!motCle) {
+      document.getElementById('midou').innerHTML = '<p>Pas de mot-clé fourni.</p>';
+      return;
+    }
+  
+    fetch(`api/recipes/search?lang=fr&query=${encodeURIComponent(motCle)}`)
+      .then(response => response.json())
+      .then(data => {
+        const container = document.getElementById('midou');
+        container.innerHTML = '';
+  
+        if (data.length === 0) {
+          container.innerHTML = `<p>Aucune recette trouvée pour "${motCle}".</p>`;
+          return;
+        }
+  
+        data.forEach(recette => {
+          const col = document.createElement('div');
+          col.className = 'col-lg-4 col-md-4 col-sm-6';
+  
+          col.innerHTML = `
+            <a href="recette.html?id=${recette.id}" class="fh5co-card-item">
+              <figure>
+                <div class="overlay"><i class="ti-plus"></i></div>
+                <img src="${recette.imageURL}" alt="Image" class="img-responsive" width="400" height="300">
+              </figure>
+              <div class="fh5co-text">
+                <h2 style="font-size: 20px;">${recette.nameFR}</h2>
+                <p><strong>Auteur :</strong> ${recette.Author}</p>
+                <p><span class="price cursive-font">♡</span></p>
+              </div>
+            </a>
+          `;
+  
+          container.appendChild(col);
+        });
+      })
+      .catch(error => {
+        console.error('Erreur lors du chargement des résultats :', error);
+      });
+  }
+  
