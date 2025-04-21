@@ -6,13 +6,19 @@ class CommentSchema
     public $username = null;
     public $content = null;
     public $created_at = null;
-    private $json_handler;
 
-    public function __construct($json_handler)
+    private JSONHandler $json_handler;
+
+    public function __construct(JSONHandler $json_handler)
     {
         $this->json_handler = $json_handler;
     }
-
-    public function create($data, $recipe_id): void {}
-    public function fetch($recipe_id): array {}
+    /**
+     * @return array
+     */
+    public function create(string $recipe_id): array {}
+    /**
+     * @return array
+     */
+    public function fetch(string $recipe_id): array {}
 }

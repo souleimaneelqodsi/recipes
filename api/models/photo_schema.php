@@ -8,12 +8,12 @@ class PhotoSchema
     public $is_main;
     public $created_at;
 
-    private $json_handler;
+    private JSONHandler $json_handler;
 
-    public function __construct($json_handler)
+    public function __construct(JSONHandler $json_handler)
     {
         $this->json_handler = $json_handler;
     }
 
-    public function upload($recipe_id) {}
+    public function upload(string $recipe_id): void {}
 }

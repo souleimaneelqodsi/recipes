@@ -7,8 +7,8 @@
         $this->comment_schema = $comment_schema;
     }
 
-    public function create($recipe_id): void {}
-    public function fetch($recipe_id): void {}
+    public function create(string $recipe_id): void {}
+    public function fetch(string $recipe_id): void {}
 
     #[\Override]
     public function dispatch($method, array $path): void
@@ -20,11 +20,7 @@
             return;
         }
 
-        if (
-            filter_var($path[0], FILTER_VALIDATE_INT) === false ||
-            count($path) != 2 ||
-            $path[1] !== "comments"
-        ) {
+        if (count($path) != 2 || $path[1] !== "comments" || $path[0] === "") {
             http_response_code(400);
             header("Content-Type: application/json");
             echo json_encode(["error" => "Bad request"]);

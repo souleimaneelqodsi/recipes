@@ -11,15 +11,21 @@ class UserSchema
     public array $comments = [];
     public array $photos = [];
 
-    private $json_handler;
+    private JSONHandler $json_handler;
 
-    public function __construct($json_handler)
+    public function __construct(JSONHandler $json_handler)
     {
         $this->json_handler = $json_handler;
     }
-
-    public function getAll() {}
-    public function getUserById($id) {}
-    public function update($data) {}
-    public function updateRole($role) {}
+    /**
+     * @return void
+     */
+    public function getAll(): array {}
+    public function getById(string $user_id): void {}
+    /**
+     * @return void
+     */
+    public function create(): array {}
+    public function update(string $user_id): void {}
+    public function updateRole(string $user_id): void {}
 }

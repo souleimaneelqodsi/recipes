@@ -24,12 +24,28 @@ class RecipeSchema
     {
         $this->json_handler = $json_handler;
     }
+    /**
+     * @return array     */
     public function search(): array {}
-    public function getById(int $recipe_id): array {}
+    /**
+     * @return array     */
+    public function getById(string $recipe_id): array {}
+    /**
+     * @return array     */
     public function create(): array {}
-    public function update(int $recipe_id): array {}
-    public function delete(int $recipe_id): array {}
-    public function like(int $recipe_id): array {}
-    public function translate(int $recipe_id): array {}
-    public function setPhoto(int $recipe_id): array {}
+    /**
+     * @return array     */
+    public function update(string $recipe_id): array {}
+    /**
+     * @return array     */
+    public function delete(string $recipe_id): array {}
+    /**
+     * @return array     */
+    public function like(string $recipe_id): array {}
+    /**
+     * @return array     */
+    public function translate(string $recipe_id): array {}
+    /**
+     * @return array     */
+    public function setPhoto(string $recipe_id): array {}
 }

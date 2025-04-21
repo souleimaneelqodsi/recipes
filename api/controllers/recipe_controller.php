@@ -10,21 +10,21 @@
     // success: 200 OK, nothing : 204, error : 400, other error:500
     public function search(): void {}
     //success: 200 OK, unauthenticated : 401, error : 400, not found:404, other error:500
-    public function getById(int $recipe_id): void {}
+    public function getById(string $recipe_id): void {}
     //nothing: 204, success:200, OK, error : 400, other error:500
-    public function getAll(int $recipe_id): void {}
+    public function getAll(string $recipe_id): void {}
     // success: 201 OK, error:400, other error:500
     public function create(): void {}
     // success: 200 OK, error:400, other error:500
-    public function update(int $recipe_id): void {}
+    public function update(string $recipe_id): void {}
     // success:200; error:400, not found:404, forbidden:403, other error:500
-    public function delete(int $recipe_id): void {}
+    public function delete(string $recipe_id): void {}
     // success:200; error:400, not found:404, forbidden:403, unauthorized:401, other error:500
-    public function like(int $recipe_id): void {}
-    // success:200; error:400, not found:404, forbidden:403, unauthorized:401, other error:500
-    public function translate(int $recipe_id): void {}
+    public function like(string $recipe_id): void {}
+    // success:200; error:400, not found:404, forbid    den:403, unauthorized:401, other error:500
+    public function translate(string $recipe_id): void {}
     // success:200; error:400, not found:404, unauthorized:401, other error:500
-    public function setPhoto(int $recipe_id): void {}
+    public function setPhoto(string $recipe_id): void {}
 
     // bad request:400, method not allowed:405
     // comment override tag if you run this on PHP <8)
@@ -51,11 +51,8 @@
                     break;
                 }
                 // getById case
-                if (
-                    filter_var($path[0], FILTER_VALIDATE_INT) !== false &&
-                    count($path) === 1
-                ) {
-                    $this->getById(intval($path[0]));
+                if ($path[0] !== "" && count($path) === 1) {
+                    $this->getById($path[0]);
                     break;
                 }
                 http_response_code(400);
@@ -65,11 +62,11 @@
             case "POST":
                 // like case
                 if (
-                    filter_var($path[0], FILTER_VALIDATE_INT) !== false &&
+                    $path[0] !== "" &&
                     $path[1] === "like" &&
                     count($path) === 2
                 ) {
-                    $this->like(intval($path[0]));
+                    $this->like($path[0]);
                     break;
                 }
                 // create case
@@ -83,11 +80,8 @@
                 break;
             case "PUT":
                 // update case
-                if (
-                    filter_var($path[0], FILTER_VALIDATE_INT) !== false &&
-                    count($path) === 1
-                ) {
-                    $this->update(intval($path[0]));
+                if ($path[0] !== "" && count($path) === 1) {
+                    $this->update($path[0]);
                     break;
                 }
                 http_response_code(400);
@@ -95,10 +89,7 @@
                 echo json_encode(["error" => "Bad request"]);
                 break;
             case "PATCH":
-                if (
-                    filter_var($path[0], FILTER_VALIDATE_INT) !== false &&
-                    count($path) === 2
-                ) {
+                if ($path[0] !== "" && count($path) === 2) {
                     //case set photo
                     if ($path[1] === "photos") {
                         $this->setPhoto($path[0]);
@@ -114,11 +105,8 @@
                 break;
             case "DELETE":
                 // case delete
-                if (
-                    filter_var($path[0], FILTER_VALIDATE_INT) !== false &&
-                    count($path) === 1
-                ) {
-                    $this->delete(intval($path[0]));
+                if (count($path) === 1 && $path[0] !== "") {
+                    $this->delete($path[0]);
                     break;
                 }
                 http_response_code(400);
