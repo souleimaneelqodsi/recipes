@@ -1,9 +1,6 @@
 <?php class Session
 {
-
-
-
-    public static function start()
+    public static function start(): void
     {
         if (session_status() == PHP_SESSION_NONE) {
             return;
@@ -11,7 +8,7 @@
         session_start();
     }
 
-    public static function destroy()
+    public static function destroy(): void
     {
         if (session_status() == PHP_SESSION_ACTIVE) {
             return;

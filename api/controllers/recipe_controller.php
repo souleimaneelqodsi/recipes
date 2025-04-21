@@ -1,47 +1,135 @@
-<?php class RecipeController implements Controller{
-    /*private $recipes;
-    public function __construct(){
-        $this->recipes = array();
+<?php class RecipeController implements Controller
+{
+    private $recipe_schema;
+
+    public function __construct(RecipeSchema $recipe_schema)
+    {
+        $this->recipe_schema = $recipe_schema;
     }
 
+    // success: 200 OK, nothing : 204, error : 400, other error:500
+    public function search(): void {}
+    //success: 200 OK, unauthenticated : 401, error : 400, not found:404, other error:500
+    public function getById(int $recipe_id): void {}
+    //nothing: 204, success:200, OK, error : 400, other error:500
+    public function getAll(int $recipe_id): void {}
+    // success: 201 OK, error:400, other error:500
+    public function create(): void {}
+    // success: 200 OK, error:400, other error:500
+    public function update(int $recipe_id): void {}
+    // success:200; error:400, not found:404, forbidden:403, other error:500
+    public function delete(int $recipe_id): void {}
+    // success:200; error:400, not found:404, forbidden:403, unauthorized:401, other error:500
+    public function like(int $recipe_id): void {}
+    // success:200; error:400, not found:404, forbidden:403, unauthorized:401, other error:500
+    public function translate(int $recipe_id): void {}
+    // success:200; error:400, not found:404, unauthorized:401, other error:500
+    public function setPhoto(int $recipe_id): void {}
 
-    private static function getRecipeById( $id ){
-    
-    }
-    private static function setRecipe( $id ){
-    
-    }
-    private static function delRecipe( $id ){
-    
-    }*/
+    // bad request:400, method not allowed:405
+    // comment override tag if you run this on PHP <8)
+    #[\Override]
+    public function dispatch($method, array $path): void
+    {
+        if (empty($method)) {
+            http_response_code(400);
+            header("Content-Type: application/json");
+            echo json_encode(["error" => "Invalid method or path"]);
+            return;
+        }
 
-    public static function dispatch($method, $uri, $path){
-
-    }
-
-    // CODE IDEA FOR DISPATCH
-    /*                if (!isset($path_elements[0]) || empty($path_elements[0])) {
-                    if($method == 'GET'){
-                        RecipeController::all();
+        switch ($method) {
+            case "GET":
+                // getAll case
+                if (empty($path)) {
+                    $this->getAll();
+                    break;
+                }
+                // search case
+                if (empty($path) && isset($_GET["search"])) {
+                    $this->search(); // the search term will be extracted from the GET request
+                    break;
+                }
+                // getById case
+                if (
+                    filter_var($path[0], FILTER_VALIDATE_INT) !== false &&
+                    count($path) === 1
+                ) {
+                    $this->getById(intval($path[0]));
+                    break;
+                }
+                http_response_code(400);
+                header("Content-Type: application/json");
+                echo json_encode(["error" => "Bad request"]);
+                break;
+            case "POST":
+                // like case
+                if (
+                    filter_var($path[0], FILTER_VALIDATE_INT) !== false &&
+                    $path[1] === "like" &&
+                    count($path) === 2
+                ) {
+                    $this->like(intval($path[0]));
+                    break;
+                }
+                // create case
+                if (empty($path)) {
+                    $this->create();
+                    break;
+                }
+                http_response_code(400);
+                header("Content-Type: application/json");
+                echo json_encode(["error" => "Bad request"]);
+                break;
+            case "PUT":
+                // update case
+                if (
+                    filter_var($path[0], FILTER_VALIDATE_INT) !== false &&
+                    count($path) === 1
+                ) {
+                    $this->update(intval($path[0]));
+                    break;
+                }
+                http_response_code(400);
+                header("Content-Type: application/json");
+                echo json_encode(["error" => "Bad request"]);
+                break;
+            case "PATCH":
+                if (
+                    filter_var($path[0], FILTER_VALIDATE_INT) !== false &&
+                    count($path) === 2
+                ) {
+                    //case set photo
+                    if ($path[1] === "photos") {
+                        $this->setPhoto($path[0]);
+                        //case translate
+                    } elseif ($path[1] === "translate") {
+                        $this->translate($path[0]);
                     }
-                } else {
-                    if (gettype($path_elements[0]) === 'integer') {
-                        switch ($method) {
-                            case 'GET':
-                                RecipeController::getRecipe($path_elements[2]);
-                                break;
-                            case 'PUT':
-                                RecipeController::setRecipe($path_elements[2]);
-                                break;
-                            case 'DELETE':
-                                RecipeController::delRecipe($path_elements[2]);
-                                break;
-                            default:
-                                throw new ErrorException("This endpoint does not exist.");
-                        }
-                    } else {
-                        if()
-                    }
-                } */
-
+                    break;
+                }
+                http_response_code(400);
+                header("Content-Type: application/json");
+                echo json_encode(["error" => "Bad request"]);
+                break;
+            case "DELETE":
+                // case delete
+                if (
+                    filter_var($path[0], FILTER_VALIDATE_INT) !== false &&
+                    count($path) === 1
+                ) {
+                    $this->delete(intval($path[0]));
+                    break;
+                }
+                http_response_code(400);
+                header("Content-Type: application/json");
+                echo json_encode(["error" => "Bad request"]);
+                break;
+            default:
+                http_response_code(405);
+                header("Content-Type: application/json");
+                echo json_encode(["error" => "Invalid method"]);
+                break;
+        }
+    }
 }

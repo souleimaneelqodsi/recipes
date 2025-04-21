@@ -1,45 +1,52 @@
 <?php
 
 spl_autoload_register(function ($class) {
-    //TODO: doesn't work, fix needed
-    $lowerClass = strtolower($class);
-    if (str_contains($class, 'Controller')) {
-        require_once 'controllers/' . substr($lowerClass, 0, strpos($lowerClass, "controller")) . "_controller.php";
-        return;
+    error_log("Attempting to autoload: " . $class);
+
+    $classFile = null;
+
+    if (str_ends_with($class, "Controller")) {
+        $baseName = strtolower(substr($class, 0, -10));
+        $classFile = __DIR__ . "/controllers/" . $baseName . "_controller.php";
+    } elseif (str_ends_with($class, "Schema")) {
+        $baseName = strtolower(substr($class, 0, -6));
+        $classFile = __DIR__ . "/models/" . $baseName . "_schema.php";
+    } else {
+        $map = [
+            "JSONHandler" => __DIR__ . "/utils/json_handler.php",
+            "Session" => __DIR__ . "/utils/session.php",
+            "Validator" => __DIR__ . "/utils/validator.php",
+            "Router" => __DIR__ . "/router.php",
+        ];
+
+        if (isset($map[$class])) {
+            $classFile = $map[$class];
+        }
     }
-    if (str_contains($lowerClass, 'schema')) {
-        require_once 'models/' . substr($lowerClass, 0, strpos($lowerClass, "schema")) . "_schema.php";
-        return;
-    }
-    switch ($class) {
-        case "JsonHandler":
-            require_once "utils/json_handler.php";
-            break;
-        case "Session":
-            require_once "utils/session.php";
-            break;
-        case "Validator":
-            require_once "utils/validator.php";
-            break;
-        case "Route":
-            require_once "route.php";
-            break;
-        case "Router":
-            require_once "router.php";
-            break;
+
+    if ($classFile !== null && file_exists($classFile)) {
+        require_once $classFile;
+    } else {
+        error_log(
+            "Could not load file for class: " .
+                $class .
+                " (looked for: " .
+                $classFile .
+                ")"
+        );
     }
 });
 
+define("API_BASE_PATH", dirname($_SERVER["SCRIPT_NAME"]));
+
 Session::start();
 
-if (getenv('APP_ENV') !== 'production') {
+if (getenv("APP_ENV") !== "production") {
     error_reporting(E_ALL);
-    ini_set('display_errors', 1);
+    ini_set("display_errors", 1);
 } else {
     error_reporting(0);
-    ini_set('display_errors', 0);
+    ini_set("display_errors", 0);
 }
 
-
-$router = new Router();
-
+Router::dispatch();
