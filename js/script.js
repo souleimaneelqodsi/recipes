@@ -247,3 +247,122 @@ function chargerRecettes() {
       });
   }
   
+
+  //connexion
+
+  document.getElementById("connexion").addEventListener("submit", async function (e) {
+    e.preventDefault(); 
+  
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+  
+    try {
+      const response = await fetch("api/auth/login", { 
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          email: email,
+          password: password
+        })
+      });
+  
+      if (!response.ok) {
+        throw new Error("Email ou mot de passe incorrect");
+      }
+  
+      const data = await response.json();
+  
+      // Stocker le token + infos user
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+  
+      document.getElementById("message").textContent = "Connexion réussie !";
+      window.location.href = "index.html"; 
+    } catch (error) {
+      document.getElementById("message").textContent = error.message;
+    }
+  });
+
+
+  //inscription
+  
+  const registerForm = document.getElementById("inscription");
+ registerForm.addEventListener("submit", async function (e) {
+  e.preventDefault();
+  const username = document.getElementById("username").value;
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  const confirm_password = document.getElementById("confirm_password").value;
+
+  const role = "Cuisinier"; // Rôle par défaut
+
+  if (password !== confirm_password) {
+    document.getElementById("message").textContent = "❌ Les mots de passe ne correspondent pas.";
+    return;
+  }
+
+  try {
+    const response = await fetch("api/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        username,
+        email,
+        password,
+        confirm_password,
+        role
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "❌ Une erreur est survenue.");
+    }
+
+    const data = await response.json();
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("user", JSON.stringify(data.user));
+
+    window.location.href = "index.html"; // Redirection après inscription
+  } catch (error) {
+    document.getElementById("message").textContent = error.message;
+  }
+});
+
+
+
+//deconnexion
+
+document.getElementById("logoutButton").addEventListener("click", async function () {
+    try {
+      const response = await fetch("api/auth/logout", {
+        method: "POST", 
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("token")}` 
+        }
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+  
+        document.getElementById("message").textContent = "Déconnexion réussie ! Vous allez être redirigé vers la page d'acceuil.";
+  
+        setTimeout(function () {
+          window.location.href = "index.html";
+        }, 2000); 
+      } else {
+        document.getElementById("message").textContent = `❌ Erreur : ${data.message}`;
+      }
+    } catch (error) {
+      document.getElementById("message").textContent = "❌ Une erreur est survenue pendant la déconnexion.";
+    }
+  });
+  
