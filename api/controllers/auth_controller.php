@@ -19,7 +19,7 @@
             echo json_encode(["error" => "Invalid request"]);
             return;
         }
-        if ($method == "POST") {
+        if ($method === "POST") {
             if (count($path) == 1) {
                 switch ($path[0]) {
                     case "register":
