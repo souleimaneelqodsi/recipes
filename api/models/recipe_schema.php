@@ -18,9 +18,9 @@ class RecipeSchema
     public array $photos = [];
     public $total_time = 0;
 
-    private $json_handler;
+    private JSONHandler $json_handler;
 
-    public function __construct($json_handler)
+    public function __construct(JSONHandler $json_handler)
     {
         $this->json_handler = $json_handler;
     }
