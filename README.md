@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-orange.svg)](https://opensource.org/licenses/MIT)
 
 
-![Tech Stack](https://skillicons.dev/icons?i=html,css,js,jquery,php)
+![Tech Stack](https://skillicons.dev/icons?i=html,css,js,php)
 
 
 ## Overview
