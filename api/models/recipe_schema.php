@@ -8,8 +8,10 @@ class RecipeSchema
     public $author = null;
     public array $without = [];
     public array $ingredients = [];
+    public array $ingredientsFR = [];
     public array $steps = [];
     public array $stepsFR = [];
+    public array $timers = [];
     public $imageURL;
     public $originalURL;
     public $likes = 0;
