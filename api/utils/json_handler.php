@@ -59,7 +59,7 @@ class JSONHandler
         }
         try {
             if (flock($fp, LOCK_EX)) {
-                //atomic writing system: we write to a temporary file, and only copy its contents when we're sure the writing was successfully completed
+                //atomic writing system: we write to a temporary file, and only we rename it to the intended file name when we're sure the writing was successfully completed
                 $tempFile = $filePath . ".tmp";
                 file_put_contents(
                     $tempFile,
