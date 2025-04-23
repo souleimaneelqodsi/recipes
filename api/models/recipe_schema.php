@@ -184,7 +184,7 @@ class RecipeSchema
             }
         }
         arsort($final_scores);
-        return $final_scores;
+        return array_keys($final_scores);
     }
 
     /**
