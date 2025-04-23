@@ -14,6 +14,7 @@ spl_autoload_register(function ($class) {
     } else {
         $map = [
             "JSONHandler" => __DIR__ . "/utils/json_handler.php",
+            "Utils" => __DIR__ . "/utils/utils.php",
             "Session" => __DIR__ . "/utils/session.php",
             "Validator" => __DIR__ . "/utils/validator.php",
             "Router" => __DIR__ . "/router.php",

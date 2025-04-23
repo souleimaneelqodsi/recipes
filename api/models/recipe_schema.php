@@ -2,31 +2,46 @@
 
 class RecipeSchema
 {
-    //local model
-    public $id = null;
-    public $name = null;
-    public $nameFR = null;
-    public $author = null;
-    public array $without = [];
-    public array $ingredients = [];
-    public array $ingredientsFR = [];
-    public array $steps = [];
-    public array $stepsFR = [];
-    public array $timers = [];
-    public $imageURL = null;
-    public $originalURL = null;
-    public $likes = 0;
-    public $status = "draft";
-    public array $comments = [];
-    public array $photos = [];
-    public $total_time = 0;
-
     private JSONHandler $json_handler;
     private const DATA_FILE = "recipes.json";
 
     public function __construct(JSONHandler $json_handler)
     {
         $this->json_handler = $json_handler;
+    }
+
+    /**
+     * @return array     */
+    public function getAll(): array
+    {
+        try {
+            $recipes = $this->json_handler->readData(self::DATA_FILE);
+            return $recipes;
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            throw $e;
+        }
+    }
+
+    /**
+     * @return array     */
+    public function getById(string $recipe_id): array
+    {
+        try {
+            $recipes = $this->getAll();
+            $recipe_index = array_search(
+                $recipe_id,
+                array_column($recipes, "id")
+            );
+            if ($recipe_index !== false) {
+                return $recipes[$recipe_index];
+            }
+            print "Recipe not found";
+            return [];
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            throw $e;
+        }
     }
 
     /**
@@ -38,7 +53,7 @@ class RecipeSchema
         //term frequency : occurrences/
         try {
             $search_term = strtolower($search_term);
-            $recipes = $this->json_handler->readData(self::DATA_FILE);
+            $recipes = $this->getAll();
             //DF
             $document_frequency = 0;
             //TF-IDF
@@ -173,20 +188,6 @@ class RecipeSchema
     }
 
     /**
-     * @return array     */
-    public function getById(string $recipe_id): array
-    {
-        try {
-            $recipes = $this->json_handler->readData(self::DATA_FILE);
-            $recipe = $recipes[$recipe_id];
-            return $recipe;
-        } catch (Exception $e) {
-            error_log($e->getMessage());
-            throw $e;
-        }
-    }
-
-    /**
      * @return array     * @param array<int,mixed> $without
      * @param array<int,mixed> $ingredients
      * @param array<int,mixed> $steps
@@ -206,21 +207,12 @@ class RecipeSchema
             !is_array($recipeData["steps"]) ||
             !isset($recipeData["timers"]) ||
             !isset($recipeData["imageURL"]) ||
-            !isset($recipeData["total_time"]) ||
-            !isset($recipeData["description"])
+            !isset($recipeData["total_time"])
         ) {
             throw new Exception("Invalid recipe data");
         }
         $recipe = [
-            //uuid expression ai-generated (had no idea how to do it in php)
-            "id" => sprintf(
-                "%s-%s-%s-%s-%s",
-                bin2hex(random_bytes(4)),
-                bin2hex(random_bytes(2)),
-                bin2hex(chr((ord(random_bytes(1)) & 0x0f) | 0x40)), // v4
-                bin2hex(chr((ord(random_bytes(1)) & 0x3f) | 0x80)), // DCE variant
-                bin2hex(random_bytes(6))
-            ),
+            "id" => Utils::uuid4(),
             "name" => "",
             "nameFR" => "",
             "Author" => $recipeData["user_id"],
@@ -273,7 +265,7 @@ class RecipeSchema
         }
         if (Validator::validateRecipe($recipe)) {
             try {
-                $all_recipes = $this->json_handler->readData(self::DATA_FILE);
+                $all_recipes = $this->getAll();
                 array_push($all_recipes, $recipe);
                 $this->json_handler->writeData(self::DATA_FILE, $all_recipes);
             } catch (Exception $e) {
@@ -291,32 +283,278 @@ class RecipeSchema
 
     /**
      * @return array     */
-    public function update(string $recipe_id): array
+    public function update(string $recipe_id, array $updateData): array
     {
-        return [];
+        try {
+            // $recipe = $this->getById($recipe_id);
+            // if ($recipe === []) {
+            //     throw new Exception("Recipe not found");
+            // }
+            // here, I'm not using getById() because I need to have an array with all the recipes
+            if (
+                !isset($updateData) ||
+                !is_array($updateData) ||
+                empty($updateData) ||
+                // array_key_exists("id", $updateData) ||
+                // array_key_exists("Author", $updateData) ||
+                // array_key_exists("originalURL", $updateData) ||
+                // array_key_exists("created_at", $updateData) ||
+                array_diff(
+                    array_keys($updateData),
+                    //allowed:
+                    [
+                        "name",
+                        "nameFR",
+                        "Without",
+                        "ingredients",
+                        "ingredientsFR",
+                        "steps",
+                        "stepsFR",
+                        "timers",
+                        "imageURL",
+                        "status",
+                        "comments",
+                        "photos",
+                        "total_time",
+                    ]
+                ) !== []
+            ) {
+                throw new Exception(
+                    "Invalid updated recipe data: contains either inexistent or forbidden attributes"
+                );
+            }
+            $allRecipes = $this->getAll();
+            $final_recipe = [];
+            for ($i = 0; $i < count($allRecipes); $i++) {
+                if ($allRecipes[$i]["id"] == $recipe_id) {
+                    $final_recipe = $allRecipes[$i];
+                    foreach ($updateData as $key => $value) {
+                        //final check, you never know...
+                        if (!in_array($key, array_keys($final_recipe), true)) {
+                            throw new Exception(
+                                "Invalid updated recipe data: contains either inexistent or forbidden attributes"
+                            );
+                        }
+                        $final_recipe[$key] = $value;
+                    }
+                    if (!Validator::validateRecipe($final_recipe)) {
+                        throw new Exception("Invalid updated recipe data");
+                    }
+                    $allRecipes[$i] = $final_recipe;
+                    $this->json_handler->writeData(
+                        self::DATA_FILE,
+                        $allRecipes
+                    );
+                }
+            }
+
+            if (empty($final_recipe)) {
+                throw new Exception("Recipe not found");
+            }
+            return $final_recipe;
+        } catch (Exception $e) {
+            error_log("Error updating recipe data: " . $e->getMessage());
+            throw new Exception(
+                "Error updating recipe data: " . $e->getMessage()
+            );
+        }
     }
     /**
-     * @return array     */
+     * @return void     */
     public function delete(string $recipe_id): array
     {
-        return [];
+        try {
+            $all_recipes = $this->getAll();
+
+            $recipe_index = array_search(
+                $recipe_id,
+                array_column($all_recipes, "id")
+            );
+            if ($recipe_index !== false) {
+                unset($all_recipes[$recipe_index]);
+                //reindexing
+                $all_recipes = array_values($all_recipes);
+                $this->json_handler->writeData(self::DATA_FILE, $all_recipes);
+                return $all_recipes[$recipe_index];
+            } else {
+                throw new Exception("error deleting recipe:Recipe not found");
+            }
+        } catch (Exception $e) {
+            error_log("Error deleting recipe data: " . $e->getMessage());
+            throw new Exception(
+                "Error deleting recipe data: " . $e->getMessage()
+            );
+        }
     }
+    // /**
+    //  * @return void     */
+    // public function like(string $recipe_id): void
+    // {
+    //     try {
+    //         $this->update($recipe_id, [
+    //             "likes" => $this->getById($recipe_id)["likes"] + 1,
+    //         ]);
+    //     } catch (Exception $e) {
+    //         error_log("Error updating recipe data: " . $e->getMessage());
+    //         throw new Exception(
+    //             "Error updating recipe data: " . $e->getMessage()
+    //         );
+    //     }
+    // }
+    //it was possible to compose update and getById but it's not efficient
+
     /**
-     * @return array     */
+     * @return void // Ou peut-être retourner le nouveau nombre de likes ?
+     */
     public function like(string $recipe_id): array
     {
-        return [];
+        try {
+            $all_recipes = $this->getAll();
+            $recipe_index = array_search(
+                $recipe_id,
+                array_column($all_recipes, "id")
+            );
+            if ($recipe_index !== false) {
+                $current_likes = $all_recipes[$recipe_index]["likes"];
+                $all_recipes[$recipe_index]["likes"] = $current_likes + 1;
+                $this->json_handler->writeData(self::DATA_FILE, $all_recipes);
+                return $all_recipes[$recipe_index];
+            } else {
+                throw new Exception("Recipe not found for liking");
+            }
+        } catch (Exception $e) {
+            error_log("Error liking recipe: " . $e->getMessage());
+            throw new Exception("Error liking recipe: " . $e->getMessage());
+        }
     }
     /**
      * @return array     */
-    public function translate(string $recipe_id): array
+    public function translate(string $recipe_id, array $translation): array
     {
-        return [];
+        try {
+            $all_recipes = $this->getAll();
+            $recipe_index = array_search(
+                $recipe_id,
+                array_column($all_recipes, "id")
+            );
+            if ($recipe_index !== false) {
+                if (
+                    // array_keys($translation) !== [
+                    //     "name",
+                    //     "ingredients",
+                    //     "steps",
+                    // ]
+                    //could've tested like this but it's strict on the order of the keys...
+                    array_diff(array_keys($translation), [
+                        "name",
+                        "ingredients",
+                        "steps",
+                    ]) === []
+                ) {
+                    throw new Exception(
+                        "Invalid translation data: missing or invalid keys"
+                    );
+                }
+                $recipe = $all_recipes[$recipe_index];
+                //the code might seem permissive/simplist at first sight but we consider the json structure to have never been manipulated externally to the API (other than by the API itself with its Validator), so there are preexisting guarantees we can rely on...
+                $fr = !empty($recipe["nameFR"]);
+                if (!empty($recipe["name"]) && $fr) {
+                    throw new Exception("Recipe already translated");
+                }
+                if ($fr) {
+                    if (
+                        count($recipe["ingredientsFR"]) !==
+                            count($translation["ingredients"]) ||
+                        count($recipe["stepsFR"]) !==
+                            count($translation["steps"])
+                    ) {
+                        error_log(
+                            "Non-respect de l'exigence fonctionnelle du sujet du projet: le nombre d'ingrédients et d'étapes doit être le même dans les 2 langues"
+                        );
+                        throw new Exception(
+                            "Invalid translation: ingredient or step count mismatch"
+                        );
+                    }
+                    $recipe["name"] = $translation["name"];
+                    $recipe["ingredients"] = $translation["ingredients"];
+                    $recipe["steps"] = $translation["steps"];
+                } else {
+                    if (
+                        count($recipe["ingredients"]) !==
+                            count($translation["ingredients"]) ||
+                        count($recipe["steps"]) !== count($translation["steps"])
+                    ) {
+                        error_log(
+                            "Non-respect de l'exigence fonctionnelle du sujet du projet: le nombre d'ingrédients et d'étapes doit être le même dans les 2 langues"
+                        );
+                        throw new Exception(
+                            "Invalid translation: ingredient or step count mismatch"
+                        );
+                    }
+                    $recipe["nameFR"] = $translation["name"];
+                    $recipe["ingredientsFR"] = $translation["ingredients"];
+                    $recipe["stepsFR"] = $translation["steps"];
+                }
+                if (!Validator::validateRecipe($recipe)) {
+                    throw new Exception(
+                        "Translation error: Final recipe has invalid data"
+                    );
+                }
+                $all_recipes[$recipe_index] = $recipe;
+                $this->json_handler->writeData(self::DATA_FILE, $all_recipes);
+                return $recipe;
+            } else {
+                throw new Exception("Recipe not found for translation");
+            }
+        } catch (Exception $e) {
+            error_log("Error translating recipe: " . $e->getMessage());
+            throw new Exception(
+                "Error translating recipe: " . $e->getMessage()
+            );
+        }
     }
     /**
      * @return array     */
-    public function setPhoto(string $recipe_id): array
+    public function setPhoto(string $recipe_id, string $photo_id): array
     {
-        return [];
+        try {
+            if (empty($photo_id)) {
+                throw new Exception("Photo ID is empty");
+            }
+            $all_recipes = $this->getAll();
+            $recipe_index = array_search(
+                $recipe_id,
+                array_column($all_recipes, "id")
+            );
+            if ($recipe_index === false) {
+                throw new Exception("Recipe not found");
+            }
+            $recipe = $all_recipes[$recipe_index];
+            $photo_index = array_search(
+                $photo_id,
+                array_column($recipe["photos"], "id")
+            );
+            if ($photo_index === false) {
+                throw new Exception("Photo not found");
+            }
+            $photo = $recipe["photos"][$photo_index];
+            if ($recipe["imageURL"] === $photo["url"]) {
+                throw new Exception("Photo already set as main recipe image");
+            }
+            $recipe["imageURL"] = $photo["url"];
+            if (!Validator::validateRecipe($recipe)) {
+                throw new Exception(
+                    "Error after setting photo for recipe: result is not valid"
+                );
+            }
+            $all_recipes[$recipe_index] = $recipe;
+            $this->json_handler->writeData(self::DATA_FILE, $all_recipes);
+            return $recipe;
+        } catch (Exception $e) {
+            error_log("Error setting photo for recipe: " . $e->getMessage());
+            throw new Exception(
+                "Error setting photo for recipe: " . $e->getMessage()
+            );
+        }
     }
 }
