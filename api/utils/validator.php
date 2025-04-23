@@ -86,14 +86,21 @@ class Validator
      * @param mixed $ingredients
      * @return bool
      * @param array<int,mixed> $steps
+     * @param string $name
      */
-    public static function validateIngredients($ingredients, array $steps): bool
-    {
-        if (!isset($ingredients)) {
+    public static function validateLanguage(
+        $ingredients,
+        array $steps,
+        string $name
+    ): bool {
+        //to check that if the ingredients exist in in a language, the steps and the name also exist in the same language (e.g. can't have ingredients in French only and steps or name in English only)
+        if (!isset($steps) || !is_array($steps) || empty($steps)) {
             return false;
         }
-        //to check that if the ingredients exist in in a language, the steps also exist in the same language (e.g. can't have ingredients in French only and steps in English only)
-        if (!isset($steps) || !is_array($steps)) {
+        if (!isset($name) || empty($name) || !is_string($name)) {
+            return false;
+        }
+        if (!isset($ingredients)) {
             return false;
         }
         $is_valid = is_array($ingredients);
@@ -159,15 +166,15 @@ class Validator
     public static function validateRecipe($recipe): bool
     {
         return isset($recipe["id"]) &&
-            isset($recipe["title"]) &&
-            isset($recipe["description"]) &&
-            (self::validateIngredients(
+            (self::validateLanguage(
                 $recipe["ingredients"],
-                $recipe["steps"]
+                $recipe["steps"],
+                $recipe["name"]
             ) ||
-                self::validateIngredients(
+                self::validateLanguage(
                     $recipe["ingredientsFR"],
-                    $recipe["stepFR"]
+                    $recipe["stepFR"],
+                    $recipe["nameFR"]
                 )) &&
             isset($recipe["likes"]) &&
             isset($recipe["status"]) &&
@@ -187,9 +194,9 @@ class Validator
             isset($recipe["imageURL"]) &&
             isset($recipe["originalURL"]) &&
             isset($recipe["comments"]) &&
-            self::validateIngredients($recipe["photos"]) &&
             self::validateComments($recipe["comments"]) &&
-            isset($recipe["total_time"]);
+            isset($recipe["total_time"]) &&
+            isset($recipe["created_at"]);
     }
 
     /**

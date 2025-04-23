@@ -185,39 +185,138 @@ class RecipeSchema
             throw $e;
         }
     }
+
+    /**
+     * @return array     * @param array<int,mixed> $without
+     * @param array<int,mixed> $ingredients
+     * @param array<int,mixed> $steps
+     * @param array<int,mixed> $timers
+     */
+    public function create(array $recipeData): array
+    {
+        if (
+            !isset($recipeData["fr"]) ||
+            !isset($recipeData["user_id"]) ||
+            !isset($recipeData["name"]) ||
+            !isset($recipeData["without"]) ||
+            !is_array($recipeData["without"]) ||
+            !isset($recipeData["ingredients"]) ||
+            !is_array($recipeData["ingredients"]) ||
+            !isset($recipeData["steps"]) ||
+            !is_array($recipeData["steps"]) ||
+            !isset($recipeData["timers"]) ||
+            !isset($recipeData["imageURL"]) ||
+            !isset($recipeData["total_time"]) ||
+            !isset($recipeData["description"])
+        ) {
+            throw new Exception("Invalid recipe data");
+        }
+        $recipe = [
+            //uuid expression ai-generated (had no idea how to do it in php)
+            "id" => sprintf(
+                "%s-%s-%s-%s-%s",
+                bin2hex(random_bytes(4)),
+                bin2hex(random_bytes(2)),
+                bin2hex(chr((ord(random_bytes(1)) & 0x0f) | 0x40)), // v4
+                bin2hex(chr((ord(random_bytes(1)) & 0x3f) | 0x80)), // DCE variant
+                bin2hex(random_bytes(6))
+            ),
+            "name" => "",
+            "nameFR" => "",
+            "Author" => $recipeData["user_id"],
+            "Without" => $recipeData["without"],
+            "ingredients" => [],
+            "ingredientsFR" => [],
+            "steps" => [],
+            "stepsFR" => [],
+            "timers" => [],
+            "imageURL" => $recipeData["imageURL"],
+            //transforming the name of the recipe into a dash-separated slug before passing it to the URL
+            //the code to convert to slug is AI-generated! -> regex (and php) skill issues...
+            "originalURL" =>
+                "recipes/" .
+                trim(
+                    preg_replace(
+                        "/-+/",
+                        "-",
+                        preg_replace(
+                            "/[^a-z0-9-]+/",
+                            "-",
+                            strtolower(
+                                iconv(
+                                    "UTF-8",
+                                    "ASCII//TRANSLIT//IGNORE",
+                                    $recipeData["fr"]
+                                        ? $recipeData["nameFR"]
+                                        : $recipeData["name"]
+                                ) ?? ""
+                            )
+                        )
+                    ),
+                    "-"
+                ),
+            "likes" => 0,
+            "status" => "draft",
+            "comments" => [],
+            "photos" => [],
+            "total_time" => $recipeData["total_time"],
+            "created_at" => time(),
+        ];
+        if ($recipeData["fr"]) {
+            $recipe["nameFR"] = $recipeData["name"];
+            $recipe["stepsFR"] = $recipeData["steps"];
+            $recipe["ingredientsFR"] = $recipeData["ingredients"];
+        } else {
+            $recipe["name"] = $recipeData["name"];
+            $recipe["steps"] = $recipeData["steps"];
+            $recipe["ingredients"] = $recipeData["ingredients"];
+        }
+        if (Validator::validateRecipe($recipe)) {
+            try {
+                $all_recipes = $this->json_handler->readData(self::DATA_FILE);
+                array_push($all_recipes, $recipe);
+                $this->json_handler->writeData(self::DATA_FILE, $all_recipes);
+            } catch (Exception $e) {
+                error_log("Error writing recipe data: " . $e->getMessage());
+                throw new Exception(
+                    "Error writing recipe data: " . $e->getMessage()
+                );
+            }
+            return $recipe;
+        } else {
+            error_log("Invalid recipe data");
+            throw new Exception("Invalid recipe data");
+        }
+    }
+
     /**
      * @return array     */
-    public function create(): array
+    public function update(string $recipe_id): array
     {
-        $recipe_id = uniqid();
-        $recipe = [
-            "id" => $recipe_id,
-            "title" => "",
-            "description" => "",
-            "ingredients" => [],
-            "instructions" => [],
-            "tags" => [],
-            "likes" => 0,
-            "views" => 0,
-            "created_at" => time(),
-            "updated_at" => time(),
-        ];
-        $this->json_handler->writeData(self::DATA_FILE, $recipe);
-        return $recipe;
+        return [];
     }
     /**
      * @return array     */
-    public function update(string $recipe_id): array {}
+    public function delete(string $recipe_id): array
+    {
+        return [];
+    }
     /**
      * @return array     */
-    public function delete(string $recipe_id): array {}
+    public function like(string $recipe_id): array
+    {
+        return [];
+    }
     /**
      * @return array     */
-    public function like(string $recipe_id): array {}
+    public function translate(string $recipe_id): array
+    {
+        return [];
+    }
     /**
      * @return array     */
-    public function translate(string $recipe_id): array {}
-    /**
-     * @return array     */
-    public function setPhoto(string $recipe_id): array {}
+    public function setPhoto(string $recipe_id): array
+    {
+        return [];
+    }
 }
