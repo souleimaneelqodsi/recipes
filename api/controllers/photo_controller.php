@@ -1,4 +1,4 @@
-<?php class PhotoController implements Controller
+<?php class PhotoController implements BaseController
 {
     private PhotoSchema $photo_schema;
 
@@ -23,7 +23,7 @@
             echo json_encode(["error" => "Method not allowed"]);
             return;
         }
-        if (count($path) != 2) {
+        if (count((array)$path) != 2) {
             http_response_code(400);
             header("Content-Type: application/json");
             echo json_encode(["error" => "Invalid request"]);

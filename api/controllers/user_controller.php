@@ -1,4 +1,4 @@
-<?php class UserController implements Controller
+<?php class UserController implements BaseController
 {
     private UserSchema $user_schema;
 
@@ -26,7 +26,7 @@
             if (empty($path)) {
                 $this->getAll();
             } else {
-                if (count($path) == 1 && $path[0] !== "") {
+                if (count((array)$path) == 1 && $path[0] !== "") {
                     $this->getById($path[0]);
                 } else {
                     http_response_code(400);
@@ -45,11 +45,11 @@
                 return;
             }
         } elseif ($method === "PUT") {
-            if (count($path) == 1 && $path[0] !== "") {
+            if (count((array)$path) == 1 && $path[0] !== "") {
                 $this->update($path[0]);
                 return;
             }
-            if ($path[0] !== "" && count($path) == 2 && $path[1] === "role") {
+            if ($path[0] !== "" && count((array)$path) == 2 && $path[1] === "role") {
                 $this->updateRole($path[0]);
                 return;
             }

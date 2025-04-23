@@ -1,4 +1,4 @@
-<?php interface Controller
+<?php interface BaseController
 {
     /**
      * Dispatches a request to the appropriate controller

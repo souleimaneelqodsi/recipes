@@ -1,4 +1,4 @@
-<?php class CommentController implements Controller
+<?php class CommentController implements BaseController
 {
     private $comment_schema;
 
