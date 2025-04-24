@@ -173,7 +173,7 @@ class Validator
             ) ||
                 self::validateLanguage(
                     $recipe["ingredientsFR"],
-                    $recipe["stepFR"],
+                    $recipe["stepsFR"],
                     $recipe["nameFR"]
                 )) &&
             isset($recipe["likes"]) &&

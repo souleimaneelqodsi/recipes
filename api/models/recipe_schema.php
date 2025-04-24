@@ -46,6 +46,73 @@ class RecipeSchema
 
     /**
      * @return array     */
+    private function getStopWords(): array
+    {
+        $stop_words = [];
+        try {
+            $stop_words_eng = $this->json_handler->readData(
+                "stop_words_english.json"
+            );
+            $stop_words_fr = $this->json_handler->readData(
+                "stop_words_french.json"
+            );
+            $stop_words = array_merge($stop_words_eng, $stop_words_fr);
+            error_log("Could load stop word");
+        } catch (Exception $e) {
+            error_log("Couldn't load stop words : " . $e->getMessage());
+            $stop_words = [
+                //fr
+                "et",
+                "de",
+                "la",
+                "le",
+                "les",
+                "un",
+                "une",
+                "des",
+                "au",
+                "aux",
+                "à",
+                "vers",
+                "a",
+                "en",
+                "avec",
+                "pour",
+                "avant",
+                "dessous",
+                "dessus",
+                "après",
+                "mais",
+                "pendant",
+                "sur",
+                "dans",
+                "ou",
+                "tout",
+                "tous",
+                //en
+                "and",
+                "or",
+                "of",
+                "the",
+                "for",
+                "with",
+                "to",
+                "but",
+                "on",
+                "onto",
+                "in",
+                "using",
+                "all",
+                "about",
+                "at",
+                "before",
+                "after",
+            ];
+        }
+        return $stop_words;
+    }
+    /**
+     * @return array     */
     private function search_term(string $search_term): array
     {
         //define a score of correspondence
@@ -69,8 +136,6 @@ class RecipeSchema
                     strtolower($recipe["name"]) .
                     " " .
                     strtolower($recipe["nameFR"]) .
-                    " " .
-                    strtolower($recipe["Author"]) .
                     " ";
                 $ingredients_set = isset($recipe["ingredients"]);
                 $ingredientsFR_set = isset($recipe["ingredientsFR"]);
@@ -99,37 +164,69 @@ class RecipeSchema
                     -1,
                     PREG_SPLIT_NO_EMPTY
                 );
+                //remove irrelevant stop words for better efficiency
+                $stop_words = $this->getStopWords();
+                $search_tokens = array_filter(
+                    $search_tokens,
+                    fn($token) => !in_array(strtolower($token), $stop_words)
+                );
                 $word_count = count($search_tokens);
                 $words_occurrences = array_count_values($search_tokens);
                 //how many times the word appears exactly
+                // how many times the word appears exactly
                 $word_frequency = $words_occurrences[$search_term] ?? 0;
+
                 //now we have to do a traversal of the array to make a fuzzy search with each word of the array
                 foreach ($search_tokens as $token) {
-                    //of the many options available to make up the threshold, i chose log base e, it increases slowly and when rounded starts approximatly at one, which is reasonable
-                    $threshold = round(log(strlen($token)));
-                    //levenshtein was a better choice than similar_text given that we do a lot of comparisons, it has a better complexity despite lower accuracy
-                    //its the min distance between the two strings i.e. the min edits required to make the two strings equal
-                    if (levenshtein($search_term, $token) <= $threshold) {
+                    if (strlen($token) < 3) {
+                        continue;
+                    }
+                    //PREG_SPLIT_NO_EMPTY used in preg_split before guarantees no token is empty so strlen(token) > 0, safe for log here
+                    $log_threshold = round(log(strlen($token)));
+                    //bonus of 1 if rounded log of the token  is greater or equal to 1, in order to be less strict and improve the relevance of the results
+                    $threshold = $log_threshold >= 1 ? $log_threshold + 1 : 1;
+                    // Ensure we don't cause warnings with strings > 255 chars
+                    if (strlen($token) > 255 || strlen($search_term) > 255) {
+                        if (stripos($token, $search_term) !== false) {
+                            $word_frequency++;
+                        }
+                        continue;
+                    }
+                    $distance = levenshtein($search_term, $token);
+
+                    if ($distance <= $threshold) {
                         $word_frequency++;
                     }
                 }
+
                 $term_frequency =
                     $word_count > 0 ? $word_frequency / $word_count : 0;
+
                 $score_by_document[$recipe["id"]] = $term_frequency;
                 //DF (if the score is greater than 0, the element exists in this non-empty document/recipe)
                 if ($term_frequency > 0) {
                     $document_frequency++;
                 }
             }
+
             //IDF
+
             $inverse_document_frequency = log(
                 count($recipes) / (1 + $document_frequency)
             );
+            $inverse_document_frequency =
+                count($recipes) > $document_frequency + 1 &&
+                $document_frequency > 0
+                    ? $inverse_document_frequency
+                    : 1;
+            //IDF is gonna be equal to 0 if the number of recipes is equal to the number of documents in which the search term appears + 1, log(1) = 0
+            //I don't know how to fix this problem so I prefer that IDF doesn't make the whole result null, I treat this case by replacing it with 1 to cancel its effect
             //TF-IDF
             $score_by_document = array_map(
                 fn($tf_score): float => $tf_score * $inverse_document_frequency,
                 $score_by_document
             );
+
             //returning best search results...
             arsort($score_by_document);
             return $score_by_document;
@@ -151,37 +248,13 @@ class RecipeSchema
         $query = preg_split("/\s+/", $query, -1, PREG_SPLIT_NO_EMPTY);
         $query_scores = [];
         //words useless to search
-        $stop_words = [
-            //fr
-            "et",
-            "de",
-            "la",
-            "le",
-            "les",
-            "un",
-            "une",
-            "des",
-            "au",
-            "aux",
-            "à",
-            "a",
-            "avec",
-            "pour",
-            "sur",
-            //en
-            "and",
-            "or",
-            "of",
-            "the",
-            "the",
-            "with",
-            "to",
-            "on",
-        ];
+        $stop_words = $this->getStopWords();
+
         $query = array_filter(
             $query,
-            fn($term) => !in_array($term, $stop_words, true)
+            fn($term) => !in_array(strtolower($term), $stop_words)
         );
+
         foreach ($query as $term) {
             $query_scores[$term] = $this->search_term($term);
         }
