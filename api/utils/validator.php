@@ -195,6 +195,7 @@ class Validator
             isset($recipe["originalURL"]) &&
             isset($recipe["comments"]) &&
             self::validateComments($recipe["comments"]) &&
+            self::validatePhotos($recipe["photos"]) &&
             isset($recipe["total_time"]) &&
             isset($recipe["created_at"]);
     }
@@ -288,6 +289,8 @@ class Validator
             isset($user["username"]) &&
             self::validateEmail($user["email"]) &&
             self::validateUsername($user["username"]) &&
+            isset($user["likes"]) &&
+            is_array($user["likes"]) &&
             isset($user["role"]) &&
             in_array($user["role"], [
                 "Cuisinier",

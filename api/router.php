@@ -19,7 +19,8 @@ class Router
         $uri = str_replace(API_BASE_PATH, "", $requestPath);
         $clean_uri = trim($uri, "/");
         $path = explode("/", $clean_uri);
-        $json_handler = new JSONHandler(__DIR__ . "/data");
+        $path = array_slice($path, 2);
+        $json_handler = new JSONHandler(API_BASE_PATH . "/data");
         $sliced_path = array_slice($path, 1);
         switch ($path[0]) {
             case "recipes":
@@ -30,29 +31,50 @@ class Router
                             $comments_model
                         );
                         $comments_controller->dispatch($method, $sliced_path);
-                    } elseif ($path[2] === "photos") {
+                        break;
+                    } elseif ($path[2] === "photos" && $method === "POST") {
                         $photos_model = new PhotoSchema($json_handler);
                         $photos_controller = new PhotoController($photos_model);
                         $photos_controller->dispatch($method, $sliced_path);
-                    } else {
-                        Router::not_found();
-                    }
-                    break;
+                        break;
+                    } elseif ($path[2] === "photos" && $method === "PATCH") {
+                        $photos_model = new RecipeSchema($json_handler);
+                        $photos_controller = new RecipeController(
+                            $photos_model
+                        );
+                        $photos_controller->dispatch($method, $sliced_path);
+                        break;
+                    } //else {
+                    //     Router::not_found();
+                    // }
                 }
+                // $user_schema = new UserSchema(
+                //     $json_handler,
+                //     // $_SESSION["user_id"]
+                // );
                 $recipe_model = new RecipeSchema($json_handler);
-                $recipe_controller = new RecipeController($recipe_model);
+                $recipe_controller = new RecipeController(
+                    $recipe_model
+                    // $user_schema
+                );
                 $recipe_controller->dispatch($method, $sliced_path);
                 break;
             case "users":
-                $user_model = new UserSchema($json_handler);
-                $user_controller = new UserController($user_model);
-                $user_controller->dispatch($method, $sliced_path);
+                // $user_model = new UserSchema(
+                //     $json_handler,
+                //     $_SESSION["user_id"]
+                // );
+                // $user_controller = new UserController($user_model);
+                // $user_controller->dispatch($method, $sliced_path);
                 break;
             case "auth":
-                $user_model = new UserSchema($json_handler);
-                $auth_model = new AuthSchema($json_handler, $user_model);
-                $auth_controller = new AuthController($auth_model);
-                $auth_controller->dispatch($method, $sliced_path);
+                // $user_model = new UserSchema(
+                //     $json_handler,
+                //     $_SESSION["user_id"]
+                // );
+                // $auth_model = new AuthSchema($json_handler, $user_model);
+                // $auth_controller = new AuthController($auth_model);
+                // $auth_controller->dispatch($method, $sliced_path);
                 break;
             default:
                 Router::not_found();
