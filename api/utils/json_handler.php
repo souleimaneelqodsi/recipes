@@ -26,7 +26,7 @@ class JSONHandler
                 $json = json_decode(file_get_contents($filePath), true);
                 if (json_last_error() !== JSON_ERROR_NONE) {
                     throw new ErrorException(
-                        "JSON decode error: " . json_last_error_msg()
+                        json_last_error_msg() . " in file " . $filePath
                     );
                 }
                 flock($fp, LOCK_UN);

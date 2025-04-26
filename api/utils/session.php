@@ -62,23 +62,24 @@
         return isset($_SESSION["user_id"]);
     }
 
-    public static function getCurrentUser(): ?UserSchema
+    public static function getCurrentUser(): UserSchema
     {
         if (session_status() !== PHP_SESSION_ACTIVE) {
-            return null;
+            throw new Exception("Session is not active");
         }
-        $json_handler = new JSONHandler();
-        $user_schema = new UserSchema($json_handler);
+        $json_handler = new JSONHandler(API_BASE_PATH . "/data");
+        $user_schema = new UserSchema($json_handler, $_SESSION["user_id"]);
+        $user_schema->getById($_SESSION["user_id"]);
 
-        return $user_schema->getById($_SESSION["user_id"] ?? null);
+        return $user_schema;
     }
 
-    public static function getUserRole(): ?string
+    public static function getUserRole(): string
     {
         if (session_status() !== PHP_SESSION_ACTIVE) {
-            return null;
+            throw new Exception("Session is not active");
         }
         $user = self::getCurrentUser();
-        return $user ? $user->role : null;
+        return $user ? $user->role : "Guest";
     }
 }

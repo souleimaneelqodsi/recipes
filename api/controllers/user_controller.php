@@ -26,7 +26,7 @@
             if (empty($path)) {
                 $this->getAll();
             } else {
-                if (count((array)$path) == 1 && $path[0] !== "") {
+                if (count((array) $path) == 1 && $path[0] !== "") {
                     $this->getById($path[0]);
                 } else {
                     http_response_code(400);
@@ -45,11 +45,20 @@
                 return;
             }
         } elseif ($method === "PUT") {
-            if (count((array)$path) == 1 && $path[0] !== "") {
+            if (count((array) $path) == 1 && $path[0] !== "") {
                 $this->update($path[0]);
                 return;
             }
-            if ($path[0] !== "" && count((array)$path) == 2 && $path[1] === "role") {
+            http_response_code(400);
+            header("Content-Type: application/json");
+            echo json_encode(["error" => "Invalid request"]);
+            return;
+        } elseif ($method === "PATCH") {
+            if (
+                $path[0] !== "" &&
+                count((array) $path) == 2 &&
+                $path[1] === "role"
+            ) {
                 $this->updateRole($path[0]);
                 return;
             }

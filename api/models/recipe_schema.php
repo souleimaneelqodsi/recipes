@@ -46,6 +46,73 @@ class RecipeSchema
 
     /**
      * @return array     */
+    private function getStopWords(): array
+    {
+        $stop_words = [];
+        try {
+            $stop_words_eng = $this->json_handler->readData(
+                "stop_words_english.json"
+            );
+            $stop_words_fr = $this->json_handler->readData(
+                "stop_words_french.json"
+            );
+            $stop_words = array_merge($stop_words_eng, $stop_words_fr);
+            error_log("Could load stop word");
+        } catch (Exception $e) {
+            error_log("Couldn't load stop words : " . $e->getMessage());
+            $stop_words = [
+                //fr
+                "et",
+                "de",
+                "la",
+                "le",
+                "les",
+                "un",
+                "une",
+                "des",
+                "au",
+                "aux",
+                "à",
+                "vers",
+                "a",
+                "en",
+                "avec",
+                "pour",
+                "avant",
+                "dessous",
+                "dessus",
+                "après",
+                "mais",
+                "pendant",
+                "sur",
+                "dans",
+                "ou",
+                "tout",
+                "tous",
+                //en
+                "and",
+                "or",
+                "of",
+                "the",
+                "for",
+                "with",
+                "to",
+                "but",
+                "on",
+                "onto",
+                "in",
+                "using",
+                "all",
+                "about",
+                "at",
+                "before",
+                "after",
+            ];
+        }
+        return $stop_words;
+    }
+    /**
+     * @return array     */
     private function search_term(string $search_term): array
     {
         //define a score of correspondence
@@ -69,8 +136,6 @@ class RecipeSchema
                     strtolower($recipe["name"]) .
                     " " .
                     strtolower($recipe["nameFR"]) .
-                    " " .
-                    strtolower($recipe["Author"]) .
                     " ";
                 $ingredients_set = isset($recipe["ingredients"]);
                 $ingredientsFR_set = isset($recipe["ingredientsFR"]);
@@ -99,26 +164,69 @@ class RecipeSchema
                     -1,
                     PREG_SPLIT_NO_EMPTY
                 );
+                //remove irrelevant stop words for better efficiency
+                $stop_words = $this->getStopWords();
+                $search_tokens = array_filter(
+                    $search_tokens,
+                    fn($token) => !in_array(strtolower($token), $stop_words)
+                );
                 $word_count = count($search_tokens);
                 $words_occurrences = array_count_values($search_tokens);
+                //how many times the word appears exactly
+                // how many times the word appears exactly
                 $word_frequency = $words_occurrences[$search_term] ?? 0;
+
+                //now we have to do a traversal of the array to make a fuzzy search with each word of the array
+                foreach ($search_tokens as $token) {
+                    if (strlen($token) < 3) {
+                        continue;
+                    }
+                    //PREG_SPLIT_NO_EMPTY used in preg_split before guarantees no token is empty so strlen(token) > 0, safe for log here
+                    $log_threshold = round(log(strlen($token)));
+                    //bonus of 1 if rounded log of the token  is greater or equal to 1, in order to be less strict and improve the relevance of the results
+                    $threshold = $log_threshold >= 1 ? $log_threshold + 1 : 1;
+                    // Ensure we don't cause warnings with strings > 255 chars
+                    if (strlen($token) > 255 || strlen($search_term) > 255) {
+                        if (stripos($token, $search_term) !== false) {
+                            $word_frequency++;
+                        }
+                        continue;
+                    }
+                    $distance = levenshtein($search_term, $token);
+
+                    if ($distance <= $threshold) {
+                        $word_frequency++;
+                    }
+                }
+
                 $term_frequency =
                     $word_count > 0 ? $word_frequency / $word_count : 0;
+
                 $score_by_document[$recipe["id"]] = $term_frequency;
                 //DF (if the score is greater than 0, the element exists in this non-empty document/recipe)
                 if ($term_frequency > 0) {
                     $document_frequency++;
                 }
             }
+
             //IDF
+
             $inverse_document_frequency = log(
                 count($recipes) / (1 + $document_frequency)
             );
+            $inverse_document_frequency =
+                count($recipes) > $document_frequency + 1 &&
+                $document_frequency > 0
+                    ? $inverse_document_frequency
+                    : 1;
+            //IDF is gonna be equal to 0 if the number of recipes is equal to the number of documents in which the search term appears + 1, log(1) = 0
+            //I don't know how to fix this problem so I prefer that IDF doesn't make the whole result null, I treat this case by replacing it with 1 to cancel its effect
             //TF-IDF
             $score_by_document = array_map(
                 fn($tf_score): float => $tf_score * $inverse_document_frequency,
                 $score_by_document
             );
+
             //returning best search results...
             arsort($score_by_document);
             return $score_by_document;
@@ -128,7 +236,7 @@ class RecipeSchema
         }
     }
     /**
-     * @return void
+     * @return array
      */
     public function search(string $query): array
     {
@@ -140,37 +248,13 @@ class RecipeSchema
         $query = preg_split("/\s+/", $query, -1, PREG_SPLIT_NO_EMPTY);
         $query_scores = [];
         //words useless to search
-        $stop_words = [
-            //fr
-            "et",
-            "de",
-            "la",
-            "le",
-            "les",
-            "un",
-            "une",
-            "des",
-            "au",
-            "aux",
-            "à",
-            "a",
-            "avec",
-            "pour",
-            "sur",
-            //en
-            "and",
-            "or",
-            "of",
-            "the",
-            "the",
-            "with",
-            "to",
-            "on",
-        ];
+        $stop_words = $this->getStopWords();
+
         $query = array_filter(
             $query,
-            fn($term) => !in_array($term, $stop_words, true)
+            fn($term) => !in_array(strtolower($term), $stop_words)
         );
+
         foreach ($query as $term) {
             $query_scores[$term] = $this->search_term($term);
         }
@@ -192,6 +276,7 @@ class RecipeSchema
      * @param array<int,mixed> $ingredients
      * @param array<int,mixed> $steps
      * @param array<int,mixed> $timers
+     * @param array<int,mixed> $recipeData
      */
     public function create(array $recipeData): array
     {
@@ -282,7 +367,8 @@ class RecipeSchema
     }
 
     /**
-     * @return array     */
+     * @return array     * @param array<int,mixed> $updateData
+     */
     public function update(string $recipe_id, array $updateData): array
     {
         try {
@@ -312,16 +398,16 @@ class RecipeSchema
                         "stepsFR",
                         "timers",
                         "imageURL",
-                        "status",
                         "comments",
                         "photos",
                         "total_time",
                     ]
                 ) !== []
             ) {
-                throw new Exception(
+                error_log(
                     "Invalid updated recipe data: contains either inexistent or forbidden attributes"
                 );
+                return [];
             }
             $allRecipes = $this->getAll();
             $final_recipe = [];
@@ -331,9 +417,10 @@ class RecipeSchema
                     foreach ($updateData as $key => $value) {
                         //final check, you never know...
                         if (!in_array($key, array_keys($final_recipe), true)) {
-                            throw new Exception(
+                            error_log(
                                 "Invalid updated recipe data: contains either inexistent or forbidden attributes"
                             );
+                            return [];
                         }
                         $final_recipe[$key] = $value;
                     }
@@ -349,7 +436,8 @@ class RecipeSchema
             }
 
             if (empty($final_recipe)) {
-                throw new Exception("Recipe not found");
+                error_log("Recipe not found");
+                return [];
             }
             return $final_recipe;
         } catch (Exception $e) {
@@ -360,7 +448,7 @@ class RecipeSchema
         }
     }
     /**
-     * @return void     */
+     * @return array     */
     public function delete(string $recipe_id): array
     {
         try {
@@ -371,13 +459,15 @@ class RecipeSchema
                 array_column($all_recipes, "id")
             );
             if ($recipe_index !== false) {
+                $deleted_recipe = $all_recipes[$recipe_index];
                 unset($all_recipes[$recipe_index]);
                 //reindexing
                 $all_recipes = array_values($all_recipes);
                 $this->json_handler->writeData(self::DATA_FILE, $all_recipes);
-                return $all_recipes[$recipe_index];
+                return $deleted_recipe;
             } else {
-                throw new Exception("error deleting recipe:Recipe not found");
+                error_log("error deleting recipe:Recipe not found");
+                return [];
             }
         } catch (Exception $e) {
             error_log("Error deleting recipe data: " . $e->getMessage());
@@ -404,7 +494,7 @@ class RecipeSchema
     //it was possible to compose update and getById but it's not efficient
 
     /**
-     * @return void // Ou peut-être retourner le nouveau nombre de likes ?
+     * @return array
      */
     public function like(string $recipe_id): array
     {
@@ -420,7 +510,8 @@ class RecipeSchema
                 $this->json_handler->writeData(self::DATA_FILE, $all_recipes);
                 return $all_recipes[$recipe_index];
             } else {
-                throw new Exception("Recipe not found for liking");
+                error_log("Recipe not found for liking");
+                return [];
             }
         } catch (Exception $e) {
             error_log("Error liking recipe: " . $e->getMessage());
@@ -428,7 +519,36 @@ class RecipeSchema
         }
     }
     /**
-     * @return array     */
+     * @return <missing>|array
+     */
+    public function unlike(string $recipe_id)
+    {
+        try {
+            $all_recipes = $this->getAll();
+            $recipe_index = array_search(
+                $recipe_id,
+                array_column($all_recipes, "id")
+            );
+            if ($recipe_index !== false) {
+                $current_likes = $all_recipes[$recipe_index]["likes"];
+                if ($current_likes > 0) {
+                    $all_recipes[$recipe_index]["likes"] = $current_likes - 1;
+                }
+                $this->json_handler->writeData(self::DATA_FILE, $all_recipes);
+                return $all_recipes[$recipe_index];
+            } else {
+                error_log("Recipe not found for unliking");
+                return [];
+            }
+        } catch (Exception $e) {
+            error_log("Error unliking recipe: " . $e->getMessage());
+            throw new Exception("Error unliking recipe: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * @return array     * @param array<int,mixed> $translation
+     */
     public function translate(string $recipe_id, array $translation): array
     {
         try {
@@ -449,7 +569,7 @@ class RecipeSchema
                         "name",
                         "ingredients",
                         "steps",
-                    ]) === []
+                    ]) !== []
                 ) {
                     throw new Exception(
                         "Invalid translation data: missing or invalid keys"
@@ -504,7 +624,8 @@ class RecipeSchema
                 $this->json_handler->writeData(self::DATA_FILE, $all_recipes);
                 return $recipe;
             } else {
-                throw new Exception("Recipe not found for translation");
+                error_log("Recipe not found for translation");
+                return [];
             }
         } catch (Exception $e) {
             error_log("Error translating recipe: " . $e->getMessage());
@@ -534,14 +655,27 @@ class RecipeSchema
                 $photo_id,
                 array_column($recipe["photos"], "id")
             );
+
             if ($photo_index === false) {
-                throw new Exception("Photo not found");
+                error_log("Photo not found");
+                return [];
             }
-            $photo = $recipe["photos"][$photo_index];
-            if ($recipe["imageURL"] === $photo["url"]) {
-                throw new Exception("Photo already set as main recipe image");
+            $recipe["photos"][$photo_index]["is_main"] = true;
+            $old_photo_index = array_search(
+                $recipe["imageURL"],
+                array_column($recipe["photos"], "url")
+            );
+            if ($old_photo_index === false) {
+                error_log("Current photo couldn't be found");
+                return [];
             }
-            $recipe["imageURL"] = $photo["url"];
+            $recipe["photos"][$old_photo_index]["is_main"] = false;
+            $new_main_photo = $recipe["photos"][$photo_index];
+            if ($recipe["imageURL"] === $new_main_photo["url"]) {
+                error_log("Image is already main");
+                throw new InvalidArgumentException("Image is already main");
+            }
+            $recipe["imageURL"] = $new_main_photo["url"];
             if (!Validator::validateRecipe($recipe)) {
                 throw new Exception(
                     "Error after setting photo for recipe: result is not valid"
@@ -552,9 +686,55 @@ class RecipeSchema
             return $recipe;
         } catch (Exception $e) {
             error_log("Error setting photo for recipe: " . $e->getMessage());
-            throw new Exception(
-                "Error setting photo for recipe: " . $e->getMessage()
+            throw $e;
+        }
+    }
+
+    /**
+     * @return array     */
+    public function publish(string $recipe_id): array
+    {
+        try {
+            $all_recipes = $this->getAll();
+            $recipe_index = array_search(
+                $recipe_id,
+                array_column($all_recipes, "id")
             );
+            if ($recipe_index === false) {
+                error_log("Recipe not found");
+                return [];
+            }
+            $recipe = $all_recipes[$recipe_index];
+            if ($recipe["status"] == "draft") {
+                $recipe["status"] = "published";
+            } else {
+                error_log("Recipe is already published");
+                return [];
+            }
+            if (!Validator::validateRecipe($recipe)) {
+                throw new Exception(
+                    "Error after publishing recipe: result is not valid"
+                );
+            }
+            $all_recipes[$recipe_index] = $recipe;
+            $this->json_handler->writeData(self::DATA_FILE, $all_recipes);
+            return $recipe;
+        } catch (Exception $e) {
+            error_log("Error publishing recipe: " . $e->getMessage());
+            throw new Exception("Error publishing recipe: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * @return array     */
+    public function isAuthor(string $user_id, string $recipe_id): bool
+    {
+        try {
+            $recipe = $this->getById($recipe_id);
+            return $recipe["Author"] === $user_id;
+        } catch (Exception $e) {
+            error_log("Error checking author: " . $e->getMessage());
+            throw new Exception("Error checking author: " . $e->getMessage());
         }
     }
 }

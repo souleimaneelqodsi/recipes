@@ -14,4 +14,26 @@ class Utils
             bin2hex(random_bytes(6))
         );
     }
+
+    public static function getJSONBody(): ?array
+    {
+        $requestBody = file_get_contents("php://input");
+
+        if ($requestBody === false || $requestBody === "") {
+            return null;
+        }
+
+        $data = json_decode($requestBody, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            error_log("JSON Decode Error: " . json_last_error_msg());
+            return null;
+        }
+
+        if (!is_array($data)) {
+            return null;
+        }
+
+        return $data;
+    }
 }
