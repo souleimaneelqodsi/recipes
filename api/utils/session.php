@@ -1,22 +1,85 @@
 <?php class Session
 {
-
-
-
-    public static function start()
+    public static function start(): void
     {
-        if (session_status() == PHP_SESSION_NONE) {
-            return;
+        if (session_status() === PHP_SESSION_NONE) {
+            ini_set("session.cookie_httponly", 1);
+            ini_set("session.use_only_cookies", 1);
+            session_start();
         }
-        session_start();
     }
 
-    public static function destroy()
+    public static function destroy(): void
     {
-        if (session_status() == PHP_SESSION_ACTIVE) {
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_unset();
+            session_destroy();
+        }
+    }
+
+    public static function get(string $key): mixed
+    {
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            return null;
+        }
+        return $_SESSION[$key] ?? null;
+    }
+
+    public static function set(string $key, mixed $value): void
+    {
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            return;
+        }
+        $_SESSION[$key] = $value;
+    }
+
+    public static function remove(string $key): void
+    {
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            return;
+        }
+        unset($_SESSION[$key]);
+    }
+
+    public static function clear(): void
+    {
+        if (session_status() !== PHP_SESSION_ACTIVE) {
             return;
         }
         session_unset();
-        session_destroy();
+    }
+
+    public static function regenerateId(bool $deleteOldSession = true): bool
+    {
+        return session_regenerate_id($deleteOldSession);
+    }
+
+    public static function isLoggedIn(): bool
+    {
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            return false;
+        }
+        return isset($_SESSION["user_id"]);
+    }
+
+    public static function getCurrentUser(): UserSchema
+    {
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            throw new Exception("Session is not active");
+        }
+        $json_handler = new JSONHandler(API_BASE_PATH . "/data");
+        $user_schema = new UserSchema($json_handler, $_SESSION["user_id"]);
+        $user_schema->getById($_SESSION["user_id"]);
+
+        return $user_schema;
+    }
+
+    public static function getUserRole(): string
+    {
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            throw new Exception("Session is not active");
+        }
+        $user = self::getCurrentUser();
+        return $user ? $user->role : "Guest";
     }
 }
