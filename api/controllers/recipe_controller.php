@@ -1,4 +1,4 @@
-<?php class RecipeController implements Controller
+<?php class RecipeController implements BaseController
 {
     private $recipe_schema;
 
@@ -8,11 +8,11 @@
     }
 
     // success: 200 OK, nothing : 204, error : 400, other error:500
-    public function search(): void {}
+    public function search(string $search_term): void {}
     //success: 200 OK, unauthenticated : 401, error : 400, not found:404, other error:500
     public function getById(string $recipe_id): void {}
     //nothing: 204, success:200, OK, error : 400, other error:500
-    public function getAll(string $recipe_id): void {}
+    public function getAll(): void {}
     // success: 201 OK, error:400, other error:500
     public function create(): void {}
     // success: 200 OK, error:400, other error:500
@@ -47,11 +47,11 @@
                 }
                 // search case
                 if (empty($path) && isset($_GET["search"])) {
-                    $this->search(); // the search term will be extracted from the GET request
+                    $this->search($_GET["search"]);
                     break;
                 }
                 // getById case
-                if ($path[0] !== "" && count($path) === 1) {
+                if ($path[0] !== "" && count((array) $path) === 1) {
                     $this->getById($path[0]);
                     break;
                 }
@@ -64,7 +64,7 @@
                 if (
                     $path[0] !== "" &&
                     $path[1] === "like" &&
-                    count($path) === 2
+                    count((array) $path) === 2
                 ) {
                     $this->like($path[0]);
                     break;
@@ -80,7 +80,7 @@
                 break;
             case "PUT":
                 // update case
-                if ($path[0] !== "" && count($path) === 1) {
+                if ($path[0] !== "" && count((array) $path) === 1) {
                     $this->update($path[0]);
                     break;
                 }
@@ -89,7 +89,7 @@
                 echo json_encode(["error" => "Bad request"]);
                 break;
             case "PATCH":
-                if ($path[0] !== "" && count($path) === 2) {
+                if ($path[0] !== "" && count((array) $path) === 2) {
                     //case set photo
                     if ($path[1] === "photos") {
                         $this->setPhoto($path[0]);
@@ -105,7 +105,7 @@
                 break;
             case "DELETE":
                 // case delete
-                if (count($path) === 1 && $path[0] !== "") {
+                if (count((array) $path) === 1 && $path[0] !== "") {
                     $this->delete($path[0]);
                     break;
                 }

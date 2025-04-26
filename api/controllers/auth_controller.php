@@ -1,4 +1,4 @@
-<?php class AuthController implements Controller
+<?php class AuthController implements BaseController
 {
     private $auth_schema;
 
@@ -20,7 +20,7 @@
             return;
         }
         if ($method === "POST") {
-            if (count($path) == 1) {
+            if (count((array)$path) == 1) {
                 switch ($path[0]) {
                     case "register":
                         $this->register();

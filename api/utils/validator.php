@@ -71,6 +71,50 @@ class Validator
     }
 
     /**
+     * @param mixed $ingredient
+     * @return bool
+     */
+    public static function validateIngredient($ingredient): bool
+    {
+        return is_array($ingredient) &&
+            isset($ingredient["quantity"]) &&
+            isset($ingredient["name"]) &&
+            isset($ingredient["type"]);
+    }
+
+    /**
+     * @param mixed $ingredients
+     * @return bool
+     * @param array<int,mixed> $steps
+     * @param string $name
+     */
+    public static function validateLanguage(
+        $ingredients,
+        array $steps,
+        string $name
+    ): bool {
+        //to check that if the ingredients exist in in a language, the steps and the name also exist in the same language (e.g. can't have ingredients in French only and steps or name in English only)
+        if (!isset($steps) || !is_array($steps) || empty($steps)) {
+            return false;
+        }
+        if (!isset($name) || empty($name) || !is_string($name)) {
+            return false;
+        }
+        if (!isset($ingredients)) {
+            return false;
+        }
+        $is_valid = is_array($ingredients);
+        if (empty($ingredients)) {
+            return $is_valid;
+        } else {
+            foreach ($ingredients as $ingredient) {
+                $is_valid = $is_valid && self::validateIngredient($ingredient);
+            }
+            return $is_valid;
+        }
+    }
+
+    /**
      * @param mixed $comment
      * @return bool
      */
@@ -122,15 +166,21 @@ class Validator
     public static function validateRecipe($recipe): bool
     {
         return isset($recipe["id"]) &&
-            isset($recipe["title"]) &&
-            isset($recipe["description"]) &&
-            (isset($recipe["steps"]) || isset($recipe["stepsFR"])) &&
-            (isset($recipe["ingredients"]) ||
-                isset($recipe["ingredientsFR"])) &&
+            (self::validateLanguage(
+                $recipe["ingredients"],
+                $recipe["steps"],
+                $recipe["name"]
+            ) ||
+                self::validateLanguage(
+                    $recipe["ingredientsFR"],
+                    $recipe["stepFR"],
+                    $recipe["nameFR"]
+                )) &&
             isset($recipe["likes"]) &&
             isset($recipe["status"]) &&
             in_array($recipe["status"], ["draft", "published"]) &&
             isset($recipe["Author"]) &&
+            is_array($recipe["Without"]) &&
             (isset($recipe["Without"])
                 ? (!empty($recipe["Without"])
                     ? array_diff($recipe["Without"], [
@@ -144,9 +194,9 @@ class Validator
             isset($recipe["imageURL"]) &&
             isset($recipe["originalURL"]) &&
             isset($recipe["comments"]) &&
-            self::validatePhotos($recipe["photos"]) &&
             self::validateComments($recipe["comments"]) &&
-            isset($recipe["total_time"]);
+            isset($recipe["total_time"]) &&
+            isset($recipe["created_at"]);
     }
 
     /**
