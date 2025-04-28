@@ -226,24 +226,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 //recherche de recette
 
-// Redirection vers la page de recherche
-function redirigerVersRecherche() {
-    const motCle = document.getElementById('searchInput').value.trim();
-    if (motCle !== '') {
-        window.location.href = `rechercher_recette.html?query=${encodeURIComponent(motCle)}`;
-    } else {
-        alert('Veuillez entrer un mot-clé');
-    }
-}
-
-//chargement des recettes recherchés
-// Partie 1 : Redirection lors du clic sur le bouton de recherche
-
 document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('searchInput');
     const btnRechercher = document.getElementById('btn-rechercher');
   
-    // Fonction de redirection vers la page de recherche avec le terme de recherche
     function redirigerVersRecherche() {
       const motCle = searchInput.value.trim();
       if (motCle !== '') {
@@ -253,48 +239,47 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
   
-    // Ajout d'un écouteur d'événement pour le clic sur le bouton
     if (btnRechercher) {
       btnRechercher.addEventListener('click', redirigerVersRecherche);
     }
   });
   
   
-  // Partie 2 : Affichage des résultats de la recherche sur la page `rechercher_recette.html`
+  // Partie 2 : Affichage des résultats sur la page rechercher_recette.html
   
   document.addEventListener('DOMContentLoaded', () => {
     const params = new URLSearchParams(window.location.search);
     const motCle = params.get('search');
     const container = document.getElementById('midou');
   
-    // Vérifie si un mot-clé a été fourni
     if (!motCle) {
+      container.innerHTML = '<p>Veuillez entrer un mot-clé dans la barre de recherche.</p>';
       return;
     }
   
-    // Récupération des recettes par le terme de recherche
     fetch(`/recipes/api/recipes?search=${encodeURIComponent(motCle)}`)
       .then(response => {
+        if (response.status === 204) {
+          // Aucun contenu trouvé
+          container.innerHTML = `<p>Aucune recette trouvée pour "${motCle}".</p>`;
+          throw new Error('Aucun résultat'); // On arrête ici volontairement
+        }
         if (!response.ok) {
           throw new Error('Erreur de récupération des recettes.');
         }
         return response.json();
       })
       .then(data => {
-        container.innerHTML = '';  // Réinitialise le contenu du conteneur
+        container.innerHTML = `<p>${data.length} résultat(s) trouvé(s) pour "${motCle}".</p>`;
   
-        if (data.length == 0) {
-          container.innerHTML = `<p>Aucune recette trouvée pour "${motCle}".</p>`;
-          return;
-        }
-        else
-        container.innerHTML = `<p>plusieurs resultats trouvé pour "${motCle}" pour "${data.length}".</p>`;
-
-  
-        // Pour chaque recette, on crée un élément HTML pour l'affichage
         data.forEach(recetteId => {
           fetch(`/recipes/api/recipes/${recetteId}`)
-            .then(response => response.json())
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Erreur de récupération de la recette.');
+              }
+              return response.json();
+            })
             .then(recette => {
               const col = document.createElement('div');
               col.className = 'col-lg-4 col-md-4 col-sm-6';
@@ -316,16 +301,19 @@ document.addEventListener('DOMContentLoaded', () => {
               container.appendChild(col);
             })
             .catch(error => {
-              //console.error('Erreur de récupération de la recette :', error);
-              console.log(error.message);
+              console.error('Erreur lors du chargement de la recette :', error.message);
             });
         });
       })
       .catch(error => {
-        console.error('Erreur lors du chargement des résultats :', error);
-        container.innerHTML = '<p>Erreur de chargement des résultats.</p>';
+        // On n'affiche pas un message d'erreur si c'était juste "aucun résultat"
+        if (error.message !== 'Aucun résultat') {
+          console.error('Erreur lors du chargement des résultats :', error.message);
+          container.innerHTML = '<p>Erreur de chargement des résultats.</p>';
+        }
       });
   });
+  
   
 
 
