@@ -175,16 +175,17 @@ class RecipeSchema
                 //how many times the word appears exactly
                 // how many times the word appears exactly
                 $word_frequency = $words_occurrences[$search_term] ?? 0;
-
                 //now we have to do a traversal of the array to make a fuzzy search with each word of the array
+                //(pimme, pomme) -> 1
+                //(pimmes, pommes) -> 2
                 foreach ($search_tokens as $token) {
                     if (strlen($token) < 3) {
                         continue;
                     }
                     //PREG_SPLIT_NO_EMPTY used in preg_split before guarantees no token is empty so strlen(token) > 0, safe for log here
-                    $log_threshold = round(log(strlen($token)));
+                    $threshold = round(log(strlen($token)));
                     //bonus of 1 if rounded log of the token  is greater or equal to 1, in order to be less strict and improve the relevance of the results
-                    $threshold = $log_threshold >= 1 ? $log_threshold + 1 : 1;
+                    // $threshold = $log_threshold >= 3 ? $log_threshold + 1 : 1;
                     // Ensure we don't cause warnings with strings > 255 chars
                     if (strlen($token) > 255 || strlen($search_term) > 255) {
                         if (stripos($token, $search_term) !== false) {
@@ -246,14 +247,15 @@ class RecipeSchema
         $query = preg_replace("/[[:punct:]]/", "", $query);
         //split into words
         $query = preg_split("/\s+/", $query, -1, PREG_SPLIT_NO_EMPTY);
-        $query_scores = [];
         //words useless to search
-        $stop_words = $this->getStopWords();
+        // $stop_words = $this->getStopWords();
+        //removed this because some stop words can resemble tokens in recipes...
+        // $query = array_filter(
+        //     $query,
+        //     fn($term) => !in_array(strtolower($term), $stop_words)
+        // );
 
-        $query = array_filter(
-            $query,
-            fn($term) => !in_array(strtolower($term), $stop_words)
-        );
+        $query_scores = [];
 
         foreach ($query as $term) {
             $query_scores[$term] = $this->search_term($term);
@@ -261,12 +263,24 @@ class RecipeSchema
         $final_scores = [];
         foreach ($query_scores as $term => $score_set) {
             foreach ($score_set as $recipe_id => $score) {
-                if (!isset($final_scores[$recipe_id])) {
-                    $final_scores[$recipe_id] = 0;
+                // if ($score == 0) {
+                //     continue;
+                // }
+                // if (!isset($final_scores[$recipe_id])) {
+                //     $final_scores[$recipe_id] = 0;
+                // } else {
+                //     $final_scores[$recipe_id] += $score;
+                // }
+                if ($score > 0) {
+                    if (!isset($final_scores[$recipe_id])) {
+                        $final_scores[$recipe_id] = $score;
+                    } else {
+                        $final_scores[$recipe_id] += $score;
+                    }
                 }
-                $final_scores[$recipe_id] += $score;
             }
         }
+
         arsort($final_scores);
         return array_keys($final_scores);
     }
