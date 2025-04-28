@@ -267,8 +267,14 @@ class RecipeSchema
                 $final_scores[$recipe_id] += $score;
             }
         }
+        foreach ($final_scores as $recipe => $score) {
+            if ($score == 0) {
+                unset($final_scores[$recipe]);
+            }
+        }
         arsort($final_scores);
         return array_keys($final_scores);
+        
     }
 
     /**
