@@ -1,24 +1,50 @@
 <?php
 
-class UserSchema
+class UserSchema implements JsonSerializable
 {
     public $id;
     public $username;
     public $email;
-    public $role = "Cuisiner";
+    public $role;
     public $created_at;
-    public array $recipes = [];
-    public array $comments = [];
-    public array $photos = [];
-    public array $likes = [];
+    public array $recipes;
+    public array $comments;
+    public array $photos;
+    public array $likes;
 
     private JSONHandler $json_handler;
     private const DATA_FILE = "users.json";
 
-    public function __construct(JSONHandler $json_handler, string $user_id)
-    {
-        $this->id = $user_id;
+    public function __construct(
+        JSONHandler $json_handler,
+        string $username,
+        string $email
+    ) {
+        $this->id = Utils::uuid4();
+        $this->username = $username;
+        $this->email = $email;
+        $this->role = "Cuisinier";
+        $this->created_at = time();
+        $this->recipes = [];
+        $this->comments = [];
+        $this->photos = [];
+        $this->likes = [];
         $this->json_handler = $json_handler;
+    }
+
+    public function jsonSerialize(): mixed
+    {
+        return [
+            "id" => $this->id,
+            "username" => $this->username,
+            "email" => $this->email,
+            "role" => $this->role,
+            "created_at" => $this->created_at,
+            "recipes" => $this->recipes,
+            "comments" => $this->comments,
+            "photos" => $this->photos,
+            "likes" => $this->likes,
+        ];
     }
 
     /**
@@ -77,23 +103,87 @@ class UserSchema
     /**
      * @return array
      */
-    public function create(): array
+    public function create(string $username, string $email): array
     {
-        return [];
+        try {
+            $user = new UserSchema($this->json_handler, $username, $email);
+            $usr_array = $user->jsonSerialize();
+            if (Validator::validateUser($usr_array)) {
+                $this = $user;
+                $user_array = $this->jsonSerialize();
+                $all_users = $this->getAll();
+                array_push($all_users, $user_array);
+                $this->json_handler->writeData(
+                    UserSchema::DATA_FILE,
+                    $all_users
+                );
+                return $user_array;
+            } else {
+                error_log("User creation failed: invalid user data");
+                throw new Exception("Invalid user data");
+            }
+        } catch (Exception $e) {
+            error_log("User creation failed");
+            throw $e;
+        }
     }
     /**
      * @return array
      */
-    public function update(string $user_id): array
+    public function update(array $updates): array
     {
-        return [];
+        try {
+            if (!Validator::validateUser($updates)) {
+                error_log("Invalid user data");
+                throw new Exception("Invalid user data");
+            }
+            $all_users = $this->getAll();
+            $usr_index = array_search(
+                $this->id,
+                array_column($all_users, "id"),
+                true
+            );
+            if ($usr_index === false) {
+                error_log("User not found");
+                return [];
+            }
+            $all_users[$usr_index] = $updates;
+            $this->json_handler->writeData(UserSchema::DATA_FILE, $all_users);
+            $this->fromArray($updates);
+            return $updates;
+        } catch (Exception $e) {
+            error_log("User update failed");
+            throw $e;
+        }
     }
     /**
      * @return array
      */
-    public function updateRole(string $user_id): array
+    public function updateRole(string $user_id, string $role): array
     {
-        return [];
+        try {
+            $all_users = $this->getAll();
+            $usr_index = array_search(
+                $user_id,
+                array_column($all_users, "id"),
+                true
+            );
+            if ($usr_index === false) {
+                throw new Exception("User not found");
+            }
+            $current_usr_array = $this->jsonSerialize();
+            $current_usr_array["role"] = $role;
+            if (!Validator::validateUser($current_usr_array)) {
+                error_log("Invalid role");
+                throw new Exception("Invalid role");
+            }
+            $all_users[$usr_index]["role"] = $role;
+            $this->json_handler->writeData(UserSchema::DATA_FILE, $all_users);
+            return $current_usr_array;
+        } catch (Exception $e) {
+            error_log("User role update failed");
+            throw $e;
+        }
     }
 
     /**
