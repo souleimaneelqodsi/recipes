@@ -1,59 +1,4 @@
-/*document.addEventListener("DOMContentLoaded", function() {
-    document.querySelectorAll(".recipe-popup").forEach(link => {
-        link.addEventListener("click", function(event) {
-            event.preventDefault();
 
-            // Récupérer les données de la recette
-            let title = this.getAttribute("data-name");
-            let image = this.getAttribute("data-image");
-            let ingredients = this.getAttribute("data-ingredients").split(", ");
-            let steps = this.getAttribute("data-steps").split("|");
-            let author = this.getAttribute("data-author");
-
-            // Mettre à jour la pop-up
-            document.getElementById("modal-title").textContent = title;
-            document.getElementById("modal-image").src = image;
-            document.getElementById("modal-author").textContent = author;
-
-            // Afficher les ingrédients
-            let ingredientsList = document.getElementById("modal-ingredients");
-            ingredientsList.innerHTML = "";
-            ingredients.forEach(ing => {
-                let li = document.createElement("li");
-                li.textContent = ing;
-                ingredientsList.appendChild(li);
-            });
-
-            // Afficher les étapes
-            let stepsList = document.getElementById("modal-steps");
-            stepsList.innerHTML = "";
-            steps.forEach(step => {
-                let li = document.createElement("li");
-                li.textContent = step;
-                stepsList.appendChild(li);
-            });
-
-            // Afficher la pop-up
-            document.getElementById("recipe-modal").style.display = "flex";
-        });
-    });
-
-    // Fermer la pop-up
-    document.querySelector(".close-btn").addEventListener("click", function() {
-        document.getElementById("recipe-modal").style.display = "none";
-    });
-
-    // Fermer la pop-up si on clique en dehors
-    document.getElementById("recipe-modal").addEventListener("click", function(event) {
-        if (event.target === this) {
-            this.style.display = "none";
-        }
-    });
-});
-*/
-
-
-//chargement des recetttes
 
 
 
@@ -61,6 +6,83 @@
 
   // script.js
 
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const recipesContainer = document.getElementById("midou");
+
+    fetchRecipes();
+
+    function fetchRecipes() {
+        fetch('/recipes/api/recipes')
+            .then(response => {
+                // Log de la réponse pour analyser le contenu
+                console.log('Réponse de l\'API:', response);
+
+                // Vérifier si la réponse est vide ou n'a pas de corps JSON
+                if (response.status === 204) {
+                    console.log('Aucune recette disponible (204)');
+                    return [];  // Retourner un tableau vide
+                }
+
+                // Si la réponse est valide (200), traiter le JSON
+                if (response.status === 200) {
+                    return response.text()  // Lire la réponse comme texte brut
+                        .then(text => {
+                            // Si la réponse contient du texte, essayer de la parser
+                            try {
+                                const data = text ? JSON.parse(text) : [];  // Essayer de parser le texte si ce n'est pas vide
+                                return data;
+                            } catch (e) {
+                                throw new Error('Erreur de parsing JSON');
+                            }
+                        });
+                } else {
+                    // Si statut différent, traiter comme une erreur
+                    throw new Error('Erreur inconnue: ' + response.status);
+                }
+            })
+            .then(data => {
+                displayRecipes(data);
+            })
+            .catch(error => {
+                console.error('Erreur lors de la récupération des recettes :', error);
+                recipesContainer.innerHTML = `<p style="color:red;">${error.message}</p>`;
+            });
+    }
+
+    function displayRecipes(recipes) {
+        recipesContainer.innerHTML = ''; // On vide
+
+        if (!Array.isArray(recipes) || recipes.length === 0) {
+            recipesContainer.innerHTML = '<p>Aucune recette trouvée.</p>';
+            return;
+        }
+
+        recipes.forEach(recipe => {
+            const col = document.createElement('div');
+            col.className = 'col-lg-4 col-md-4 col-sm-6';
+
+            col.innerHTML = `
+                <a href="recette.html?id=${recipe.id}" class="fh5co-card-item">
+                    <figure>
+                        <div class="overlay"><i class="ti-plus"></i></div>
+                        <img src="${recipe.imageURL || 'https://via.placeholder.com/400x300?text=Pas+de+photo'}" alt="Image" class="img-responsive" width="400" height="300">
+                    </figure>
+                    <div class="fh5co-text">
+                        <h2 style="font-size: 20px;">${recipe.nameFR || recipe.name || "Nom non disponible"}</h2>
+                        <p><strong>Auteur :</strong> ${recipe.Author || "Inconnu"}</p>
+                        <p><span class="price cursive-font">♡</span></p>
+                    </div>
+                </a>
+            `;
+
+            recipesContainer.appendChild(col);
+        });
+    }
+});
+
+
+/*
 document.addEventListener("DOMContentLoaded", () => {
     const recipesContainer = document.getElementById("midou");
 
@@ -117,7 +139,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-
+*/
 
 
 //affichzge detaillé d'un recette
@@ -312,6 +334,70 @@ document.addEventListener('DOMContentLoaded', () => {
           container.innerHTML = '<p>Erreur de chargement des résultats.</p>';
         }
       });
+  });
+  
+
+
+  //page inscription
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('Inscription');
+  
+    form.addEventListener('submit', function (e) {
+      e.preventDefault(); // Empêche l'envoi classique du formulaire
+  
+      const username = document.getElementById('username').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirm-password').value;
+      const messageContainer = document.getElementById('message');
+  
+      messageContainer.innerHTML = ''; 
+  
+      if (!username || !email || !password || !confirmPassword) {
+        messageContainer.innerHTML = '<p style="color:red;">Veuillez remplir tous les champs.</p>';
+        return;
+      }
+  
+      if (password !== confirmPassword) {
+        messageContainer.innerHTML = '<p style="color:red;">Les mots de passe ne correspondent pas.</p>';
+        return;
+      }
+  
+      const payload = { username, email, password };
+  
+      fetch('/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      })
+      .then(response => {
+        if (response.status === 201) {
+          return response.json();
+        } else if (response.status === 400) {
+          throw new Error('Champs manquants ou invalides.');
+        } else if (response.status === 409) {
+          throw new Error('Nom d’utilisateur ou e-mail déjà utilisé.');
+        } else {
+          throw new Error('Erreur serveur. Veuillez réessayer plus tard.');
+        }
+      })
+      .then(user => {
+        // Succès : on stocke l'état connecté
+        localStorage.setItem('estConnecte', 'true');
+        localStorage.setItem('utilisateur', JSON.stringify(user));
+        messageContainer.innerHTML = '<p style="color:green;">Inscription réussie. Redirection...</p>';
+        // Redirection après un petit délai
+        setTimeout(() => {
+          window.location.href = 'index.html';
+        }, 1500);
+      })
+      .catch(error => {
+        messageContainer.innerHTML = `<p style="color:red;">${error.message}</p>`;
+      });
+    });
   });
   
   
