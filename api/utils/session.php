@@ -80,7 +80,15 @@
             $_SESSION["username"],
             $_SESSION["email"]
         );
-        $user_schema->fromArray($user_schema->getById($_SESSION["user_id"]));
+        try {
+            $user_schema->fromArray(
+                $user_schema->getById($_SESSION["user_id"])
+            );
+        } catch (Exception $e) {
+            throw new Exception(
+                "User retrieval error during session initialization."
+            );
+        }
 
         return $user_schema;
     }
@@ -91,6 +99,6 @@
             throw new Exception("Session is not active");
         }
         $user = self::getCurrentUser();
-        return $user ? $user->role : "Guest";
+        return $user ? $user->getRole() : "Guest";
     }
 }

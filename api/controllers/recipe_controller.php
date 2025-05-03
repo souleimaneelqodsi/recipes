@@ -145,7 +145,7 @@
             if (
                 Session::getUserRole() !== "Administrateur" &&
                 !$this->recipe_schema->isAuthor(
-                    Session::getCurrentUser()->id,
+                    Session::getCurrentUser()->getId(),
                     $id
                 )
             ) {
@@ -345,7 +345,7 @@
             if (
                 !$this->recipe_schema->isAuthor(
                     $recipe_id,
-                    Session::getCurrentUser()->id
+                    Session::getCurrentUser()->getId()
                 ) &&
                 Session::getUserRole() !== "Administrateur"
             ) {

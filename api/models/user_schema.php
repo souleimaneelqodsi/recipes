@@ -2,15 +2,16 @@
 
 class UserSchema
 {
-    public $id;
-    public $username;
-    public $email;
-    public $role;
-    public $created_at;
-    public array $recipes;
-    public array $comments;
-    public array $photos;
-    public array $likes;
+    private $id;
+    private $username;
+    private $email;
+    private $password;
+    private $role;
+    private $created_at;
+    private array $recipes;
+    private array $comments;
+    private array $photos;
+    private array $likes;
 
     private JSONHandler $json_handler;
     private const DATA_FILE = "users.json";
@@ -22,7 +23,7 @@ class UserSchema
     ) {
         $this->id = Utils::uuid4();
         $this->username = $username;
-        $this->email = $email;
+        $this->email = strtolower($email);
         $this->role = "Cuisinier";
         $this->created_at = time();
         $this->recipes = [];
@@ -32,15 +33,40 @@ class UserSchema
         $this->json_handler = $json_handler;
     }
 
+    public function getId(): string
+    {
+        return $this->id;
+    }
+
+    public function getRole(): string
+    {
+        return $this->role;
+    }
+
+    public function getUsername(): string
+    {
+        return $this->username;
+    }
+
+    public function getEmail(): string
+    {
+        return $this->email;
+    }
+
+    public function setPassword($hashed_password): void
+    {
+        $this->password = $hashed_password;
+    }
+
     /**
      * @param array<string,mixed> $data
      */
-    public function toArray(): mixed
+    public function toArray(): array
     {
-        return [
+        $data = [
             "id" => $this->id,
             "username" => $this->username,
-            "email" => $this->email,
+            "email" => strtolower($this->email),
             "role" => $this->role,
             "created_at" => $this->created_at,
             "recipes" => $this->recipes,
@@ -48,6 +74,10 @@ class UserSchema
             "photos" => $this->photos,
             "likes" => $this->likes,
         ];
+        if (isset($this->password)) {
+            $data["password"] = $this->password;
+        }
+        return $data;
     }
 
     /**
@@ -55,9 +85,13 @@ class UserSchema
      */
     public function fromArray(array $data): void
     {
+        if (!Validator::validateUser($data)) {
+            throw new InvalidArgumentException("Invalid user data structure");
+        }
         $this->id = $data["id"];
         $this->username = $data["username"];
-        $this->email = $data["email"];
+        $this->email = strtolower($data["email"]);
+        $this->password = $data["password"];
         $this->role = $data["role"];
         $this->created_at = $data["created_at"];
         $this->recipes = $data["recipes"];
@@ -107,11 +141,10 @@ class UserSchema
     /**
      * @return array
      */
-    public function create(string $username, string $email): array
+    //throws an exception if there is a duplicate username or email
+    public function duplicate_handler(string $username, string $email)
     {
         try {
-            $user = new UserSchema($this->json_handler, $username, $email);
-            $usr_array = $user->toArray();
             $all_users = $this->getAll();
             $username_exists = array_search(
                 $username,
@@ -123,28 +156,45 @@ class UserSchema
                 throw new UsernameAlreadyExistsException();
             }
             $email_exists = array_search(
-                $email,
-                array_column($all_users, "email"),
+                strtolower($email),
+                array_map("strtolower", array_column($all_users, "email")),
                 true
             );
             if ($email_exists !== false) {
                 error_log("Email already exists");
                 throw new EmailAlreadyExistsException();
             }
+        } catch (Exception $e) {
+            error_log("Duplicate handler failed: " . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public function create(
+        string $username,
+        string $email,
+        string $password
+    ): array {
+        try {
+            $user = new UserSchema($this->json_handler, $username, $email);
+            $user->setPassword($password);
+            $usr_array = $user->toArray();
+            $all_users = $this->getAll();
+            // $this->duplicate_handler($username, $email);
             if (Validator::validateUser($usr_array)) {
                 $this->fromArray($usr_array);
                 array_push($all_users, $usr_array);
-                $this->json_handler->writeData(
-                    UserSchema::DATA_FILE,
-                    $all_users
-                );
+                $this->json_handler->writeData(self::DATA_FILE, $all_users);
                 return $usr_array;
             } else {
                 error_log("User creation failed: invalid user data");
                 throw new Exception("Invalid user data");
             }
         } catch (Exception $e) {
-            error_log("User creation failed");
+            error_log("User creation failed: " . $e->getMessage());
             throw $e;
         }
     }
@@ -172,10 +222,7 @@ class UserSchema
                     throw new Exception("User not found");
                 }
                 array_push($all_users[$usr_index]["recipes"], $recipeData);
-                $this->json_handler->writeData(
-                    UserSchema::DATA_FILE,
-                    $all_users
-                );
+                $this->json_handler->writeData(self::DATA_FILE, $all_users);
                 return $all_users[$usr_index];
             }
         } catch (Exception $e) {
@@ -266,10 +313,7 @@ class UserSchema
                     $usr["recipes"] = $usr_recipes;
                     $this->recipes = $usr_recipes;
                     $all_users[$usr_index] = $usr;
-                    $this->json_handler->writeData(
-                        UserSchema::DATA_FILE,
-                        $all_users
-                    );
+                    $this->json_handler->writeData(self::DATA_FILE, $all_users);
                 }
                 //possible because in PHP variables don't have block scope
                 return $all_users[$usr_index];
@@ -311,7 +355,7 @@ class UserSchema
             unset($usr_recipes[$recipe_index]);
             $all_users[$usr_index]["recipes"] = $usr_recipes;
             $this->recipes = $usr_recipes;
-            $this->json_handler->writeData(UserSchema::DATA_FILE, $all_users);
+            $this->json_handler->writeData(self::DATA_FILE, $all_users);
             return $all_users[$usr_index];
         } catch (Exception $e) {
             error_log($e->getMessage());
@@ -344,7 +388,7 @@ class UserSchema
             array_push($usr_comments, $comment_data);
             $all_users[$usr_index]["comments"] = $usr_comments;
             $this->comments = $usr_comments;
-            $this->json_handler->writeData(UserSchema::DATA_FILE, $all_users);
+            $this->json_handler->writeData(self::DATA_FILE, $all_users);
             return $all_users[$usr_index];
         } catch (Exception $e) {
             error_log($e->getMessage());
@@ -383,7 +427,7 @@ class UserSchema
             unset($usr_comments[$comment_index]);
             $all_users[$usr_index]["comments"] = $usr_comments;
             $this->comments = $usr_comments;
-            $this->json_handler->writeData(UserSchema::DATA_FILE, $all_users);
+            $this->json_handler->writeData(self::DATA_FILE, $all_users);
             return $all_users[$usr_index];
         } catch (Exception $e) {
             error_log($e->getMessage());
@@ -416,7 +460,7 @@ class UserSchema
             array_push($usr_photos, $photo_data);
             $all_users[$usr_index]["photos"] = $usr_photos;
             $this->photos = $usr_photos;
-            $this->json_handler->writeData(UserSchema::DATA_FILE, $all_users);
+            $this->json_handler->writeData(self::DATA_FILE, $all_users);
             return $all_users[$usr_index];
         } catch (Exception $e) {
             error_log($e->getMessage());
@@ -455,7 +499,7 @@ class UserSchema
             unset($usr_photos[$photo_index]);
             $all_users[$usr_index]["photos"] = $usr_photos;
             $this->photos = $usr_photos;
-            $this->json_handler->writeData(UserSchema::DATA_FILE, $all_users);
+            $this->json_handler->writeData(self::DATA_FILE, $all_users);
             return $all_users[$usr_index];
         } catch (Exception $e) {
             error_log($e->getMessage());
@@ -492,7 +536,7 @@ class UserSchema
             }
             $all_users[$usr_index]["role"] = $role;
             $this->role = $role;
-            $this->json_handler->writeData(UserSchema::DATA_FILE, $all_users);
+            $this->json_handler->writeData(self::DATA_FILE, $all_users);
             return $current_usr_array;
         } catch (Exception $e) {
             error_log("User role update failed");

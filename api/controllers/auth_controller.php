@@ -10,8 +10,49 @@
         $this->auth_schema = $auth_schema;
         $this->user_schema = $user_schema;
     }
+    public function register(): void
+    {
+        try {
+            if (
+                !isset($_POST["username"]) ||
+                !isset($_POST["email"]) ||
+                !isset($_POST["password"]) ||
+                empty($_POST["username"]) ||
+                empty($_POST["email"]) ||
+                empty($_POST["password"])
+            ) {
+                http_response_code(400);
+                header("Content-Type: application/json");
+                echo json_encode(["error" => "Missing required fields"]);
+                return;
+            }
+            $username = $_POST["username"];
+            $email = strtolower($_POST["email"]);
+            $password = $_POST["password"];
+            if (!Validator::validateUsername($username)) {
+                throw new InvalidUsernameException();
+            }
+            if (!Validator::validateEmail($email)) {
+                throw new InvalidEmailException();
+            }
+            $this->user_schema->duplicate_handler($username, $email);
+            $hashed_password = $this->auth_schema->register($password);
+            $this->user_schema->create($username, $email, $hashed_password);
+            Session::set("user_id", $this->user_schema->getId());
+            Session::set("username", $this->user_schema->getUsername());
+            Session::set("email", $this->user_schema->getEmail());
+            Session::set("role", $this->user_schema->getRole());
+            http_response_code(201);
+            header("Content-Type: application/json");
+            echo json_encode($this->user_schema->toArray());
+        } catch (Exception $e) {
+            http_response_code($e->getCode() !== 0 ? $e->getCode() : 400);
+            header("Content-Type: application/json");
+            echo json_encode(["error" => $e->getMessage()]);
+            return;
+        }
+    }
     public function login(): void {}
-    public function register(): void {}
     public function logout(): void {}
 
     #[\Override]

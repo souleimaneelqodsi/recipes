@@ -9,16 +9,20 @@ class AuthSchema
         $this->json_handler = $json_handler;
     }
     /**
-     * @return array
+     * @return string
      */
-    public function login(): array
+    public function register(string $password): string
     {
-        return [];
+        if (!Validator::validatePassword($password)) {
+            throw new InvalidPasswordException();
+        }
+        return password_hash($password, PASSWORD_DEFAULT);
+        //sanitized input and hashed passsword
     }
     /**
      * @return array
      */
-    public function register(): array
+    public function login(): array
     {
         return [];
     }
