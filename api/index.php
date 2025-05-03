@@ -1,13 +1,15 @@
 <?php
 
-define("API_BASE_PATH", "."); // $_SERVER['SCRIPT_NAME'] didn't work...
+define("API_BASE_PATH", ".");
 
 spl_autoload_register(function ($class) {
     error_log("Attempting to autoload: " . $class);
 
     $classFile = null;
 
-    if (str_ends_with($class, "Controller")) {
+    if (str_ends_with($class, "Exception")) {
+        $classFile = API_BASE_PATH . "/utils/errors.php";
+    } elseif (str_ends_with($class, "Controller")) {
         $baseName = strtolower(substr($class, 0, -10));
         $classFile =
             API_BASE_PATH . "/controllers/" . $baseName . "_controller.php";

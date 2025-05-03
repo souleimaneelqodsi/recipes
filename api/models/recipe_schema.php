@@ -31,7 +31,8 @@ class RecipeSchema
             $recipes = $this->getAll();
             $recipe_index = array_search(
                 $recipe_id,
-                array_column($recipes, "id")
+                array_column($recipes, "id"),
+                true
             );
             if ($recipe_index !== false) {
                 return $recipes[$recipe_index];
@@ -173,11 +174,8 @@ class RecipeSchema
                 $word_count = count($search_tokens);
                 $words_occurrences = array_count_values($search_tokens);
                 //how many times the word appears exactly
-                // how many times the word appears exactly
                 $word_frequency = $words_occurrences[$search_term] ?? 0;
                 //now we have to do a traversal of the array to make a fuzzy search with each word of the array
-                //(pimme, pomme) -> 1
-                //(pimmes, pommes) -> 2
                 foreach ($search_tokens as $token) {
                     if (strlen($token) < 3) {
                         continue;
@@ -186,6 +184,7 @@ class RecipeSchema
                     $threshold = round(log(strlen($token)));
                     //bonus of 1 if rounded log of the token  is greater or equal to 1, in order to be less strict and improve the relevance of the results
                     // $threshold = $log_threshold >= 3 ? $log_threshold + 1 : 1;
+                    // removed it because it was possible source of imbalanced thresholds
                     // Ensure we don't cause warnings with strings > 255 chars
                     if (strlen($token) > 255 || strlen($search_term) > 255) {
                         if (stripos($token, $search_term) !== false) {
@@ -215,13 +214,13 @@ class RecipeSchema
             $inverse_document_frequency = log(
                 count($recipes) / (1 + $document_frequency)
             );
+            //IDF is gonna be equal to 0 if the number of recipes is equal to the number of documents in which the search term appears + 1, log(1) = 0
+            //I don't know how to fix this problem so I prefer that IDF doesn't make the whole result null, I treat this case by replacing it with 1 to cancel its effect
             $inverse_document_frequency =
                 count($recipes) > $document_frequency + 1 &&
                 $document_frequency > 0
                     ? $inverse_document_frequency
                     : 1;
-            //IDF is gonna be equal to 0 if the number of recipes is equal to the number of documents in which the search term appears + 1, log(1) = 0
-            //I don't know how to fix this problem so I prefer that IDF doesn't make the whole result null, I treat this case by replacing it with 1 to cancel its effect
             //TF-IDF
             $score_by_document = array_map(
                 fn($tf_score): float => $tf_score * $inverse_document_frequency,
@@ -263,14 +262,6 @@ class RecipeSchema
         $final_scores = [];
         foreach ($query_scores as $term => $score_set) {
             foreach ($score_set as $recipe_id => $score) {
-                // if ($score == 0) {
-                //     continue;
-                // }
-                // if (!isset($final_scores[$recipe_id])) {
-                //     $final_scores[$recipe_id] = 0;
-                // } else {
-                //     $final_scores[$recipe_id] += $score;
-                // }
                 if ($score > 0) {
                     if (!isset($final_scores[$recipe_id])) {
                         $final_scores[$recipe_id] = $score;
@@ -386,11 +377,6 @@ class RecipeSchema
     public function update(string $recipe_id, array $updateData): array
     {
         try {
-            // $recipe = $this->getById($recipe_id);
-            // if ($recipe === []) {
-            //     throw new Exception("Recipe not found");
-            // }
-            // here, I'm not using getById() because I need to have an array with all the recipes
             if (
                 !isset($updateData) ||
                 !is_array($updateData) ||
@@ -411,9 +397,6 @@ class RecipeSchema
                         "steps",
                         "stepsFR",
                         "timers",
-                        "imageURL",
-                        "comments",
-                        "photos",
                         "total_time",
                     ]
                 ) !== []
@@ -470,7 +453,8 @@ class RecipeSchema
 
             $recipe_index = array_search(
                 $recipe_id,
-                array_column($all_recipes, "id")
+                array_column($all_recipes, "id"),
+                true
             );
             if ($recipe_index !== false) {
                 $deleted_recipe = $all_recipes[$recipe_index];
@@ -490,22 +474,6 @@ class RecipeSchema
             );
         }
     }
-    // /**
-    //  * @return void     */
-    // public function like(string $recipe_id): void
-    // {
-    //     try {
-    //         $this->update($recipe_id, [
-    //             "likes" => $this->getById($recipe_id)["likes"] + 1,
-    //         ]);
-    //     } catch (Exception $e) {
-    //         error_log("Error updating recipe data: " . $e->getMessage());
-    //         throw new Exception(
-    //             "Error updating recipe data: " . $e->getMessage()
-    //         );
-    //     }
-    // }
-    //it was possible to compose update and getById but it's not efficient
 
     /**
      * @return array
@@ -516,7 +484,8 @@ class RecipeSchema
             $all_recipes = $this->getAll();
             $recipe_index = array_search(
                 $recipe_id,
-                array_column($all_recipes, "id")
+                array_column($all_recipes, "id"),
+                true
             );
             if ($recipe_index !== false) {
                 $current_likes = $all_recipes[$recipe_index]["likes"];
@@ -533,7 +502,7 @@ class RecipeSchema
         }
     }
     /**
-     * @return <missing>|array
+     * @return array
      */
     public function unlike(string $recipe_id)
     {
@@ -541,7 +510,8 @@ class RecipeSchema
             $all_recipes = $this->getAll();
             $recipe_index = array_search(
                 $recipe_id,
-                array_column($all_recipes, "id")
+                array_column($all_recipes, "id"),
+                true
             );
             if ($recipe_index !== false) {
                 $current_likes = $all_recipes[$recipe_index]["likes"];
@@ -561,7 +531,8 @@ class RecipeSchema
     }
 
     /**
-     * @return array     * @param array<int,mixed> $translation
+     * @return array
+     * @param array<int,mixed> $translation
      */
     public function translate(string $recipe_id, array $translation): array
     {
@@ -569,16 +540,11 @@ class RecipeSchema
             $all_recipes = $this->getAll();
             $recipe_index = array_search(
                 $recipe_id,
-                array_column($all_recipes, "id")
+                array_column($all_recipes, "id"),
+                true
             );
             if ($recipe_index !== false) {
                 if (
-                    // array_keys($translation) !== [
-                    //     "name",
-                    //     "ingredients",
-                    //     "steps",
-                    // ]
-                    //could've tested like this but it's strict on the order of the keys...
                     array_diff(array_keys($translation), [
                         "name",
                         "ingredients",
@@ -650,8 +616,11 @@ class RecipeSchema
     }
     /**
      * @return array     */
-    public function setPhoto(string $recipe_id, string $photo_id): array
-    {
+    public function setPhoto(
+        string $recipe_id,
+        string $photo_id,
+        &$final_url
+    ): array {
         try {
             if (empty($photo_id)) {
                 throw new Exception("Photo ID is empty");
@@ -659,7 +628,8 @@ class RecipeSchema
             $all_recipes = $this->getAll();
             $recipe_index = array_search(
                 $recipe_id,
-                array_column($all_recipes, "id")
+                array_column($all_recipes, "id"),
+                true
             );
             if ($recipe_index === false) {
                 throw new Exception("Recipe not found");
@@ -667,7 +637,8 @@ class RecipeSchema
             $recipe = $all_recipes[$recipe_index];
             $photo_index = array_search(
                 $photo_id,
-                array_column($recipe["photos"], "id")
+                array_column($recipe["photos"], "id"),
+                true
             );
 
             if ($photo_index === false) {
@@ -677,7 +648,8 @@ class RecipeSchema
             $recipe["photos"][$photo_index]["is_main"] = true;
             $old_photo_index = array_search(
                 $recipe["imageURL"],
-                array_column($recipe["photos"], "url")
+                array_column($recipe["photos"], "url"),
+                true
             );
             if ($old_photo_index === false) {
                 error_log("Current photo couldn't be found");
@@ -690,6 +662,7 @@ class RecipeSchema
                 throw new InvalidArgumentException("Image is already main");
             }
             $recipe["imageURL"] = $new_main_photo["url"];
+            $final_url = $new_main_photo["url"];
             if (!Validator::validateRecipe($recipe)) {
                 throw new Exception(
                     "Error after setting photo for recipe: result is not valid"
@@ -712,7 +685,8 @@ class RecipeSchema
             $all_recipes = $this->getAll();
             $recipe_index = array_search(
                 $recipe_id,
-                array_column($all_recipes, "id")
+                array_column($all_recipes, "id"),
+                true
             );
             if ($recipe_index === false) {
                 error_log("Recipe not found");
