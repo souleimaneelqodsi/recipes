@@ -48,16 +48,20 @@ class InvalidPasswordException extends Exception
 
 class IncorrectPasswordException extends Exception
 {
-    public function __construct($message = "Incorrect password", $code = 401)
-    {
+    public function __construct(
+        $message = "Invalid credentials: Incorrect password",
+        $code = 401
+    ) {
         parent::__construct($message, $code);
     }
 }
 
 class IncorrectUsernameException extends Exception
 {
-    public function __construct($message = "Incorrect username", $code = 401)
-    {
+    public function __construct(
+        $message = "Invalid credentials: Incorrect username",
+        $code = 401
+    ) {
         parent::__construct($message, $code);
     }
 }

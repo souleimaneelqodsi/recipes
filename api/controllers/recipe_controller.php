@@ -215,7 +215,10 @@
                 ]);
                 return;
             }
-            $delete_recipe = $this->user_schema->deleteRecipe($recipe_id);
+            $delete_recipe = $this->user_schema->deleteRecipe(
+                $recipe_id,
+                $this->recipe_schema->getById($recipe_id)["Author"]
+            );
             if (empty($delete_recipe)) {
                 http_response_code(404);
                 header("Content-Type: application/json");
