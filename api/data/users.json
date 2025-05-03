@@ -1,1 +1,14 @@
-[]
+[
+    {
+        "id": "1998d29f-fded-41-b7-1eabb2d45077",
+        "username": "newuser_test",
+        "email": "newuser@example.com",
+        "role": "Cuisinier",
+        "created_at": 1746301070,
+        "recipes": [],
+        "comments": [],
+        "photos": [],
+        "likes": [],
+        "password": "$2y$10$JqM21Y4BkV2Pi63MhbUY7eN1LkAvb8.2yjY85yLyL4U7lQFSUiv3q"
+    }
+]

@@ -3,13 +3,12 @@
     private $recipe_schema;
     private UserSchema $user_schema;
 
-    // UserSchema $user_schema)
-    public function __construct(RecipeSchema $recipe_schema)
-    {
-        // UserSchema $user_schema
+    public function __construct(
+        RecipeSchema $recipe_schema,
+        UserSchema $user_schema
+    ) {
         $this->recipe_schema = $recipe_schema;
-
-        // $this->user_schema = $user_schema;
+        $this->user_schema = $user_schema;
     }
 
     private function handleUnauthorized(): bool
@@ -46,7 +45,9 @@
     public function getById(string $id): void
     {
         try {
-            // if($this->handleUnauthorized()){return;}
+            if ($this->handleUnauthorized()) {
+                return;
+            }
             $recipe = $this->recipe_schema->getById($id);
             if (empty($recipe)) {
                 http_response_code(404);
@@ -85,21 +86,21 @@
     public function create(): void
     {
         try {
-            // if ($this->handleUnauthorized()) {
-            //     return;
-            // }
-            // if (
-            //     Session::getUserRole() !== "Chef" &&
-            //     Session::getUserRole() !== "Administrateur"
-            // ) {
-            //     http_response_code(403);
-            //     header("Content-Type: application/json");
-            //     echo json_encode([
-            //         "error" =>
-            //             "Forbidden: User is neither cook nor administrator",
-            //     ]);
-            //     return;
-            // }
+            if ($this->handleUnauthorized()) {
+                return;
+            }
+            if (
+                Session::getUserRole() !== "Chef" &&
+                Session::getUserRole() !== "Administrateur"
+            ) {
+                http_response_code(403);
+                header("Content-Type: application/json");
+                echo json_encode([
+                    "error" =>
+                        "Forbidden: User is neither cook nor administrator",
+                ]);
+                return;
+            }
             $data = Utils::getJSONBody();
             if ($data == null) {
                 http_response_code(400);
@@ -110,6 +111,22 @@
                 return;
             }
             $recipe = $this->recipe_schema->create($data);
+            $sub_data = ["id" => $data["id"]];
+            key_exists("name", $data)
+                ? ($sub_data["name"] = $data["name"])
+                : ($sub_data["nameFR"] = $data["nameFR"]);
+            $sub_data["imageURL"] = $data["imageURL"];
+            $sub_data["likes"] = 0;
+            $owner_recipe = $this->user_schema->addRecipe($sub_data);
+            if (empty($owner_recipe)) {
+                http_response_code(400);
+                header("Content-Type: application/json");
+                echo json_encode([
+                    "error" =>
+                        "Failed to add recipe to the user's recipes: bad input.",
+                ]);
+                return;
+            }
             http_response_code(201);
             header("Content-Type: application/json");
             echo json_encode($recipe);
@@ -119,28 +136,28 @@
             echo json_encode(["error" => $e->getMessage()]);
         }
     }
-    // success: 200 OK, error:400, other error:500
+
     public function update(string $id, array $data): void
     {
         try {
-            // if ($this->handleUnauthorized()) {
-            //     return;
-            // }
-            // if (
-            //     Session::getUserRole() !== "Administrateur" &&
-            //     !$this->recipe_schema->isAuthor(
-            //         $id,
-            //         Session::getCurrentUser()->id
-            //     )
-            // ) {
-            //     http_response_code(403);
-            //     header("Content-Type: application/json");
-            //     echo json_encode([
-            //         "error" =>
-            //             "Forbidden: User is neither author nor administrator",
-            //     ]);
-            //     return;
-            // }
+            if ($this->handleUnauthorized()) {
+                return;
+            }
+            if (
+                Session::getUserRole() !== "Administrateur" &&
+                !$this->recipe_schema->isAuthor(
+                    Session::getCurrentUser()->getId(),
+                    $id
+                )
+            ) {
+                http_response_code(403);
+                header("Content-Type: application/json");
+                echo json_encode([
+                    "error" =>
+                        "Forbidden: User is neither author nor administrator",
+                ]);
+                return;
+            }
             $recipe = $this->recipe_schema->update($id, $data);
             if (empty($recipe)) {
                 http_response_code(400);
@@ -149,6 +166,22 @@
                     "error" => "Bad Request: recipe not found or bad entry",
                 ]);
                 return;
+            }
+            $name = key_exists("name", $data) ? $data["name"] : null;
+            $nameFR = key_exists("nameFR", $data) ? $data["nameFR"] : null;
+            $recipe_obj = $this->recipe_schema->getById($id);
+            if (!empty($recipe_obj)) {
+                $author_id = $recipe_obj["Author"];
+                $this->user_schema->editRecipe(
+                    $id,
+                    $author_id,
+                    name: $name,
+                    nameFR: $nameFR
+                );
+            } else {
+                throw new Exception(
+                    "Could not edit the recipe in the owner profile"
+                );
             }
             http_response_code(200);
             header("Content-Type: application/json");
@@ -163,17 +196,17 @@
     public function delete(string $recipe_id): void
     {
         try {
-            // if ($this->handleUnauthorized()) {
-            //     return;
-            // }
-            // if (Session::getUserRole() !== "Administrateur") {
-            //     http_response_code(403);
-            //     header("Content-Type: application/json");
-            //     echo json_encode([
-            //         "error" => "Forbidden: User is not an administrator",
-            //     ]);
-            //     return;
-            // }
+            if ($this->handleUnauthorized()) {
+                return;
+            }
+            if (Session::getUserRole() !== "Administrateur") {
+                http_response_code(403);
+                header("Content-Type: application/json");
+                echo json_encode([
+                    "error" => "Forbidden: User is not an administrator",
+                ]);
+                return;
+            }
             $recipe = $this->recipe_schema->delete($recipe_id);
             if (empty($recipe)) {
                 http_response_code(404);
@@ -183,6 +216,18 @@
                 ]);
                 return;
             }
+            $delete_recipe = $this->user_schema->deleteRecipe(
+                $recipe_id,
+                $this->recipe_schema->getById($recipe_id)["Author"]
+            );
+            if (empty($delete_recipe)) {
+                http_response_code(404);
+                header("Content-Type: application/json");
+                echo json_encode([
+                    "error" => "Not found: User or recipe not found",
+                ]);
+                return;
+            }
             http_response_code(200);
             header("Content-Type: application/json");
             echo json_encode($recipe);
@@ -192,14 +237,21 @@
             echo json_encode(["error" => $e->getMessage()]);
         }
     }
+
     public function like(string $recipe_id): void
     {
         try {
-            // if ($this->handleUnauthorized()) {
-            //     return;
-            // }
+            if ($this->handleUnauthorized()) {
+                return;
+            }
             $recipe = $this->recipe_schema->like($recipe_id);
-            // $user = $this->user_schema->like($recipe_id);
+            $user = $this->user_schema->like($recipe_id);
+            $recipe_obj = $this->recipe_schema->getById($recipe_id);
+            $this->user_schema->editRecipe(
+                $recipe_id,
+                $recipe_obj["Author"],
+                likes: $recipe_obj["likes"]
+            );
             if (empty($recipe)) {
                 http_response_code(404);
                 header("Content-Type: application/json");
@@ -208,14 +260,14 @@
                 ]);
                 return;
             }
-            // if (empty($user)) {
-            //     http_response_code(403);
-            //     header("Content-Type: application/json");
-            //     echo json_encode([
-            //         "error" => "Forbidden: User already liked this recipe",
-            //     ]);
-            //     return;
-            // }
+            if (empty($user)) {
+                http_response_code(403);
+                header("Content-Type: application/json");
+                echo json_encode([
+                    "error" => "Forbidden: User already liked this recipe",
+                ]);
+                return;
+            }
             http_response_code(200);
             header("Content-Type: application/json");
             echo json_encode($recipe);
@@ -225,14 +277,21 @@
             echo json_encode(["error" => $e->getMessage()]);
         }
     }
+
     public function unlike(string $recipe_id): void
     {
         try {
-            // if ($this->handleUnauthorized()) {
-            //     return;
-            // }
+            if ($this->handleUnauthorized()) {
+                return;
+            }
             $recipe = $this->recipe_schema->unlike($recipe_id);
-            // $user = $this->user_schema->unlike($recipe_id);
+            $user = $this->user_schema->unlike($recipe_id);
+            $recipe_obj = $this->recipe_schema->getById($recipe_id);
+            $this->user_schema->editRecipe(
+                $recipe_id,
+                $recipe_obj["Author"],
+                likes: $recipe_obj["likes"]
+            );
             if (empty($recipe)) {
                 http_response_code(404);
                 header("Content-Type: application/json");
@@ -241,14 +300,14 @@
                 ]);
                 return;
             }
-            // if (empty($user)) {
-            //     http_response_code(403);
-            //     header("Content-Type: application/json");
-            //     echo json_encode([
-            //         "error" => "Forbidden: Recipe not liked",
-            //     ]);
-            //     return;
-            // }
+            if (empty($user)) {
+                http_response_code(403);
+                header("Content-Type: application/json");
+                echo json_encode([
+                    "error" => "Forbidden: Recipe not liked",
+                ]);
+                return;
+            }
             http_response_code(200);
             header("Content-Type: application/json");
             echo json_encode($recipe);
@@ -258,13 +317,13 @@
             echo json_encode(["error" => $e->getMessage()]);
         }
     }
-    // success:200; error:400, not found:404, forbidden:403, unauthorized:401, other error:500
+
     public function translate(string $recipe_id, array $translation): void
     {
         try {
-            // if ($this->handleUnauthorized()) {
-            //     return;
-            // }
+            if ($this->handleUnauthorized()) {
+                return;
+            }
             $recipe = $this->recipe_schema->translate($recipe_id, $translation);
             if (empty($recipe)) {
                 http_response_code(404);
@@ -287,25 +346,30 @@
     public function setPhoto(string $recipe_id, string $photo_id): void
     {
         try {
-            // if ($this->handleUnauthorized()) {
-            //     return;
-            // }
-            $recipe = $this->recipe_schema->setPhoto($recipe_id, $photo_id);
-            // if (
-            //     !$this->recipe_schema->isAuthor(
-            //         $recipe_id,
-            //         Session::getCurrentUser()->id
-            //     ) &&
-            //     Session::getUserRole() !== "Administrateur"
-            // ) {
-            //     http_response_code(403);
-            //     header("Content-Type: application/json");
-            //     echo json_encode([
-            //         "error" =>
-            //             "Forbidden: You are neither the author of this recipe nor an administrator",
-            //     ]);
-            //     return;
-            // }
+            if ($this->handleUnauthorized()) {
+                return;
+            }
+            if (
+                !$this->recipe_schema->isAuthor(
+                    $recipe_id,
+                    Session::getCurrentUser()->getId()
+                ) &&
+                Session::getUserRole() !== "Administrateur"
+            ) {
+                http_response_code(403);
+                header("Content-Type: application/json");
+                echo json_encode([
+                    "error" =>
+                        "Forbidden: You are neither the author of this recipe nor an administrator",
+                ]);
+                return;
+            }
+            $url = "";
+            $recipe = $this->recipe_schema->setPhoto(
+                $recipe_id,
+                $photo_id,
+                $url
+            );
             if (empty($recipe)) {
                 http_response_code(404);
                 header("Content-Type: application/json");
@@ -314,6 +378,13 @@
                 ]);
                 return;
             }
+            $recipe_obj = $this->recipe_schema->getById($recipe_id);
+            $author_id = $recipe_obj["Author"];
+            $this->user_schema->editRecipe(
+                $recipe_id,
+                $author_id,
+                imageURL: $url
+            );
             http_response_code(200);
             header("Content-Type: application/json");
             echo json_encode($recipe);
@@ -333,19 +404,19 @@
     public function publish(string $recipe_id): void
     {
         try {
-            // if ($this->handleUnauthorized()) {
-            //     return;
-            // }
+            if ($this->handleUnauthorized()) {
+                return;
+            }
             $recipe = $this->recipe_schema->publish($recipe_id);
-            // if (Session::getUserRole() !== "Administrateur") {
-            //     http_response_code(403);
-            //     header("Content-Type: application/json");
-            //     echo json_encode([
-            //         "error" =>
-            //             "Forbidden: You are not administrator, you cannot publish a recipe.",
-            //     ]);
-            //     return;
-            // }
+            if (Session::getUserRole() !== "Administrateur") {
+                http_response_code(403);
+                header("Content-Type: application/json");
+                echo json_encode([
+                    "error" =>
+                        "Forbidden: You are not administrator, you cannot publish a recipe.",
+                ]);
+                return;
+            }
             if (empty($recipe)) {
                 http_response_code(404);
                 header("Content-Type: application/json");

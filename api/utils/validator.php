@@ -200,6 +200,30 @@ class Validator
             isset($recipe["created_at"]);
     }
 
+    public static function validateRecipeUser($recipe): bool
+    {
+        return isset($recipe["id"]) &&
+            (isset($recipe["name"]) || isset($recipe["nameFR"])) &&
+            isset($recipe["imageURL"]) &&
+            isset($recipe["likes"]);
+    }
+
+    public static function validateRecipesUser($recipes): bool
+    {
+        if (!isset($recipes)) {
+            return false;
+        }
+        $is_valid = is_array($recipes);
+        if (empty($recipes)) {
+            return $is_valid;
+        } else {
+            foreach ($recipes as $recipe) {
+                $is_valid = $is_valid && self::validateRecipesUser($recipe);
+            }
+            return $is_valid;
+        }
+    }
+
     /**
      * @param mixed $photo
      * @return bool
@@ -289,6 +313,7 @@ class Validator
             isset($user["username"]) &&
             self::validateEmail($user["email"]) &&
             self::validateUsername($user["username"]) &&
+            isset($user["password"]) &&
             isset($user["likes"]) &&
             is_array($user["likes"]) &&
             isset($user["role"]) &&
@@ -301,9 +326,11 @@ class Validator
                 "DemandeTraducteur",
             ]) &&
             isset($user["created_at"]) &&
+            self::validateRecipesUser($user["recipes"]) &&
             self::validateCommentsUser($user["comments"]) &&
             self::validatePhotosUser($user["photos"]);
     }
+
     /**
      * @param mixed $token
      */

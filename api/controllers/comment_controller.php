@@ -13,14 +13,18 @@
     #[\Override]
     public function dispatch($method, array $path): void
     {
-        if (!isset($path) || !isset($method)) {
+        if (empty($path) || !isset($method)) {
             http_response_code(400);
             header("Content-Type: application/json");
             echo json_encode(["error" => "Invalid request"]);
             return;
         }
 
-        if (count($path) != 2 || $path[1] !== "comments" || $path[0] === "") {
+        if (
+            count((array) $path) != 2 ||
+            $path[1] !== "comments" ||
+            $path[0] === ""
+        ) {
             http_response_code(400);
             header("Content-Type: application/json");
             echo json_encode(["error" => "Bad request"]);

@@ -16,9 +16,15 @@ class CommentSchema
     /**
      * @return array
      */
-    public function create(string $recipe_id): array {}
+    public function create(string $recipe_id): array
+    {
+        return [];
+    }
     /**
      * @return array
      */
-    public function fetch(string $recipe_id): array {}
+    public function fetch(string $recipe_id): array
+    {
+        return [];
+    }
 }
