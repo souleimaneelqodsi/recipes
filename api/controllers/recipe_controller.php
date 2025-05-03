@@ -136,6 +136,7 @@
             echo json_encode(["error" => $e->getMessage()]);
         }
     }
+
     public function update(string $id, array $data): void
     {
         try {
@@ -236,6 +237,7 @@
             echo json_encode(["error" => $e->getMessage()]);
         }
     }
+
     public function like(string $recipe_id): void
     {
         try {
@@ -275,6 +277,7 @@
             echo json_encode(["error" => $e->getMessage()]);
         }
     }
+
     public function unlike(string $recipe_id): void
     {
         try {
@@ -314,6 +317,7 @@
             echo json_encode(["error" => $e->getMessage()]);
         }
     }
+
     public function translate(string $recipe_id, array $translation): void
     {
         try {
