@@ -313,6 +313,7 @@ class Validator
             isset($user["username"]) &&
             self::validateEmail($user["email"]) &&
             self::validateUsername($user["username"]) &&
+            isset($user["password"]) &&
             isset($user["likes"]) &&
             is_array($user["likes"]) &&
             isset($user["role"]) &&
@@ -329,6 +330,7 @@ class Validator
             self::validateCommentsUser($user["comments"]) &&
             self::validatePhotosUser($user["photos"]);
     }
+
     /**
      * @param mixed $token
      */

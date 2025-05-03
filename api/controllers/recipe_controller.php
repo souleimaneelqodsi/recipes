@@ -136,6 +136,7 @@
             echo json_encode(["error" => $e->getMessage()]);
         }
     }
+
     public function update(string $id, array $data): void
     {
         try {
@@ -145,7 +146,7 @@
             if (
                 Session::getUserRole() !== "Administrateur" &&
                 !$this->recipe_schema->isAuthor(
-                    Session::getCurrentUser()->id,
+                    Session::getCurrentUser()->getId(),
                     $id
                 )
             ) {
@@ -215,7 +216,10 @@
                 ]);
                 return;
             }
-            $delete_recipe = $this->user_schema->deleteRecipe($recipe_id);
+            $delete_recipe = $this->user_schema->deleteRecipe(
+                $recipe_id,
+                $this->recipe_schema->getById($recipe_id)["Author"]
+            );
             if (empty($delete_recipe)) {
                 http_response_code(404);
                 header("Content-Type: application/json");
@@ -233,6 +237,7 @@
             echo json_encode(["error" => $e->getMessage()]);
         }
     }
+
     public function like(string $recipe_id): void
     {
         try {
@@ -272,6 +277,7 @@
             echo json_encode(["error" => $e->getMessage()]);
         }
     }
+
     public function unlike(string $recipe_id): void
     {
         try {
@@ -311,6 +317,7 @@
             echo json_encode(["error" => $e->getMessage()]);
         }
     }
+
     public function translate(string $recipe_id, array $translation): void
     {
         try {
@@ -345,7 +352,7 @@
             if (
                 !$this->recipe_schema->isAuthor(
                     $recipe_id,
-                    Session::getCurrentUser()->id
+                    Session::getCurrentUser()->getId()
                 ) &&
                 Session::getUserRole() !== "Administrateur"
             ) {

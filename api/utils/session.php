@@ -80,9 +80,20 @@
             $_SESSION["username"],
             $_SESSION["email"]
         );
-        $user_schema->fromArray($user_schema->getById($_SESSION["user_id"]));
-
-        return $user_schema;
+        try {
+            $userData = $user_schema->getById($_SESSION["user_id"]);
+            if (empty($userData)) {
+                throw new Exception("User not found in session");
+            }
+            $user_schema->fromArray($userData);
+            return $user_schema;
+        } catch (Exception $e) {
+            error_log(
+                "User retrieval error during session initialization: " .
+                    $e->getMessage()
+            );
+            throw $e;
+        }
     }
 
     public static function getUserRole(): string
@@ -90,7 +101,6 @@
         if (session_status() !== PHP_SESSION_ACTIVE) {
             throw new Exception("Session is not active");
         }
-        $user = self::getCurrentUser();
-        return $user ? $user->role : "Guest";
+        return self::get("role");
     }
 }

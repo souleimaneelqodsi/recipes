@@ -2,31 +2,25 @@
 
 class AuthSchema
 {
-    private JSONHandler $json_handler;
-
-    public function __construct(JSONHandler $json_handler)
+    /**
+     * @return string
+     */
+    public function register(string $password): string
     {
-        $this->json_handler = $json_handler;
+        if (!Validator::validatePassword($password)) {
+            throw new InvalidPasswordException();
+        }
+        return password_hash($password, PASSWORD_DEFAULT);
     }
     /**
-     * @return array
+     * @return void
+     * @param mixed $password
+     * @param mixed $hash
      */
-    public function login(): array
+    public function login(string $password, string $hash): void
     {
-        return [];
-    }
-    /**
-     * @return array
-     */
-    public function register(): array
-    {
-        return [];
-    }
-    /**
-     * @return array
-     */
-    public function logout(): array
-    {
-        return [];
+        if (!password_verify($password, $hash)) {
+            throw new IncorrectPasswordException();
+        }
     }
 }
