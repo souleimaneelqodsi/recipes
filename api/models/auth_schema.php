@@ -3,25 +3,30 @@
 class AuthSchema
 {
     private JSONHandler $json_handler;
-    private UserSchema $user_model;
 
-    public function __construct(
-        JSONHandler $json_handler,
-        UserSchema $user_schema
-    ) {
+    public function __construct(JSONHandler $json_handler)
+    {
         $this->json_handler = $json_handler;
-        $this->user_model = $user_schema;
     }
     /**
      * @return array
      */
-    public function login(): array {}
+    public function login(): array
+    {
+        return [];
+    }
     /**
      * @return array
      */
-    public function register(): array {}
+    public function register(): array
+    {
+        return [];
+    }
     /**
      * @return array
      */
-    public function logout(): array {}
+    public function logout(): array
+    {
+        return [];
+    }
 }

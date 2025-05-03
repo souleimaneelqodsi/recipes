@@ -7,6 +7,13 @@
             ini_set("session.use_only_cookies", 1);
             session_start();
         }
+        if (
+            !isset($_SESSION["last_regeneration"]) ||
+            time() - Session::get("last_regeneration") > 300
+        ) {
+            session_regenerate_id(true);
+            Session::set("last_regeneration", time());
+        }
     }
 
     public static function destroy(): void
@@ -68,8 +75,12 @@
             throw new Exception("Session is not active");
         }
         $json_handler = new JSONHandler(API_BASE_PATH . "/data");
-        $user_schema = new UserSchema($json_handler, $_SESSION["user_id"]);
-        $user_schema->getById($_SESSION["user_id"]);
+        $user_schema = new UserSchema(
+            $json_handler,
+            $_SESSION["username"],
+            $_SESSION["email"]
+        );
+        $user_schema->fromArray($user_schema->getById($_SESSION["user_id"]));
 
         return $user_schema;
     }

@@ -1,10 +1,14 @@
 <?php class AuthController implements BaseController
 {
     private $auth_schema;
+    private $user_schema;
 
-    public function __construct(AuthSchema $auth_schema)
-    {
+    public function __construct(
+        AuthSchema $auth_schema,
+        UserSchema $user_schema
+    ) {
         $this->auth_schema = $auth_schema;
+        $this->user_schema = $user_schema;
     }
     public function login(): void {}
     public function register(): void {}
@@ -20,7 +24,7 @@
             return;
         }
         if ($method === "POST") {
-            if (count((array)$path) == 1) {
+            if (count((array) $path) == 1) {
                 switch ($path[0]) {
                     case "register":
                         $this->register();

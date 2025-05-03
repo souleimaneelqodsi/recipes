@@ -7,11 +7,65 @@
         $this->user_schema = $user_schema;
     }
 
-    public function getAll(): void {}
-    public function getById(string $user_id): void {}
-    public function create(): void {}
-    public function update(string $user_id): void {}
-    public function updateRole(string $user_id): void {}
+    public function getAll(): void
+    {
+        try {
+            $users = $this->user_schema->getAll();
+            if (empty($users)) {
+                http_response_code(204);
+                header("Content-Type: application/json");
+                echo json_encode([]);
+                return;
+            }
+            http_response_code(200);
+            header("Content-Type: application/json");
+            echo json_encode($users);
+        } catch (Exception $e) {
+            http_response_code(500);
+            header("Content-Type: application/json");
+            echo json_encode(["error" => $e->getMessage()]);
+        }
+    }
+
+    public function getById(string $user_id): void
+    {
+        try {
+            $usr = $this->user_schema->getById($user_id);
+            if (empty($usr)) {
+                http_response_code(404);
+                header("Content-Type: application/json");
+                echo json_encode(["error" => "User not found"]);
+                return;
+            }
+            http_response_code(200);
+            header("Content-Type: application/json");
+            echo json_encode($usr);
+        } catch (Exception $e) {
+            http_response_code(500);
+            header("Content-Type: application/json");
+            echo json_encode(["error" => $e->getMessage()]);
+        }
+    }
+
+    public function updateRole(string $user_id, string $role): void
+    {
+        try {
+            $updated_usr = $this->user_schema->updateRole($user_id, $role);
+            if (empty($updated_usr)) {
+                http_response_code(404);
+                header("Content-Type: application/json");
+                echo json_encode(["error" => "User not found"]);
+                return;
+            }
+            http_response_code(200);
+            header("Content-Type: application/json");
+            echo json_encode(["message" => "User role updated"]);
+        } catch (Exception $e) {
+            http_response_code(500);
+            header("Content-Type: application/json");
+            echo json_encode(["error" => $e->getMessage()]);
+        }
+    }
 
     #[\Override]
     public function dispatch($method, array $path): void
@@ -35,31 +89,20 @@
                     return;
                 }
             }
-        } elseif ($method === "POST") {
-            if (empty($path)) {
-                $this->create();
-            } else {
+        } elseif ($method === "PATCH") {
+            $data = Utils::getJSONBody();
+            if ($data === null) {
                 http_response_code(400);
                 header("Content-Type: application/json");
-                echo json_encode(["error" => "Invalid request"]);
+                echo json_encode(["error" => "Bad request"]);
                 return;
             }
-        } elseif ($method === "PUT") {
-            if (count((array) $path) == 1 && $path[0] !== "") {
-                $this->update($path[0]);
-                return;
-            }
-            http_response_code(400);
-            header("Content-Type: application/json");
-            echo json_encode(["error" => "Invalid request"]);
-            return;
-        } elseif ($method === "PATCH") {
             if (
                 $path[0] !== "" &&
                 count((array) $path) == 2 &&
                 $path[1] === "role"
             ) {
-                $this->updateRole($path[0]);
+                $this->updateRole($path[0], $data["role"]);
                 return;
             }
             http_response_code(400);
