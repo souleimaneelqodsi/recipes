@@ -1,72 +1,71 @@
+//chargement des recetttes
 
+// script.js
 
-
-
-  //chargement des recetttes 
-
-  // script.js
-
-
-  document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", () => {
     const recipesContainer = document.getElementById("midou");
 
     fetchRecipes();
 
     function fetchRecipes() {
-        fetch('/recipes/api/recipes')
-            .then(response => {
+        fetch("/recipes/api/recipes")
+            .then((response) => {
                 // Log de la réponse pour analyser le contenu
-                console.log('Réponse de l\'API:', response);
+                console.log("Réponse de l'API:", response);
 
                 // Vérifier si la réponse est vide ou n'a pas de corps JSON
                 if (response.status === 204) {
-                    console.log('Aucune recette disponible (204)');
-                    return [];  // Retourner un tableau vide
+                    console.log("Aucune recette disponible (204)");
+                    return []; // Retourner un tableau vide
                 }
 
                 // Si la réponse est valide (200), traiter le JSON
                 if (response.status === 200) {
-                    return response.text()  // Lire la réponse comme texte brut
-                        .then(text => {
+                    return response
+                        .text() // Lire la réponse comme texte brut
+                        .then((text) => {
                             // Si la réponse contient du texte, essayer de la parser
                             try {
-                                const data = text ? JSON.parse(text) : [];  // Essayer de parser le texte si ce n'est pas vide
+                                const data = text ? JSON.parse(text) : []; // Essayer de parser le texte si ce n'est pas vide
                                 return data;
                             } catch (e) {
-                                throw new Error('Erreur de parsing JSON');
+                                throw new Error("Erreur de parsing JSON");
                             }
                         });
                 } else {
                     // Si statut différent, traiter comme une erreur
-                    throw new Error('Erreur inconnue: ' + response.status);
+                    throw new Error("Erreur inconnue: " + response.status);
                 }
             })
-            .then(data => {
+            .then((data) => {
                 displayRecipes(data);
             })
-            .catch(error => {
-                console.error('Erreur lors de la récupération des recettes :', error);
+            .catch((error) => {
+                console.error(
+                    "Erreur lors de la récupération des recettes :",
+                    error,
+                );
                 recipesContainer.innerHTML = `<p style="color:red;">${error.message}</p>`;
             });
     }
 
     function displayRecipes(recipes) {
-        recipesContainer.innerHTML = ''; // On vide
+        recipesContainer.innerHTML = ""; // On vide
 
         if (!Array.isArray(recipes) || recipes.length === 0) {
-            recipesContainer.innerHTML = '<p>Aucune recette trouvée.</p>';
+            recipesContainer.innerHTML = "<p>Aucune recette trouvée.</p>";
             return;
         }
 
-        recipes.forEach(recipe => {
-            const col = document.createElement('div');
-            col.className = 'col-lg-4 col-md-4 col-sm-6';
+        recipes.forEach((recipe) => {
+            const col = document.createElement("div");
+            col.className = "col-lg-4 col-md-4 col-sm-6";
 
             col.innerHTML = `
                 <a href="recette.html?id=${recipe.id}" class="fh5co-card-item">
                     <figure>
                         <div class="overlay"><i class="ti-plus"></i></div>
-                        <img src="${recipe.imageURL || 'https://via.placeholder.com/400x300?text=Pas+de+photo'}" alt="Image" class="img-responsive" width="400" height="300">
+                        <img src="${recipe.imageURL || "https://via.placeholder.com/400x300?text=Pas+de+photo"}" alt="Image" class="img-responsive" width="400" height="300">
                     </figure>
                     <div class="fh5co-text">
                         <h2 style="font-size: 20px;">${recipe.nameFR || recipe.name || "Nom non disponible"}</h2>
@@ -80,7 +79,6 @@
         });
     }
 });
-
 
 /*
 document.addEventListener("DOMContentLoaded", () => {
@@ -141,38 +139,36 @@ document.addEventListener("DOMContentLoaded", () => {
 
 */
 
-
 //affichzge detaillé d'un recette
 
-
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
     const params = new URLSearchParams(window.location.search);
-    const recetteId = params.get('id');
+    const recetteId = params.get("id");
 
-    const container = document.getElementById('recipe-container');
-    const btnAnglais = document.getElementById('btn-anglais');
+    const container = document.getElementById("recipe-container");
+    const btnAnglais = document.getElementById("btn-anglais");
 
     if (!recetteId) {
-        container.innerText = 'Aucune recette sélectionnée.';
+        container.innerText = "Aucune recette sélectionnée.";
         btnAnglais.disabled = true;
         return;
     }
 
     fetch(`/recipes/api/recipes/${recetteId}`) // Remplacer par l'URL réelle
-        .then(response => {
+        .then((response) => {
             if (response.status === 200) {
                 return response.json();
             } else if (response.status === 400) {
-                throw new Error('ID de recette invalide (400)');
+                throw new Error("ID de recette invalide (400)");
             } else if (response.status === 404) {
-                throw new Error('Recette non trouvée (404)');
+                throw new Error("Recette non trouvée (404)");
             } else if (response.status === 500) {
-                throw new Error('Erreur serveur interne (500)');
+                throw new Error("Erreur serveur interne (500)");
             } else {
-                throw new Error('Erreur inconnue: ' + response.status);
+                throw new Error("Erreur inconnue: " + response.status);
             }
         })
-        .then(recette => {
+        .then((recette) => {
             afficherRecetteFR(recette);
 
             // Gestion du bouton anglais
@@ -180,12 +176,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 btnAnglais.disabled = true;
             } else {
                 btnAnglais.disabled = false;
-                btnAnglais.addEventListener('click', () => {
+                btnAnglais.addEventListener("click", () => {
                     afficherRecetteEN(recette);
                 });
             }
         })
-        .catch(error => {
+        .catch((error) => {
             container.innerHTML = `<p style="color:red;">Erreur : ${error.message}</p>`;
             btnAnglais.disabled = true;
         });
@@ -194,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
         container.innerHTML = `
             <div class="recipe-card">
                 <div class="recipe-image">
-                    <img src="${recette.imageURL || 'https://via.placeholder.com/400x300?text=Pas+de+photo'}" alt="Image de ${recette.nameFR || recette.name || 'Nom indisponible'}">
+                    <img src="${recette.imageURL || "https://via.placeholder.com/400x300?text=Pas+de+photo"}" alt="Image de ${recette.nameFR || recette.name || "Nom indisponible"}">
                 </div>
                 <div class="recipe-content">
                     <h2>
@@ -205,12 +201,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     <h3>Ingrédients:</h3>
                     <ul>
-                        ${(recette.ingredientsFR || []).map(ing => `<li>${ing.quantity} ${ing.name} ${ing.type}</li>`).join('') || '<li>Aucun ingrédient trouvé.</li>'}
+                        ${(recette.ingredientsFR || []).map((ing) => `<li>${ing.quantity} ${ing.name} ${ing.type}</li>`).join("") || "<li>Aucun ingrédient trouvé.</li>"}
                     </ul>
 
                     <h3>Étapes:</h3>
                     <ol>
-                        ${(recette.stepsFR || []).map(step => `<li>${step}</li>`).join('') || '<li>Aucune étape trouvée.</li>'}
+                        ${(recette.stepsFR || []).map((step) => `<li>${step}</li>`).join("") || "<li>Aucune étape trouvée.</li>"}
                     </ol>
                 </div>
             </div>
@@ -221,7 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
         container.innerHTML = `
             <div class="recipe-card">
                 <div class="recipe-image">
-                    <img src="${recette.imageURL || 'https://via.placeholder.com/400x300?text=No+Image'}" alt="Image of ${recette.name || 'Name unavailable'}">
+                    <img src="${recette.imageURL || "https://via.placeholder.com/400x300?text=No+Image"}" alt="Image of ${recette.name || "Name unavailable"}">
                 </div>
                 <div class="recipe-content">
                     <h2>
@@ -232,12 +228,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     <h3>Ingredients:</h3>
                     <ul>
-                        ${(recette.ingredients || []).map(ing => `<li>${ing.quantity} ${ing.name} ${ing.type}</li>`).join('') || '<li>No ingredients found.</li>'}
+                        ${(recette.ingredients || []).map((ing) => `<li>${ing.quantity} ${ing.name} ${ing.type}</li>`).join("") || "<li>No ingredients found.</li>"}
                     </ul>
 
                     <h3>Steps:</h3>
                     <ol>
-                        ${(recette.steps || []).map(step => `<li>${step}</li>`).join('') || '<li>No steps found.</li>'}
+                        ${(recette.steps || []).map((step) => `<li>${step}</li>`).join("") || "<li>No steps found.</li>"}
                     </ol>
                 </div>
             </div>
@@ -245,68 +241,69 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-
 //recherche de recette
 
-document.addEventListener('DOMContentLoaded', () => {
-    const searchInput = document.getElementById('searchInput');
-    const btnRechercher = document.getElementById('btn-rechercher');
-  
+document.addEventListener("DOMContentLoaded", () => {
+    const searchInput = document.getElementById("searchInput");
+    const btnRechercher = document.getElementById("btn-rechercher");
+
     function redirigerVersRecherche() {
-      const motCle = searchInput.value.trim();
-      if (motCle !== '') {
-        window.location.href = `rechercher_recette.html?search=${encodeURIComponent(motCle)}`;
-      } else {
-        alert('Veuillez entrer un mot-clé');
-      }
+        const motCle = searchInput.value.trim();
+        if (motCle !== "") {
+            window.location.href = `rechercher_recette.html?search=${encodeURIComponent(motCle)}`;
+        } else {
+            alert("Veuillez entrer un mot-clé");
+        }
     }
-  
+
     if (btnRechercher) {
-      btnRechercher.addEventListener('click', redirigerVersRecherche);
+        btnRechercher.addEventListener("click", redirigerVersRecherche);
     }
-  });
-  
-  
-  // Partie 2 : Affichage des résultats sur la page rechercher_recette.html
-  
-  document.addEventListener('DOMContentLoaded', () => {
+});
+
+// Partie 2 : Affichage des résultats sur la page rechercher_recette.html
+
+document.addEventListener("DOMContentLoaded", () => {
     const params = new URLSearchParams(window.location.search);
-    const motCle = params.get('search');
-    const container = document.getElementById('midou');
-  
+    const motCle = params.get("search");
+    const container = document.getElementById("midou");
+
     if (!motCle) {
-      container.innerHTML = '<p>Veuillez entrer un mot-clé dans la barre de recherche.</p>';
-      return;
+        container.innerHTML =
+            "<p>Veuillez entrer un mot-clé dans la barre de recherche.</p>";
+        return;
     }
-  
+
     fetch(`/recipes/api/recipes?search=${encodeURIComponent(motCle)}`)
-      .then(response => {
-        if (response.status === 204) {
-          // Aucun contenu trouvé
-          container.innerHTML = `<p>Aucune recette trouvée pour "${motCle}".</p>`;
-          throw new Error('Aucun résultat'); // On arrête ici volontairement
-        }
-        if (!response.ok) {
-          throw new Error('Erreur de récupération des recettes.');
-        }
-        return response.json();
-      })
-      .then(data => {
-        container.innerHTML = `<p>${data.length} résultat(s) trouvé(s) pour "${motCle}".</p>`;
-  
-        data.forEach(recetteId => {
-          fetch(`/recipes/api/recipes/${recetteId}`)
-            .then(response => {
-              if (!response.ok) {
-                throw new Error('Erreur de récupération de la recette.');
-              }
-              return response.json();
-            })
-            .then(recette => {
-              const col = document.createElement('div');
-              col.className = 'col-lg-4 col-md-4 col-sm-6';
-  
-              col.innerHTML = `
+        .then((response) => {
+            if (response.status === 204) {
+                // Aucun contenu trouvé
+                container.innerHTML = `<p>Aucune recette trouvée pour "${motCle}".</p>`;
+                throw new Error("Aucun résultat"); // On arrête ici volontairement
+            }
+            if (!response.ok) {
+                throw new Error("Erreur de récupération des recettes.");
+            }
+            return response.json();
+        })
+        .then((data) => {
+            container.innerHTML = `<p>${data.length} résultat(s) trouvé(s) pour "${motCle}".</p>`;
+
+            data.forEach((recetteId) => {
+                fetch(`/recipes/api/recipes/${recetteId}`)
+                    .then((response) => {
+                        if (!response.ok) {
+                            throw new Error(
+                                "Erreur de récupération de la recette.",
+                            );
+                        }
+                        return response.json();
+                    })
+                    .then((recette) => {
+                        const col = document.createElement("div");
+                        col.className = "col-lg-4 col-md-4 col-sm-6";
+
+                        col.innerHTML = `
                 <a href="recette.html?id=${recette.id}" class="fh5co-card-item">
                   <figure>
                     <div class="overlay"><i class="ti-plus"></i></div>
@@ -319,100 +316,113 @@ document.addEventListener('DOMContentLoaded', () => {
                   </div>
                 </a>
               `;
-  
-              container.appendChild(col);
-            })
-            .catch(error => {
-              console.error('Erreur lors du chargement de la recette :', error.message);
+
+                        container.appendChild(col);
+                    })
+                    .catch((error) => {
+                        console.error(
+                            "Erreur lors du chargement de la recette :",
+                            error.message,
+                        );
+                    });
             });
+        })
+        .catch((error) => {
+            // On n'affiche pas un message d'erreur si c'était juste "aucun résultat"
+            if (error.message !== "Aucun résultat") {
+                console.error(
+                    "Erreur lors du chargement des résultats :",
+                    error.message,
+                );
+                container.innerHTML =
+                    "<p>Erreur de chargement des résultats.</p>";
+            }
         });
-      })
-      .catch(error => {
-        // On n'affiche pas un message d'erreur si c'était juste "aucun résultat"
-        if (error.message !== 'Aucun résultat') {
-          console.error('Erreur lors du chargement des résultats :', error.message);
-          container.innerHTML = '<p>Erreur de chargement des résultats.</p>';
+});
+
+//page inscription
+
+document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("form-inscription");
+
+    form.addEventListener("submit", function (e) {
+        e.preventDefault(); // Empêche l'envoi classique du formulaire
+
+        const username = document.getElementById("username").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
+        const confirmPassword =
+            document.getElementById("confirm_password").value;
+        const messageContainer = document.getElementById("message");
+        alert("misou");
+
+        messageContainer.innerHTML = "";
+
+        if (!username || !email || !password || !confirmPassword) {
+            messageContainer.innerHTML =
+                '<p style="color:red;">Veuillez remplir tous les champs.</p>';
+            return;
         }
-      });
-  });
-  
 
-
-  //page inscription
-
-  document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('form-inscription');
-  
-    form.addEventListener('submit', function (e) {
-      e.preventDefault(); // Empêche l'envoi classique du formulaire
-  
-      const username = document.getElementById('username').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
-      const confirmPassword = document.getElementById('confirm_password').value;
-      const messageContainer = document.getElementById('message');
-      alert("misou")
-  
-      messageContainer.innerHTML = ''; 
-  
-      if (!username || !email || !password || !confirmPassword) {
-        messageContainer.innerHTML = '<p style="color:red;">Veuillez remplir tous les champs.</p>';
-        return;
-      }
-  
-      if (password !== confirmPassword) {
-        messageContainer.innerHTML = '<p style="color:red;">Les mots de passe ne correspondent pas.</p>';
-        return;
-      }
-  
-      const payload = { username, email, password };
-      
-      fetch('/recipes/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-      })
-      .then(response => {
-        console.log("Payload envoyé:", payload);
-        console.log(response);
-        if (response.status === 201) {
-          return response.json();
-        } else if (response.status === 400) {
-          throw new Error('Champs manquants ou invalides.');
-        } else if (response.status === 409) {
-          throw new Error('Nom d’utilisateur ou e-mail déjà utilisé.');
-        } else {
-          throw new Error('Erreur serveur. Veuillez réessayer plus tard.');
+        if (password !== confirmPassword) {
+            messageContainer.innerHTML =
+                '<p style="color:red;">Les mots de passe ne correspondent pas.</p>';
+            return;
         }
-      })
-      .then(user => {
-        // Succès : on stocke l'état connecté
-        localStorage.setItem('estConnecte', 'true');
-        localStorage.setItem('utilisateur', JSON.stringify(user));
-        messageContainer.innerHTML = '<p style="color:green;">Inscription réussie. Redirection...</p>';
-        // Redirection après un petit délai
-        setTimeout(() => {
-          window.location.href = 'index.html';
-        }, 1500);
-      })
-      .catch(error => {
-        messageContainer.innerHTML = `<p style="color:red;">${error.message}</p>`;
-      });
+
+        const payload = { username, email, password };
+
+        fetch("/recipes/api/auth/register", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+        })
+            .then((response) => {
+                console.log("Payload envoyé:", payload);
+                console.log(response);
+                if (response.status === 201) {
+                    return response.json();
+                } else if (response.status === 400) {
+                    throw new Error("Champs manquants ou invalides.");
+                } else if (response.status === 409) {
+                    throw new Error(
+                        "Nom d’utilisateur ou e-mail déjà utilisé.",
+                    );
+                } else {
+                    throw new Error(
+                        "Erreur serveur. Veuillez réessayer plus tard.",
+                    );
+                }
+            })
+            .then((user) => {
+                // Succès : on stocke l'état connecté
+                localStorage.setItem("estConnecte", "true");
+                localStorage.setItem("utilisateur", JSON.stringify(user));
+                messageContainer.innerHTML =
+                    '<p style="color:green;">Inscription réussie. Redirection...</p>';
+                // Redirection après un petit délai
+                setTimeout(() => {
+                    window.location.href = "index.html";
+                }, 1500);
+            })
+            .catch((error) => {
+                messageContainer.innerHTML = `<p style="color:red;">${error.message}</p>`;
+            });
     });
-  });
-  
-  //affichage de nom utilisateur lors de la connexion
-  
-  document.addEventListener('DOMContentLoaded', () => {
-    const estConnecte = localStorage.getItem('estConnecte') === 'true';
-    const menuConnexion = document.getElementById('cont-nom');
+});
+
+//affichage de nom utilisateur lors de la connexion
+
+document.addEventListener("DOMContentLoaded", () => {
+    const estConnecte = localStorage.getItem("estConnecte") === "true";
+    const menuConnexion = document.getElementById("cont-nom");
 
     if (estConnecte && menuConnexion) {
-      const utilisateur = JSON.parse(localStorage.getItem('utilisateur'));
-      menuConnexion.innerHTML = `
-        
+        const utilisateur = JSON.parse(localStorage.getItem("utilisateur"));
+        menuConnexion.innerHTML = `
+
         <li class="has-dropdown" id="cont-nom">
                                     <a href="services.html">${utilisateur.username}</a>
                                     <ul class="dropdown">
@@ -422,71 +432,58 @@ document.addEventListener('DOMContentLoaded', () => {
                                 </li>
       `;
     }
-  });
+});
 
-
-  //deconnexion d'un utilisateur
+//deconnexion d'un utilisateur
 //je ne recois aucune reponse de l'api
-  document.addEventListener('DOMContentLoaded', () => {
-    const lienDeconnexion = document.getElementById('lien-deconnexion');
-  
+document.addEventListener("DOMContentLoaded", () => {
+    const lienDeconnexion = document.getElementById("lien-deconnexion");
+
     if (lienDeconnexion) {
-      lienDeconnexion.addEventListener('click', (e) => {
-        e.preventDefault(); // Empêche la navigation normale
-  
-        fetch('recipes/api/auth/logout', {
-          method: 'POST',
-        })
-        .then(response => {
-          console.log(response.text());
+        lienDeconnexion.addEventListener("click", (e) => {
+            e.preventDefault();
 
-          if(!response)
-            alert("pas de reponse");
-          
-          if (response.status === 200) {
-            console.log('reponse recu');
-            alert("200");
-            return response.json();
-          } else if (response.status === 401) {
-            console.log('utilisateur non connecter');
-            alert("401");
-            throw new Error('Vous n\'êtes pas connecté.');
-          }
-          else if (response.status === 404) {
-            console.log(response.text());
-            alert(response.text());
-            
-            throw new Error('NOOOOOOT FOUND');
-          }
-          else if (response.status === 500) {
-            console.log('erreur du serveur');
-            alert("500");
-            throw new Error('Erreur interne du serveur.');
-          } else {
-            alert("600");
-            
-            throw new Error('Erreur inconnue : ' + response.status);
-            
-          }
-          
-        })
-        .then(data => {
-          console.log(data.status); // Message "user logged out successfully"
-          localStorage.setItem('estConnecte', 'false');
-          localStorage.removeItem('utilisateur');
-          window.location.href = 'index.html'; // Redirection
-        })
-        .catch(error => {
-          console.error('Erreur lors de la déconnexion :', error.message); // Affiche dans la console
-          alert(error.message);
-          window.location.href = 'index.html';
+            fetch("/recipes/api/auth/logout", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            })
+                .then((response) => {
+                    // Don't consume response body here
+                    console.log("Response status:", response.status);
+
+                    if (response.status === 200) {
+                        return response.json();
+                    } else if (response.status === 401) {
+                        throw new Error("Vous n'êtes pas connecté.");
+                    } else if (response.status === 404) {
+                        throw new Error("Endpoint non trouvé.");
+                    } else if (response.status === 500) {
+                        throw new Error("Erreur interne du serveur.");
+                    } else {
+                        throw new Error("Erreur inconnue : " + response.status);
+                    }
+                })
+                .then((data) => {
+                    console.log("Logout successful:", data);
+                    localStorage.setItem("estConnecte", "false");
+                    localStorage.removeItem("utilisateur");
+                    window.location.href = "index.html";
+                })
+                .catch((error) => {
+                    console.error(
+                        "Erreur lors de la déconnexion:",
+                        error.message,
+                    );
+                    // Still logout locally even if server logout fails
+                    localStorage.setItem("estConnecte", "false");
+                    localStorage.removeItem("utilisateur");
+                    window.location.href = "index.html";
+                });
         });
-      });
     }
-  });
-  
-  
-
+});
 
 /*
 
@@ -494,16 +491,16 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('DOMContentLoaded', () => {
     const params = new URLSearchParams(window.location.search);
     const recetteId = params.get('id');
-  
+
     const container = document.getElementById('recipe-container');
     const btnAnglais = document.getElementById('btn-anglais');
-  
+
     if (!recetteId) {
       container.innerText = 'Aucune recette sélectionnée.';
       btnAnglais.disabled = true;
       return;
     }
-  
+
     fetch(`api/recipes/${recetteId}`)
       .then(response => {
         if (!response.ok) {
@@ -514,7 +511,7 @@ document.addEventListener('DOMContentLoaded', () => {
       .then(recette => {
         // Recette en français
         afficherRecetteFR(recette);
-  
+
         if (!recette.steps || recette.steps.length === 0) {
           btnAnglais.disabled = true;
         } else {
@@ -528,7 +525,7 @@ document.addEventListener('DOMContentLoaded', () => {
         container.innerText = 'Erreur : ' + error.message;
         btnAnglais.disabled = true;
       });
-  
+
       function afficherRecetteFR(recette) {
         container.innerHTML = `
           <div class="recipe-card">
@@ -541,12 +538,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 <span class="heart-icon"><i class="fa-solid fa-heart"></i></span>
               </h2>
               <p><strong>Auteur:</strong> ${recette.Author}</p>
-      
+
               <h3>Ingrédients:</h3>
               <ul>
                 ${recette.ingredientsFR.map(ing => `<li>${ing.quantity} ${ing.name} ${ing.type}</li>`).join('')}
               </ul>
-      
+
               <h3>Etapes:</h3>
               <ol>
                 ${recette.etapesFR.map(step => `<li>${step}</li>`).join('')}
@@ -555,8 +552,8 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
         `;
       }
-      
-  
+
+
       function afficherRecetteEN(recette) {
         container.innerHTML = `
           <div class="recipe-card">
@@ -569,12 +566,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 <span class="heart-icon"><i class="fa-solid fa-heart"></i></span>
               </h2>
               <p><strong>Author:</strong> ${recette.Author}</p>
-      
+
               <h3>Ingredients:</h3>
               <ul>
                 ${recette.ingredients.map(ing => `<li>${ing.quantity} ${ing.name} ${ing.type}</li>`).join('')}
               </ul>
-      
+
               <h3>Steps:</h3>
               <ol>
                 ${recette.etapesEN.map(step => `<li>${step}</li>`).join('')}
@@ -583,9 +580,9 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
         `;
       }
-      
+
   });
-  
+
 
 
   //recherche de recettes
@@ -675,7 +672,7 @@ function chargerRecettesRecherche() {
 }
 
 
-  //redirection vers la page de recherche 
+  //redirection vers la page de recherche
   function redirigerVersRecherche() {
     const motCle = document.getElementById('searchInput').value.trim();
     if (motCle !== '') {
@@ -684,34 +681,34 @@ function chargerRecettesRecherche() {
       alert('Veuillez entrer un mot-clé');
     }
   }
-  
+
 
   //chzrgement des recettte à partir de la barre de recherche
 
   function chargerRecettesRecherche() {
     const params = new URLSearchParams(window.location.search);
     const motCle = params.get('query');
-  
+
     if (!motCle) {
       document.getElementById('midou').innerHTML = '<p>Pas de mot-clé fourni.</p>';
       return;
     }
-  
+
     fetch(`api/recipes/search?lang=fr&query=${encodeURIComponent(motCle)}`)
       .then(response => response.json())
       .then(data => {
         const container = document.getElementById('midou');
         container.innerHTML = '';
-  
+
         if (data.length === 0) {
           container.innerHTML = `<p>Aucune recette trouvée pour "${motCle}".</p>`;
           return;
         }
-  
+
         data.forEach(recette => {
           const col = document.createElement('div');
           col.className = 'col-lg-4 col-md-4 col-sm-6';
-  
+
           col.innerHTML = `
             <a href="recette.html?id=${recette.id}" class="fh5co-card-item">
               <figure>
@@ -725,7 +722,7 @@ function chargerRecettesRecherche() {
               </div>
             </a>
           `;
-  
+
           container.appendChild(col);
         });
       })
@@ -733,18 +730,18 @@ function chargerRecettesRecherche() {
         console.error('Erreur lors du chargement des résultats :', error);
       });
   }
-  
+
 
   //connexion
 
   document.getElementById("connexion").addEventListener("submit", async function (e) {
-    e.preventDefault(); 
-  
+    e.preventDefault();
+
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
-  
+
     try {
-      const response = await fetch("api/auth/login", { 
+      const response = await fetch("api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -754,19 +751,19 @@ function chargerRecettesRecherche() {
           password: password
         })
       });
-  
+
       if (!response.ok) {
         throw new Error("Email ou mot de passe incorrect");
       }
-  
+
       const data = await response.json();
-  
+
       // Stocker le token + infos user
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
-  
+
       document.getElementById("message").textContent = "Connexion réussie !";
-      window.location.href = "index.html"; 
+      window.location.href = "index.html";
     } catch (error) {
       document.getElementById("message").textContent = error.message;
     }
@@ -774,7 +771,7 @@ function chargerRecettesRecherche() {
 
 
   //inscription
-  
+
   const registerForm = document.getElementById("inscription");
  registerForm.addEventListener("submit", async function (e) {
   e.preventDefault();
@@ -827,24 +824,24 @@ function chargerRecettesRecherche() {
 document.getElementById("logoutButton").addEventListener("click", async function () {
     try {
       const response = await fetch("api/auth/logout", {
-        method: "POST", 
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("token")}` 
+          "Authorization": `Bearer ${localStorage.getItem("token")}`
         }
       });
-  
+
       const data = await response.json();
-  
+
       if (response.ok) {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
-  
+
         document.getElementById("message").textContent = "Déconnexion réussie ! Vous allez être redirigé vers la page d'acceuil.";
-  
+
         setTimeout(function () {
           window.location.href = "index.html";
-        }, 2000); 
+        }, 2000);
       } else {
         document.getElementById("message").textContent = `❌ Erreur : ${data.message}`;
       }
@@ -852,5 +849,5 @@ document.getElementById("logoutButton").addEventListener("click", async function
       document.getElementById("message").textContent = "❌ Une erreur est survenue pendant la déconnexion.";
     }
   });
-  
+
 */
