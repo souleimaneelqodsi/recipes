@@ -29,7 +29,6 @@
         try {
             $recipes = $this->recipe_schema->search($_GET["search"]);
             if (empty($recipes)) {
-                error_log("empty recipes.json");
                 http_response_code(204);
             } else {
                 http_response_code(200);
@@ -46,13 +45,14 @@
     public function getById(string $id): void
     {
         try {
-            // if ($this->handleUnauthorized()) {
-            //     error_log("GET BY ID ERROR: Unauthorized");
-            //     return;
-            // }
+            if ($this->handleUnauthorized()) {
+                return;
+            }
             $recipe = $this->recipe_schema->getById($id);
             if (empty($recipe)) {
                 http_response_code(404);
+                header("Content-Type: application/json");
+                echo json_encode(["error" => "Recipe not found"]);
             } else {
                 http_response_code(200);
                 header("Content-Type: application/json");
@@ -68,6 +68,13 @@
     public function getAll(): void
     {
         try {
+            $this->handleUnauthorized();
+            if (!Session::getUserRole() !== "Administrateur") {
+                http_response_code(403);
+                header("Content-Type: application/json");
+                echo json_encode(["error" => "Forbidden: you're not admin"]);
+                return;
+            }
             $recipes = $this->recipe_schema->getAll();
             if (empty($recipes)) {
                 http_response_code(204);
@@ -88,6 +95,15 @@
     public function getDrafts(): void
     {
         try {
+            if (
+                !Session::getUserRole() !== "Administrateur" ||
+                $this->handleUnauthorized()
+            ) {
+                http_response_code(403);
+                header("Content-Type: application/json");
+                echo json_encode(["error" => "Forbidden: you're not admin"]);
+                return;
+            }
             $recipes = $this->recipe_schema->getDrafts();
             if (empty($recipes)) {
                 http_response_code(204);
@@ -483,7 +499,6 @@
     public function dispatch($method, array $path): void
     {
         if (empty($method)) {
-            error_log("RECIPES dispatch: empty method");
             http_response_code(400);
             header("Content-Type: application/json");
             echo json_encode(["error" => "Invalid method or path"]);
@@ -492,43 +507,31 @@
 
         switch ($method) {
             case "GET":
-                error_log("RECIPES DISPATCH: GET CASE");
                 // search case
                 if (empty($path) && isset($_GET["search"])) {
-                    error_log("SEARCH METHOD CALLED");
                     $this->search();
                     return;
                 }
                 // getAll case
                 if (empty($path)) {
-                    error_log("SEARCH GETALL CALLED");
                     $this->getAll();
+                    return;
+                }
+                //getDrafts
+                if ($path[0] === "drafts" && count((array) $path) === 1) {
+                    $this->getDrafts();
+                    return;
+                }
+                //getPublished
+                if ($path[0] === "published" && count((array) $path) === 1) {
+                    $this->getPublished();
                     return;
                 }
                 // getById case
                 if ($path[0] !== "" && count((array) $path) === 1) {
-                    error_log("SEARCH GETBYID CALLED");
                     $this->getById($path[0]);
                     return;
                 }
-
-                //getDrafts
-                if (
-                    $path[0] !== "" &&
-                    count((array) $path) === 1 &&
-                    $path[1] === "drafts"
-                ) {
-                    $this->getDrafts();
-                }
-                //getPublished
-                if (
-                    $path[0] !== "" &&
-                    count((array) $path) === 1 &&
-                    $path[1] === "published"
-                ) {
-                    $this->getPublished();
-                }
-
                 http_response_code(400);
                 header("Content-Type: application/json");
                 echo json_encode(["error" => $path]);

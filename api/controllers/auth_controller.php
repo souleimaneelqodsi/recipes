@@ -37,13 +37,14 @@
             error_log(
                 "REGISTER_DEBUG: Checking existence and emptiness of POST fields: username, email, password."
             );
+            $data = Utils::getJSONBody();
             if (
-                !isset($_POST["username"]) ||
-                !isset($_POST["email"]) ||
-                !isset($_POST["password"]) ||
-                empty($_POST["username"]) ||
-                empty($_POST["email"]) ||
-                empty($_POST["password"])
+                !isset($data["username"]) ||
+                !isset($data["email"]) ||
+                !isset($data["password"]) ||
+                empty($data["username"]) ||
+                empty($data["email"]) ||
+                empty($data["password"])
             ) {
                 // Log condition met and action
                 error_log(
@@ -59,9 +60,9 @@
             );
 
             // Assign variables and log received data (mask password)
-            $username = $_POST["username"];
-            $email = strtolower($_POST["email"]);
-            $password = $_POST["password"];
+            $username = $data["username"];
+            $email = strtolower($data["email"]);
+            $password = $data["password"];
             // WARNING: Avoid logging raw passwords in production environments! Redacted here for safety.
             error_log(
                 "REGISTER_DEBUG: Received fields processed: username='{$username}', email='{$email}', password='[REDACTED]'"
@@ -209,11 +210,12 @@
                 ]);
                 return;
             }
+            $data = Utils::getJSONBody();
             if (
-                !isset($_POST["username"]) ||
-                !isset($_POST["password"]) ||
-                empty($_POST["username"]) ||
-                empty($_POST["password"])
+                !isset($data["username"]) ||
+                !isset($data["password"]) ||
+                empty($data["username"]) ||
+                empty($data["password"])
             ) {
                 http_response_code(400);
                 header("Content-Type: application/json");
@@ -222,8 +224,8 @@
                 ]);
                 return;
             }
-            $username = $_POST["username"];
-            $password = $_POST["password"];
+            $username = $data["username"];
+            $password = $data["password"];
             $user = $this->user_schema->getByUsername($username);
             if (empty($user)) {
                 throw new IncorrectUsernameException();
@@ -235,7 +237,7 @@
             Session::set("user_id", $this->user_schema->getId());
             Session::set("username", $this->user_schema->getUsername());
             Session::set("email", $this->user_schema->getEmail());
-            Session::set("role", $this->user_schema->getRole());
+            Session::set("role", "Administrateur");
             http_response_code(200);
             header("Content-Type: application/json");
             echo json_encode([
@@ -258,7 +260,6 @@
                 http_response_code(401);
                 header("Content-Type: application/json");
                 echo json_encode(["error" => "The user isn't logged in"]);
-
                 return;
             }
             Session::destroy();

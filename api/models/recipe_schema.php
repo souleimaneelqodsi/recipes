@@ -112,34 +112,34 @@ class RecipeSchema
         return $stop_words;
     }
 
-    /**
-     * @return array */
-    public function getDrafts()
+    public function getDrafts(): array
     {
         try {
             $all_recipes = $this->getAll();
-            return array_search("draft", array_column($all_recipes, "status"));
+            return array_filter(
+                $all_recipes,
+                fn($recipe) => $recipe["status"] === "draft"
+            );
         } catch (Exception $e) {
-            http_response_code(500);
-            header("Content-Type: application/json");
-            echo json_encode(["error" => "error: " . $e->getMessage()]);
+            error_log("Error getting draft recipes: " . $e->getMessage());
+            throw $e;
         }
     }
 
     /**
-     * @return array */
-    public function getPublished()
+     * @return array
+     */
+    public function getPublished(): array
     {
         try {
             $all_recipes = $this->getAll();
-            return array_search(
-                "published",
-                array_column($all_recipes, "status")
+            return array_filter(
+                $all_recipes,
+                fn($recipe) => $recipe["status"] === "published"
             );
         } catch (Exception $e) {
-            http_response_code(500);
-            header("Content-Type: application/json");
-            echo json_encode(["error" => "error: " . $e->getMessage()]);
+            error_log("Error getting published recipes: " . $e->getMessage());
+            throw $e;
         }
     }
 
