@@ -32,7 +32,11 @@ class Router
             case "recipes":
                 if (isset($path[2]) && !empty($path[2])) {
                     if ($path[2] === "comments") {
-                        $comments_model = new CommentSchema($json_handler);
+                        $recipe_schema = new RecipeSchema($json_handler);
+                        $comments_model = new CommentSchema(
+                            $json_handler,
+                            $recipe_schema
+                        );
                         $comments_controller = new CommentController(
                             $comments_model
                         );

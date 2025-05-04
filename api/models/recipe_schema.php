@@ -152,7 +152,7 @@ class RecipeSchema
         //term frequency : occurrences/
         try {
             $search_term = strtolower($search_term);
-            $recipes = $this->getAll();
+            $recipes = $this->getPublished();
             //DF
             $document_frequency = 0;
             //TF-IDF
@@ -506,7 +506,7 @@ class RecipeSchema
     public function like(string $recipe_id): array
     {
         try {
-            $all_recipes = $this->getAll();
+            $all_recipes = $this->getPublished();
             $recipe_index = array_search(
                 $recipe_id,
                 array_column($all_recipes, "id"),
@@ -532,7 +532,7 @@ class RecipeSchema
     public function unlike(string $recipe_id)
     {
         try {
-            $all_recipes = $this->getAll();
+            $all_recipes = $this->getPublished();
             $recipe_index = array_search(
                 $recipe_id,
                 array_column($all_recipes, "id"),
@@ -562,7 +562,7 @@ class RecipeSchema
     public function translate(string $recipe_id, array $translation): array
     {
         try {
-            $all_recipes = $this->getAll();
+            $all_recipes = $this->getPublished();
             $recipe_index = array_search(
                 $recipe_id,
                 array_column($all_recipes, "id"),
@@ -718,7 +718,7 @@ class RecipeSchema
                 return [];
             }
             $recipe = $all_recipes[$recipe_index];
-            if ($recipe["status"] == "draft") {
+            if ($recipe["status"] === "draft") {
                 $recipe["status"] = "published";
             } else {
                 error_log("Recipe is already published");
