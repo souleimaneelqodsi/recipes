@@ -15,13 +15,16 @@ class JSONHandler
     {
         $filePath = $this->dataDirectory . DIRECTORY_SEPARATOR . $filename;
         if (!file_exists($filePath)) {
-            throw new ErrorException("File not found");
+            $emptyData = [];
+            $this->writeData($filename, $emptyData);
+            return $emptyData;
         }
         $fp = fopen($filePath, "r");
         if ($fp === false) {
             error_log("Failed to open file");
             throw new ErrorException("Failed to open file");
         }
+
         try {
             if (flock($fp, LOCK_SH)) {
                 $json = json_decode(file_get_contents($filePath), true);
@@ -71,6 +74,7 @@ class JSONHandler
             if (flock($fp, LOCK_EX)) {
                 $jsonData = json_encode($data, JSON_PRETTY_PRINT);
                 if ($jsonData === false) {
+                    error_log("JSON Encode Error: " . json_last_error_msg());
                     throw new ErrorException("Failed to encode data to JSON.");
                 }
 
@@ -78,6 +82,10 @@ class JSONHandler
 
                 if ($bytesWritten === false) {
                     $error = error_get_last();
+                    error_log(
+                        "Failed to write data to file '$filePath'. fwrite returned false. Error: " .
+                            ($error["message"] ?? "Unknown error")
+                    );
                     throw new ErrorException(
                         "Failed to write data to file '$filePath'. Error: " .
                             ($error["message"] ?? "Unknown error")
@@ -87,14 +95,17 @@ class JSONHandler
                 flock($fp, LOCK_UN);
             } else {
                 throw new ErrorException(
-                    "Failed to acquire lock to write data to the file"
+                    "Failed to acquire lock to write data to the file '$filePath'."
                 );
             }
         } catch (Exception $e) {
-            error_log("Error writing file");
-            throw $e;
-        } finally {
+            error_log(
+                "Error during file write operation for '$filePath': " .
+                    $e->getMessage()
+            );
+
             fclose($fp);
+            throw $e;
         }
     }
 }

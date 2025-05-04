@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 <!DOCTYPE HTML>
 
 <html>
@@ -68,8 +66,10 @@
                         </div>
         
                         <div class="col-sm-4 col-xs-12" style="flex: 2;">
+                            <form class="navbar-form" role="search" action="search.php" method="GET" style="display: flex;">	
                                 <input type="text" id="searchInput" placeholder="Rechercher une recette..." />
-                                <button id="btn-rechercher">Rechercher</button>
+                                <button onclick="redirigerVersRecherche()">Rechercher</button>
+                            </form>
                         </div>
         
             
@@ -97,34 +97,33 @@
             
             </header>  
                 
-            <!--La premiere page index-->
-            <div class="index">
-                <div class="gtco-section">
-                    <div class="gtco-container">
-                        <div class="row">
-                            <div class="col-md-8 col-md-offset-2 text-center gtco-heading">
-                                <h2 class="cursive-font primary-color">Nos Recettes</h2>
-                                <p>Envie d'inspiration en cuisine ? Parcourez nos recettes savoureuses et faciles à réaliser, adaptées à toutes les envies !</p>
-                            </div>
-                        </div>
-            
-            
-            
-                        <div class="row" id="midou">
-                            
-                        </div>
-                        
-            
-            
-            
-                         
-                        
-                    </div>
-            
-                    
-                </div>
+            <!--La page de l'inscription-->
+            <div class="form-container" id="Inscription">
+                <h2>Inscription</h2>
 
+                <form  method="post" id="form-inscription">
+                    <label>Nom d'utilisateur :</label>
+                    <input type="text" name="username" id="username" required>
+
+                    <label>Email :</label>
+                    <input type="email" name="email" id="email" required>
+                     
+                    <label>Mot de passe :</label>
+                    <input type="password" name="password"  id="password" required>
+                    
+                    <label>Confirmer le mot de passe :</label>
+                    <input type="password" name="confirm_password" id="confirm_password" required>
+                    
+                    <button type="submit">S'inscrire</button>
+                </form>
+
+                <div id="message" style="margin-top:10px;color:red;"></div>
+
+                <p>Vous avez déjà un compte ? <a href="connexion.html">Connectez-vous ici</a></p>
             </div>
+            
+
+            
 
         
         
@@ -192,4 +191,3 @@
 	<script src="js/main.js"></script>
     </body>
 </html>      
->>>>>>> develop
