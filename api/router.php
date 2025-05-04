@@ -19,6 +19,7 @@ class Router
         $path = explode("/", $clean_uri);
         $path = array_slice($path, 2);
         $json_handler = new JSONHandler(API_BASE_PATH . "/data");
+
         $sliced_path = array_slice($path, 1);
         $user_model = null;
         if (Session::isLoggedIn()) {

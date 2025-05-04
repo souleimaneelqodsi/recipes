@@ -52,23 +52,38 @@ class JSONHandler
     public function writeData(string $filename, array $data): void
     {
         $filePath = $this->dataDirectory . DIRECTORY_SEPARATOR . $filename;
-        if (!file_exists($filePath)) {
-            //if the file doesn't exist, we create an empty one
-            file_put_contents($filePath, json_encode([]));
-        }
-        $fp = fopen($filePath, "w");
+
+        $fp = @fopen($filePath, "w");
+
         if ($fp === false) {
-            throw new ErrorException("Failed to open file");
+            $error = error_get_last();
+            error_log(
+                "Failed to open file '$filePath' for writing. Error: " .
+                    ($error["message"] ?? "Unknown error")
+            );
+            throw new ErrorException(
+                "Failed to open file '$filePath' for writing. Error: " .
+                    ($error["message"] ?? "Unknown error")
+            );
         }
+
         try {
             if (flock($fp, LOCK_EX)) {
-                //atomic writing system: we write to a temporary file, and only we rename it to the intended file name when we're sure the writing was completed
-                $tempFile = $filePath . ".tmp";
-                file_put_contents(
-                    $tempFile,
-                    json_encode($data, JSON_PRETTY_PRINT)
-                );
-                rename($tempFile, $filePath);
+                $jsonData = json_encode($data, JSON_PRETTY_PRINT);
+                if ($jsonData === false) {
+                    throw new ErrorException("Failed to encode data to JSON.");
+                }
+
+                $bytesWritten = fwrite($fp, $jsonData);
+
+                if ($bytesWritten === false) {
+                    $error = error_get_last();
+                    throw new ErrorException(
+                        "Failed to write data to file '$filePath'. Error: " .
+                            ($error["message"] ?? "Unknown error")
+                    );
+                }
+
                 flock($fp, LOCK_UN);
             } else {
                 throw new ErrorException(
