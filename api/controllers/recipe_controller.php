@@ -100,7 +100,6 @@
             if ($this->handleUnauthorized()) {
                 return;
             }
-            Session::set("role", "Administrateur");
             if (Session::getUserRole() !== "Administrateur") {
                 http_response_code(403);
                 header("Content-Type: application/json");
