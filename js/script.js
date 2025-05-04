@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
     fetchRecipes();
 
     function fetchRecipes() {
-        fetch("/recipes/api/recipes")
+        fetch("/recipes/api/recipes/published")
             .then((response) => {
                 // Log de la réponse pour analyser le contenu
                 console.log("Réponse de l'API:", response);
