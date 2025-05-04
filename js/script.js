@@ -341,7 +341,7 @@ document.addEventListener('DOMContentLoaded', () => {
   //page inscription
 
   document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('Inscription');
+    const form = document.getElementById('form-inscription');
   
     form.addEventListener('submit', function (e) {
       e.preventDefault(); // Empêche l'envoi classique du formulaire
@@ -349,8 +349,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const username = document.getElementById('username').value.trim();
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
-      const confirmPassword = document.getElementById('confirm-password').value;
+      const confirmPassword = document.getElementById('confirm_password').value;
       const messageContainer = document.getElementById('message');
+      alert("misou")
   
       messageContainer.innerHTML = ''; 
   
@@ -365,8 +366,8 @@ document.addEventListener('DOMContentLoaded', () => {
       }
   
       const payload = { username, email, password };
-  
-      fetch('/auth/register', {
+      
+      fetch('/recipes/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -374,6 +375,8 @@ document.addEventListener('DOMContentLoaded', () => {
         body: JSON.stringify(payload)
       })
       .then(response => {
+        console.log("Payload envoyé:", payload);
+        console.log(response);
         if (response.status === 201) {
           return response.json();
         } else if (response.status === 400) {
