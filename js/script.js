@@ -403,6 +403,88 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
   
+  //affichage de nom utilisateur lors de la connexion
+  
+  document.addEventListener('DOMContentLoaded', () => {
+    const estConnecte = localStorage.getItem('estConnecte') === 'true';
+    const menuConnexion = document.getElementById('cont-nom');
+
+    if (estConnecte && menuConnexion) {
+      const utilisateur = JSON.parse(localStorage.getItem('utilisateur'));
+      menuConnexion.innerHTML = `
+        
+        <li class="has-dropdown" id="cont-nom">
+                                    <a href="services.html">${utilisateur.username}</a>
+                                    <ul class="dropdown">
+                                        <li><a href="#">Se Connecter</a></li>
+                                        <li><a href="deconnexion.html" id="lien-deconnexion">Se deconnecter</a></li>
+                                    </ul>
+                                </li>
+      `;
+    }
+  });
+
+
+  //deconnexion d'un utilisateur
+//je ne recois aucune reponse de l'api
+  document.addEventListener('DOMContentLoaded', () => {
+    const lienDeconnexion = document.getElementById('lien-deconnexion');
+  
+    if (lienDeconnexion) {
+      lienDeconnexion.addEventListener('click', (e) => {
+        e.preventDefault(); // Empêche la navigation normale
+  
+        fetch('recipes/api/auth/logout', {
+          method: 'POST',
+        })
+        .then(response => {
+          console.log(response.text());
+
+          if(!response)
+            alert("pas de reponse");
+          
+          if (response.status === 200) {
+            console.log('reponse recu');
+            alert("200");
+            return response.json();
+          } else if (response.status === 401) {
+            console.log('utilisateur non connecter');
+            alert("401");
+            throw new Error('Vous n\'êtes pas connecté.');
+          }
+          else if (response.status === 404) {
+            console.log(response.text());
+            alert(response.text());
+            
+            throw new Error('NOOOOOOT FOUND');
+          }
+          else if (response.status === 500) {
+            console.log('erreur du serveur');
+            alert("500");
+            throw new Error('Erreur interne du serveur.');
+          } else {
+            alert("600");
+            
+            throw new Error('Erreur inconnue : ' + response.status);
+            
+          }
+          
+        })
+        .then(data => {
+          console.log(data.status); // Message "user logged out successfully"
+          localStorage.setItem('estConnecte', 'false');
+          localStorage.removeItem('utilisateur');
+          window.location.href = 'index.html'; // Redirection
+        })
+        .catch(error => {
+          console.error('Erreur lors de la déconnexion :', error.message); // Affiche dans la console
+          alert(error.message);
+          window.location.href = 'index.html';
+        });
+      });
+    }
+  });
+  
   
 
 

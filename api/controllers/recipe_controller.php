@@ -53,6 +53,8 @@
             $recipe = $this->recipe_schema->getById($id);
             if (empty($recipe)) {
                 http_response_code(404);
+                header("Content-Type: application/json");
+                echo json_encode(["error" => "Recipe not found"]);
             } else {
                 http_response_code(200);
                 header("Content-Type: application/json");

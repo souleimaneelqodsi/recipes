@@ -1,1 +1,14 @@
-[]
+[
+    {
+        "id": "52490eb1-e7b6-4b-82-1517dd554406",
+        "username": "misou",
+        "email": "em_lakehal@esi.dz",
+        "role": "Cuisinier",
+        "created_at": 1746366580,
+        "recipes": [],
+        "comments": [],
+        "photos": [],
+        "likes": [],
+        "password": "$2y$10$UrZJmhQJAOl1nQByENyReecF48MF.qAfEa4800F8hNp\/2EAww7e6K"
+    }
+]
