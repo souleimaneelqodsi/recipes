@@ -111,6 +111,38 @@ class RecipeSchema
         }
         return $stop_words;
     }
+
+    public function getDrafts(): array
+    {
+        try {
+            $all_recipes = $this->getAll();
+            return array_filter(
+                $all_recipes,
+                fn($recipe) => $recipe["status"] === "draft"
+            );
+        } catch (Exception $e) {
+            error_log("Error getting draft recipes: " . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public function getPublished(): array
+    {
+        try {
+            $all_recipes = $this->getAll();
+            return array_filter(
+                $all_recipes,
+                fn($recipe) => $recipe["status"] === "published"
+            );
+        } catch (Exception $e) {
+            error_log("Error getting published recipes: " . $e->getMessage());
+            throw $e;
+        }
+    }
+
     /**
      * @return array     */
     private function search_term(string $search_term): array
@@ -120,7 +152,7 @@ class RecipeSchema
         //term frequency : occurrences/
         try {
             $search_term = strtolower($search_term);
-            $recipes = $this->getAll();
+            $recipes = $this->getPublished();
             //DF
             $document_frequency = 0;
             //TF-IDF
@@ -276,10 +308,7 @@ class RecipeSchema
     }
 
     /**
-     * @return array     * @param array<int,mixed> $without
-     * @param array<int,mixed> $ingredients
-     * @param array<int,mixed> $steps
-     * @param array<int,mixed> $timers
+     * @return array
      * @param array<int,mixed> $recipeData
      */
     public function create(array $recipeData): array
@@ -371,7 +400,8 @@ class RecipeSchema
     }
 
     /**
-     * @return array     * @param array<int,mixed> $updateData
+     * @param array<int,mixed> $updateData
+     * @return array
      */
     public function update(string $recipe_id, array $updateData): array
     {
@@ -380,10 +410,6 @@ class RecipeSchema
                 !isset($updateData) ||
                 !is_array($updateData) ||
                 empty($updateData) ||
-                // array_key_exists("id", $updateData) ||
-                // array_key_exists("Author", $updateData) ||
-                // array_key_exists("originalURL", $updateData) ||
-                // array_key_exists("created_at", $updateData) ||
                 array_diff(
                     array_keys($updateData),
                     //allowed:
@@ -480,7 +506,7 @@ class RecipeSchema
     public function like(string $recipe_id): array
     {
         try {
-            $all_recipes = $this->getAll();
+            $all_recipes = $this->getPublished();
             $recipe_index = array_search(
                 $recipe_id,
                 array_column($all_recipes, "id"),
@@ -506,7 +532,7 @@ class RecipeSchema
     public function unlike(string $recipe_id)
     {
         try {
-            $all_recipes = $this->getAll();
+            $all_recipes = $this->getPublished();
             $recipe_index = array_search(
                 $recipe_id,
                 array_column($all_recipes, "id"),
@@ -536,7 +562,7 @@ class RecipeSchema
     public function translate(string $recipe_id, array $translation): array
     {
         try {
-            $all_recipes = $this->getAll();
+            $all_recipes = $this->getPublished();
             $recipe_index = array_search(
                 $recipe_id,
                 array_column($all_recipes, "id"),
@@ -692,7 +718,7 @@ class RecipeSchema
                 return [];
             }
             $recipe = $all_recipes[$recipe_index];
-            if ($recipe["status"] == "draft") {
+            if ($recipe["status"] === "draft") {
                 $recipe["status"] = "published";
             } else {
                 error_log("Recipe is already published");

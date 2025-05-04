@@ -124,6 +124,8 @@
         if (session_status() !== PHP_SESSION_ACTIVE) {
             throw new Exception("Session is not active");
         }
-        return self::get("role");
+        $role = self::get("role");
+        error_log("Role returned by getUseRole : " . $role ?? "null");
+        return $role;
     }
 }

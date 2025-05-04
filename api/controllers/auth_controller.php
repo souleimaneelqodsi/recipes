@@ -160,7 +160,6 @@
                 http_response_code(401);
                 header("Content-Type: application/json");
                 echo json_encode(["error" => "The user isn't logged in"]);
-
                 return;
             }
             Session::destroy();

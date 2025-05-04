@@ -55,7 +55,6 @@ class JSONHandler
     public function writeData(string $filename, array $data): void
     {
         $filePath = $this->dataDirectory . DIRECTORY_SEPARATOR . $filename;
-        error_log("Attempting to write data to: " . $filePath);
 
         $fp = @fopen($filePath, "w");
 
@@ -71,12 +70,8 @@ class JSONHandler
             );
         }
 
-        error_log("File '$filePath' opened successfully for writing.");
-
         try {
             if (flock($fp, LOCK_EX)) {
-                error_log("Exclusive lock acquired for file '$filePath'.");
-
                 $jsonData = json_encode($data, JSON_PRETTY_PRINT);
                 if ($jsonData === false) {
                     error_log("JSON Encode Error: " . json_last_error_msg());
@@ -97,16 +92,8 @@ class JSONHandler
                     );
                 }
 
-                error_log(
-                    "Successfully wrote $bytesWritten bytes to file '$filePath'."
-                );
-
                 flock($fp, LOCK_UN);
-                error_log("Lock released for file '$filePath'.");
             } else {
-                error_log(
-                    "Failed to acquire exclusive lock for file '$filePath'."
-                );
                 throw new ErrorException(
                     "Failed to acquire lock to write data to the file '$filePath'."
                 );
@@ -118,16 +105,7 @@ class JSONHandler
             );
 
             fclose($fp);
-            error_log("File '$filePath' closed due to exception.");
             throw $e;
-        }
-
-        if (!fclose($fp)) {
-            error_log(
-                "Failed to close the file pointer for '$filePath' after successful write."
-            );
-        } else {
-            error_log("File '$filePath' closed successfully.");
         }
     }
 }

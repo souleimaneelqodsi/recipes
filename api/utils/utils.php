@@ -20,18 +20,18 @@ class Utils
         $requestBody = file_get_contents("php://input");
 
         if ($requestBody === false || $requestBody === "") {
-            return null;
+            throw new Exception("Invalid request body");
         }
 
         $data = json_decode($requestBody, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             error_log("JSON Decode Error: " . json_last_error_msg());
-            return null;
+            throw new Exception("Invalid JSON format");
         }
 
         if (!is_array($data)) {
-            return null;
+            throw new Exception("Invalid JSON format");
         }
 
         return $data;

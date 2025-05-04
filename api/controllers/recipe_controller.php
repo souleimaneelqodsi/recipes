@@ -29,7 +29,6 @@
         try {
             $recipes = $this->recipe_schema->search($_GET["search"]);
             if (empty($recipes)) {
-                error_log("empty recipes.json");
                 http_response_code(204);
             } else {
                 http_response_code(200);
@@ -46,10 +45,9 @@
     public function getById(string $id): void
     {
         try {
-            // if ($this->handleUnauthorized()) {
-            //     error_log("GET BY ID ERROR: Unauthorized");
-            //     return;
-            // }
+            if ($this->handleUnauthorized()) {
+                return;
+            }
             $recipe = $this->recipe_schema->getById($id);
             if (empty($recipe)) {
                 http_response_code(404);
@@ -70,7 +68,65 @@
     public function getAll(): void
     {
         try {
+            if ($this->handleUnauthorized()) {
+                return;
+            }
+            if (Session::getUserRole() !== "Administrateur") {
+                http_response_code(403);
+                header("Content-Type: application/json");
+                echo json_encode(["error" => "Forbidden: you're not admin"]);
+                return;
+            }
             $recipes = $this->recipe_schema->getAll();
+            if (empty($recipes)) {
+                http_response_code(204);
+                header("Content-Type: application/json");
+                echo json_encode([]);
+            } else {
+                http_response_code(200);
+                header("Content-Type: application/json");
+                echo json_encode($recipes);
+            }
+        } catch (Exception $e) {
+            http_response_code(500);
+            header("Content-Type: application/json");
+            echo json_encode(["error" => $e->getMessage()]);
+        }
+    }
+
+    public function getDrafts(): void
+    {
+        try {
+            if ($this->handleUnauthorized()) {
+                return;
+            }
+            if (Session::getUserRole() !== "Administrateur") {
+                http_response_code(403);
+                header("Content-Type: application/json");
+                echo json_encode(["error" => "Forbidden: you're not admin"]);
+                return;
+            }
+            $recipes = $this->recipe_schema->getDrafts();
+            if (empty($recipes)) {
+                http_response_code(204);
+                header("Content-Type: application/json");
+                echo json_encode([]);
+            } else {
+                http_response_code(200);
+                header("Content-Type: application/json");
+                echo json_encode($recipes);
+            }
+        } catch (Exception $e) {
+            http_response_code(500);
+            header("Content-Type: application/json");
+            echo json_encode(["error" => $e->getMessage()]);
+        }
+    }
+
+    public function getPublished(): void
+    {
+        try {
+            $recipes = $this->recipe_schema->getPublished();
             if (empty($recipes)) {
                 http_response_code(204);
                 header("Content-Type: application/json");
@@ -445,7 +501,6 @@
     public function dispatch($method, array $path): void
     {
         if (empty($method)) {
-            error_log("RECIPES dispatch: empty method");
             http_response_code(400);
             header("Content-Type: application/json");
             echo json_encode(["error" => "Invalid method or path"]);
@@ -454,28 +509,31 @@
 
         switch ($method) {
             case "GET":
-                error_log("RECIPES DISPATCH: GET CASE");
                 // search case
                 if (empty($path) && isset($_GET["search"])) {
-                    error_log("SEARCH METHOD CALLED");
                     $this->search();
                     return;
                 }
                 // getAll case
                 if (empty($path)) {
-                    error_log("SEARCH GETALL CALLED");
                     $this->getAll();
+                    return;
+                }
+                //getDrafts
+                if ($path[0] === "drafts" && count((array) $path) === 1) {
+                    $this->getDrafts();
+                    return;
+                }
+                //getPublished
+                if ($path[0] === "published" && count((array) $path) === 1) {
+                    $this->getPublished();
                     return;
                 }
                 // getById case
                 if ($path[0] !== "" && count((array) $path) === 1) {
-                    error_log("SEARCH GETBYID CALLED");
                     $this->getById($path[0]);
                     return;
                 }
-                error_log(
-                    "FAILED TO PARSE GET CASES IN RECIPECONTROLLER DISPATCH"
-                );
                 http_response_code(400);
                 header("Content-Type: application/json");
                 echo json_encode(["error" => $path]);
