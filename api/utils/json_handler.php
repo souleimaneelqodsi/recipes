@@ -15,13 +15,16 @@ class JSONHandler
     {
         $filePath = $this->dataDirectory . DIRECTORY_SEPARATOR . $filename;
         if (!file_exists($filePath)) {
-            throw new ErrorException("File not found");
+            $emptyData = [];
+            $this->writeData($filename, $emptyData);
+            return $emptyData;
         }
         $fp = fopen($filePath, "r");
         if ($fp === false) {
             error_log("Failed to open file");
             throw new ErrorException("Failed to open file");
         }
+
         try {
             if (flock($fp, LOCK_SH)) {
                 $json = json_decode(file_get_contents($filePath), true);
