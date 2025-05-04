@@ -15,16 +15,21 @@ class JSONHandler
     {
         $filePath = $this->dataDirectory . DIRECTORY_SEPARATOR . $filename;
         if (!file_exists($filePath)) {
-            throw new ErrorException("File not found");
+            $emptyData = [];
+            $this->writeData($filename, $emptyData);
+            return $emptyData;
         }
         $fp = fopen($filePath, "r");
         if ($fp === false) {
+            error_log("Failed to open file");
             throw new ErrorException("Failed to open file");
         }
+
         try {
             if (flock($fp, LOCK_SH)) {
                 $json = json_decode(file_get_contents($filePath), true);
                 if (json_last_error() !== JSON_ERROR_NONE) {
+                    error_log("Failed to decode JSON");
                     throw new ErrorException(
                         json_last_error_msg() . " in file " . $filePath
                     );
@@ -40,6 +45,7 @@ class JSONHandler
             error_log("Error reading file");
             throw $e;
         } finally {
+            error_log("readData finished");
             fclose($fp);
         }
     }
@@ -49,34 +55,79 @@ class JSONHandler
     public function writeData(string $filename, array $data): void
     {
         $filePath = $this->dataDirectory . DIRECTORY_SEPARATOR . $filename;
-        if (!file_exists($filePath)) {
-            //if the file doesn't exist, we create an empty one
-            file_put_contents($filePath, json_encode([]));
-        }
-        $fp = fopen($filePath, "w");
+        error_log("Attempting to write data to: " . $filePath);
+
+        $fp = @fopen($filePath, "w");
+
         if ($fp === false) {
-            throw new ErrorException("Failed to open file");
+            $error = error_get_last();
+            error_log(
+                "Failed to open file '$filePath' for writing. Error: " .
+                    ($error["message"] ?? "Unknown error")
+            );
+            throw new ErrorException(
+                "Failed to open file '$filePath' for writing. Error: " .
+                    ($error["message"] ?? "Unknown error")
+            );
         }
+
+        error_log("File '$filePath' opened successfully for writing.");
+
         try {
             if (flock($fp, LOCK_EX)) {
-                //atomic writing system: we write to a temporary file, and only we rename it to the intended file name when we're sure the writing was completed
-                $tempFile = $filePath . ".tmp";
-                file_put_contents(
-                    $tempFile,
-                    json_encode($data, JSON_PRETTY_PRINT)
+                error_log("Exclusive lock acquired for file '$filePath'.");
+
+                $jsonData = json_encode($data, JSON_PRETTY_PRINT);
+                if ($jsonData === false) {
+                    error_log("JSON Encode Error: " . json_last_error_msg());
+                    throw new ErrorException("Failed to encode data to JSON.");
+                }
+
+                $bytesWritten = fwrite($fp, $jsonData);
+
+                if ($bytesWritten === false) {
+                    $error = error_get_last();
+                    error_log(
+                        "Failed to write data to file '$filePath'. fwrite returned false. Error: " .
+                            ($error["message"] ?? "Unknown error")
+                    );
+                    throw new ErrorException(
+                        "Failed to write data to file '$filePath'. Error: " .
+                            ($error["message"] ?? "Unknown error")
+                    );
+                }
+
+                error_log(
+                    "Successfully wrote $bytesWritten bytes to file '$filePath'."
                 );
-                rename($tempFile, $filePath);
+
                 flock($fp, LOCK_UN);
+                error_log("Lock released for file '$filePath'.");
             } else {
+                error_log(
+                    "Failed to acquire exclusive lock for file '$filePath'."
+                );
                 throw new ErrorException(
-                    "Failed to acquire lock to write data to the file"
+                    "Failed to acquire lock to write data to the file '$filePath'."
                 );
             }
         } catch (Exception $e) {
-            error_log("Error writing file");
-            throw $e;
-        } finally {
+            error_log(
+                "Error during file write operation for '$filePath': " .
+                    $e->getMessage()
+            );
+
             fclose($fp);
+            error_log("File '$filePath' closed due to exception.");
+            throw $e;
+        }
+
+        if (!fclose($fp)) {
+            error_log(
+                "Failed to close the file pointer for '$filePath' after successful write."
+            );
+        } else {
+            error_log("File '$filePath' closed successfully.");
         }
     }
 }

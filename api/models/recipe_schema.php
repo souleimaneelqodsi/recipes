@@ -37,7 +37,6 @@ class RecipeSchema
             if ($recipe_index !== false) {
                 return $recipes[$recipe_index];
             }
-            print "Recipe not found";
             return [];
         } catch (Exception $e) {
             error_log($e->getMessage());

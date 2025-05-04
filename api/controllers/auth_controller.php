@@ -12,171 +12,73 @@
     }
     public function register(): void
     {
-        // Log entry into the function
-        error_log("REGISTER_DEBUG: Attempting user registration process.");
-
         try {
-            error_log(
-                "REGISTER_DEBUG: Checking if user is already logged in via Session::isLoggedIn()."
-            );
             if (Session::isLoggedIn()) {
-                // Log condition met and action
-                error_log(
-                    "REGISTER_DEBUG: User is already logged in. Aborting registration with 400 error."
-                );
                 http_response_code(400);
                 header("Content-Type: application/json");
                 echo json_encode([
                     "error" => "User already logged in",
                 ]);
-                return; // Exit function
+                return;
             }
-            error_log("REGISTER_DEBUG: User is not logged in. Proceeding.");
-
-            // Log check for required fields
-            error_log(
-                "REGISTER_DEBUG: Checking existence and emptiness of POST fields: username, email, password."
-            );
+            $data = Utils::getJSONBody();
             if (
-                !isset($_POST["username"]) ||
-                !isset($_POST["email"]) ||
-                !isset($_POST["password"]) ||
-                empty($_POST["username"]) ||
-                empty($_POST["email"]) ||
-                empty($_POST["password"])
+                !isset($data["username"]) ||
+                !isset($data["email"]) ||
+                !isset($data["password"]) ||
+                empty($data["username"]) ||
+                empty($data["email"]) ||
+                empty($data["password"])
             ) {
-                // Log condition met and action
-                error_log(
-                    "REGISTER_DEBUG: One or more required fields are missing or empty. Aborting registration with 400 error."
-                );
                 http_response_code(400);
                 header("Content-Type: application/json");
                 echo json_encode(["error" => "Missing required fields"]);
-                return; // Exit function
+                return;
             }
-            error_log(
-                "REGISTER_DEBUG: All required POST fields are present and not empty."
-            );
 
-            // Assign variables and log received data (mask password)
-            $username = $_POST["username"];
-            $email = strtolower($_POST["email"]);
-            $password = $_POST["password"];
-            // WARNING: Avoid logging raw passwords in production environments! Redacted here for safety.
-            error_log(
-                "REGISTER_DEBUG: Received fields processed: username='{$username}', email='{$email}', password='[REDACTED]'"
-            );
+            $username = $data["username"];
+            $email = strtolower($data["email"]);
+            $password = $data["password"];
 
-            // Log before username validation
-            error_log(
-                "REGISTER_DEBUG: Attempting username validation for '{$username}'."
-            );
             if (!Validator::validateUsername($username)) {
-                // Log validation failure
-                error_log(
-                    "REGISTER_DEBUG: Username '{$username}' failed validation."
-                );
-                throw new InvalidUsernameException(); // Throw specific exception
+                throw new InvalidUsernameException();
             }
-            // Log validation success
-            error_log(
-                "REGISTER_DEBUG: Username '{$username}' passed validation."
-            );
 
-            // Log before email validation
-            error_log(
-                "REGISTER_DEBUG: Attempting email validation for '{$email}'."
-            );
             if (!Validator::validateEmail($email)) {
-                // Log validation failure
-                error_log(
-                    "REGISTER_DEBUG: Email '{$email}' failed validation."
-                );
-                throw new InvalidEmailException(); // Throw specific exception
+                throw new InvalidEmailException();
             }
-            // Log validation success
-            error_log("REGISTER_DEBUG: Email '{$email}' passed validation.");
 
-            // Log before duplicate check
-            error_log(
-                "REGISTER_DEBUG: Checking for duplicate username/email via user_schema->duplicate_handler()."
-            );
             $this->user_schema->duplicate_handler($username, $email);
-            // Log duplicate check success
-            error_log(
-                "REGISTER_DEBUG: Duplicate check passed (no existing user found with same username/email)."
-            );
 
-            // Log before password hashing
-            error_log(
-                "REGISTER_DEBUG: Hashing password via auth_schema->register()."
-            );
             $hashed_password = $this->auth_schema->register($password);
-            // Log password hashing success
-            error_log(
-                "REGISTER_DEBUG: Password hashing completed successfully."
-            );
 
-            // Log before user creation in data store
-            error_log(
-                "REGISTER_DEBUG: Creating user record via user_schema->create() with username='{$username}', email='{$email}'."
-            );
-            // Assuming user_schema->create returns the created user array, including the ID
             $createdUserData = $this->user_schema->create(
                 $username,
                 $email,
                 $hashed_password
             );
             if (empty($createdUserData) || !isset($createdUserData["id"])) {
-                error_log(
-                    "REGISTER_ERROR: UserSchema->create did not return expected user data or ID."
-                );
                 throw new Exception("User creation failed internally.", 500);
             }
-            $newUserId = $createdUserData["id"]; // Get the actual ID returned
-            // Log user creation success
-            error_log(
-                "REGISTER_DEBUG: User record created successfully. New User ID: {$newUserId}"
-            );
+            $newUserId = $createdUserData["id"];
 
-            // Log before setting session variables
-            // Session::start(); // REMOVED - Should be started globally in index.php
-            error_log(
-                "REGISTER_DEBUG: Setting session variables: user_id, username, email, role for User ID: {$newUserId}."
-            );
-            Session::set("user_id", $newUserId); // Use the definite ID
-            Session::set("username", $createdUserData["username"]); // Use data returned from create
+            Session::set("user_id", $newUserId);
+            Session::set("username", $createdUserData["username"]);
             Session::set("email", $createdUserData["email"]);
             Session::set("role", $createdUserData["role"]);
-            // Log session setting success
-            error_log("REGISTER_DEBUG: Session variables set successfully.");
 
-            // Log before sending final success response
-            error_log(
-                "REGISTER_DEBUG: Preparing successful response (201 Created)."
-            );
             http_response_code(201);
             header("Content-Type: application/json");
-            // Use the data returned by create() for the response body for consistency
+
             $responseBody = json_encode($createdUserData);
-            error_log(
-                "REGISTER_DEBUG: Sending JSON response body: {$responseBody}"
-            );
             echo $responseBody;
-            error_log(
-                "REGISTER_DEBUG: Registration process completed successfully and response sent."
-            );
         } catch (Exception $e) {
-            // Log the caught exception details
-            $errorCode = $e->getCode() !== 0 ? $e->getCode() : 500; // Use exception code or default to 500
+            $errorCode = $e->getCode() !== 0 ? $e->getCode() : 500;
             error_log(
                 "REGISTER_ERROR: Exception caught during registration. Code: {$errorCode}, Message: " .
                     $e->getMessage()
             );
-            // Optional: Log stack trace for detailed debugging
-            // error_log("REGISTER_ERROR: Stack Trace: " . $e->getTraceAsString());
 
-            // Ensure headers aren't sent before setting the status code if possible
             if (!headers_sent()) {
                 error_log(
                     "REGISTER_ERROR: Setting HTTP response code to {$errorCode}."
@@ -189,13 +91,12 @@
                 );
             }
 
-            // Send JSON error response
             $errorResponse = json_encode(["error" => $e->getMessage()]);
             error_log(
                 "REGISTER_ERROR: Sending JSON error response: {$errorResponse}"
             );
             echo $errorResponse;
-            return; // Exit after handling the error
+            return;
         }
     }
     public function login(): void
@@ -209,11 +110,12 @@
                 ]);
                 return;
             }
+            $data = Utils::getJSONBody();
             if (
-                !isset($_POST["username"]) ||
-                !isset($_POST["password"]) ||
-                empty($_POST["username"]) ||
-                empty($_POST["password"])
+                !isset($data["username"]) ||
+                !isset($data["password"]) ||
+                empty($data["username"]) ||
+                empty($data["password"])
             ) {
                 http_response_code(400);
                 header("Content-Type: application/json");
@@ -222,8 +124,8 @@
                 ]);
                 return;
             }
-            $username = $_POST["username"];
-            $password = $_POST["password"];
+            $username = $data["username"];
+            $password = $data["password"];
             $user = $this->user_schema->getByUsername($username);
             if (empty($user)) {
                 throw new IncorrectUsernameException();
@@ -266,6 +168,7 @@
             header("Content-Type: application/json");
             echo json_encode(["status" => "user logged out successfully"]);
         } catch (Exception $e) {
+            error_log("500 LOGOUT: failed to logout: " . $e->getMessage());
             http_response_code(500);
             header("Content-Type: application/json");
             echo json_encode(["error" => $e->getMessage()]);
@@ -283,7 +186,7 @@
             return;
         }
         if ($method === "POST") {
-            if (count((array) $path) == 1) {
+            if (count((array) $path) == 1 && $path !== "") {
                 switch ($path[0]) {
                     case "register":
                         $this->register();
@@ -295,12 +198,15 @@
                         $this->logout();
                         break;
                     default:
-                        http_response_code(404);
+                        http_response_code(400);
                         header("Content-Type: application/json");
-                        echo json_encode(["error" => "Not found"]);
+                        echo json_encode(["error" => "Auth: Bad request"]);
                         break;
                 }
             } else {
+                error_log(
+                    "Auth: Invalid path -> the extracted URI param is 2-word long"
+                );
                 http_response_code(400);
                 header("Content-Type: application/json");
                 echo json_encode(["error" => "Invalid request"]);
