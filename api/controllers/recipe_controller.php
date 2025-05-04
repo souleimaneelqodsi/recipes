@@ -45,9 +45,6 @@
     public function getById(string $id): void
     {
         try {
-            if ($this->handleUnauthorized()) {
-                return;
-            }
             $recipe = $this->recipe_schema->getById($id);
             if (empty($recipe)) {
                 http_response_code(404);
