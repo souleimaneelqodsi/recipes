@@ -85,6 +85,46 @@
         }
     }
 
+    public function getDrafts(): void
+    {
+        try {
+            $recipes = $this->recipe_schema->getDrafts();
+            if (empty($recipes)) {
+                http_response_code(204);
+                header("Content-Type: application/json");
+                echo json_encode([]);
+            } else {
+                http_response_code(200);
+                header("Content-Type: application/json");
+                echo json_encode($recipes);
+            }
+        } catch (Exception $e) {
+            http_response_code(500);
+            header("Content-Type: application/json");
+            echo json_encode(["error" => $e->getMessage()]);
+        }
+    }
+
+    public function getPublished(): void
+    {
+        try {
+            $recipes = $this->recipe_schema->getPublished();
+            if (empty($recipes)) {
+                http_response_code(204);
+                header("Content-Type: application/json");
+                echo json_encode([]);
+            } else {
+                http_response_code(200);
+                header("Content-Type: application/json");
+                echo json_encode($recipes);
+            }
+        } catch (Exception $e) {
+            http_response_code(500);
+            header("Content-Type: application/json");
+            echo json_encode(["error" => $e->getMessage()]);
+        }
+    }
+
     public function create(): void
     {
         try {
@@ -471,9 +511,24 @@
                     $this->getById($path[0]);
                     return;
                 }
-                error_log(
-                    "FAILED TO PARSE GET CASES IN RECIPECONTROLLER DISPATCH"
-                );
+
+                //getDrafts
+                if (
+                    $path[0] !== "" &&
+                    count((array) $path) === 1 &&
+                    $path[1] === "drafts"
+                ) {
+                    $this->getDrafts();
+                }
+                //getPublished
+                if (
+                    $path[0] !== "" &&
+                    count((array) $path) === 1 &&
+                    $path[1] === "published"
+                ) {
+                    $this->getPublished();
+                }
+
                 http_response_code(400);
                 header("Content-Type: application/json");
                 echo json_encode(["error" => $path]);

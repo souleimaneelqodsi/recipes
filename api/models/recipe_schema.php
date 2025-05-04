@@ -111,6 +111,38 @@ class RecipeSchema
         }
         return $stop_words;
     }
+
+    /**
+     * @return array */
+    public function getDrafts()
+    {
+        try {
+            $all_recipes = $this->getAll();
+            return array_search("draft", array_column($all_recipes, "status"));
+        } catch (Exception $e) {
+            http_response_code(500);
+            header("Content-Type: application/json");
+            echo json_encode(["error" => "error: " . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * @return array */
+    public function getPublished()
+    {
+        try {
+            $all_recipes = $this->getAll();
+            return array_search(
+                "published",
+                array_column($all_recipes, "status")
+            );
+        } catch (Exception $e) {
+            http_response_code(500);
+            header("Content-Type: application/json");
+            echo json_encode(["error" => "error: " . $e->getMessage()]);
+        }
+    }
+
     /**
      * @return array     */
     private function search_term(string $search_term): array
@@ -276,10 +308,7 @@ class RecipeSchema
     }
 
     /**
-     * @return array     * @param array<int,mixed> $without
-     * @param array<int,mixed> $ingredients
-     * @param array<int,mixed> $steps
-     * @param array<int,mixed> $timers
+     * @return array
      * @param array<int,mixed> $recipeData
      */
     public function create(array $recipeData): array
@@ -371,7 +400,8 @@ class RecipeSchema
     }
 
     /**
-     * @return array     * @param array<int,mixed> $updateData
+     * @param array<int,mixed> $updateData
+     * @return array
      */
     public function update(string $recipe_id, array $updateData): array
     {
@@ -380,10 +410,6 @@ class RecipeSchema
                 !isset($updateData) ||
                 !is_array($updateData) ||
                 empty($updateData) ||
-                // array_key_exists("id", $updateData) ||
-                // array_key_exists("Author", $updateData) ||
-                // array_key_exists("originalURL", $updateData) ||
-                // array_key_exists("created_at", $updateData) ||
                 array_diff(
                     array_keys($updateData),
                     //allowed:
