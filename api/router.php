@@ -18,17 +18,7 @@ class Router
         $clean_uri = trim($uri, "/");
         $path = explode("/", $clean_uri);
         $path = array_slice($path, 2);
-
-        $data_directory_path = realpath(API_BASE_PATH . "/../../test");
-        if ($data_directory_path === false) {
-            error_log(
-                "ERREUR : Le répertoire de données spécifié est invalide ou n'existe pas : " .
-                    API_BASE_PATH .
-                    "/../../test"
-            );
-            throw new Exception("Répertoire de données invalide.");
-        }
-        $json_handler = new JSONHandler($data_directory_path);
+        $json_handler = new JSONHandler(API_BASE_PATH . "/data");
         $sliced_path = array_slice($path, 1);
         $user_model = null;
         if (Session::isLoggedIn()) {

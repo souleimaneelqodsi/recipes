@@ -66,12 +66,12 @@ class JSONHandler
         try {
             if (flock($fp, LOCK_EX)) {
                 //atomic writing system: we write to a temporary file, and only we rename it to the intended file name when we're sure the writing was completed
-                // $tempFile = $filePath . ".tmp";
+                 $tempFile = $filePath . ".tmp";
                 file_put_contents(
-                    $filePath,
+                    $tempFile,
                     json_encode($data, JSON_PRETTY_PRINT)
                 );
-                // rename($tempFile, $filePath);
+                 rename($tempFile, $filePath);
                 flock($fp, LOCK_UN);
             } else {
                 throw new ErrorException(
