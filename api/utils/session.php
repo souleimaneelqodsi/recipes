@@ -37,6 +37,11 @@
         if (session_status() !== PHP_SESSION_ACTIVE) {
             return;
         }
+        if (!is_array($value)) {
+            error_log("define " . $key . " as " . $value);
+        } else {
+            error_log("define " . $key . " as " . json_encode($value));
+        }
         $_SESSION[$key] = $value;
     }
 
@@ -63,10 +68,28 @@
 
     public static function isLoggedIn(): bool
     {
-        if (session_status() !== PHP_SESSION_ACTIVE) {
+        $status = session_status();
+        error_log(
+            "SESSION_DEBUG: Checking isLoggedIn. Session status: " . $status
+        );
+
+        if ($status !== PHP_SESSION_ACTIVE) {
+            error_log(
+                "SESSION_DEBUG: isLoggedIn check failed - session status is not PHP_SESSION_ACTIVE."
+            );
             return false;
         }
-        return isset($_SESSION["user_id"]);
+
+        $isSet = isset($_SESSION["user_id"]);
+        $userIdValue = $_SESSION["user_id"] ?? "NOT SET";
+        error_log(
+            "SESSION_DEBUG: isLoggedIn checking \$_SESSION['user_id']. Is set: " .
+                ($isSet ? "true" : "false") .
+                ". Value: " .
+                $userIdValue
+        );
+
+        return $isSet;
     }
 
     public static function getCurrentUser(): UserSchema
