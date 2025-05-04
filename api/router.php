@@ -3,6 +3,7 @@ class Router
 {
     private static function not_found(): void
     {
+        error_log("Could not parse the path: bad endpoint");
         http_response_code(400);
         header("Content-Type: application/json");
         echo json_encode(["error" => "Endpoint not found"]);
@@ -26,79 +27,68 @@ class Router
                 Session::get("username"),
                 Session::get("email")
             );
-            switch ($path[0]) {
-                case "recipes":
-                    if (isset($path[2]) && !empty($path[2])) {
-                        if ($path[2] === "comments") {
-                            $comments_model = new CommentSchema($json_handler);
-                            $comments_controller = new CommentController(
-                                $comments_model
-                            );
-                            $comments_controller->dispatch(
-                                $method,
-                                $sliced_path
-                            );
-                            break;
-                        } elseif ($path[2] === "photos" && $method === "POST") {
-                            $photos_model = new PhotoSchema($json_handler);
-                            $photos_controller = new PhotoController(
-                                $photos_model
-                            );
-                            $photos_controller->dispatch($method, $sliced_path);
-                            break;
-                        } elseif (
-                            $path[2] === "photos" &&
-                            $method === "PATCH"
-                        ) {
-                            $user_model = new UserSchema(
-                                $json_handler,
-                                "guest",
-                                "guest@example.com"
-                            );
-                            $recipe_model = new RecipeSchema($json_handler);
-                            $photos_controller = new RecipeController(
-                                $recipe_model,
-                                $user_model
-                            );
-                            $photos_controller->dispatch($method, $sliced_path);
-                            break;
-                        } else {
-                            self::not_found();
-                        }
+        }
+        switch ($path[0]) {
+            case "recipes":
+                if (isset($path[2]) && !empty($path[2])) {
+                    if ($path[2] === "comments") {
+                        $comments_model = new CommentSchema($json_handler);
+                        $comments_controller = new CommentController(
+                            $comments_model
+                        );
+                        $comments_controller->dispatch($method, $sliced_path);
+                        break;
+                    } elseif ($path[2] === "photos" && $method === "POST") {
+                        $photos_model = new PhotoSchema($json_handler);
+                        $photos_controller = new PhotoController($photos_model);
+                        $photos_controller->dispatch($method, $sliced_path);
+                        break;
+                    } elseif ($path[2] === "photos" && $method === "PATCH") {
+                        $user_model = new UserSchema(
+                            $json_handler,
+                            "guest",
+                            "guest@example.com"
+                        );
+                        $recipe_model = new RecipeSchema($json_handler);
+                        $photos_controller = new RecipeController(
+                            $recipe_model,
+                            $user_model
+                        );
+                        $photos_controller->dispatch($method, $sliced_path);
+                        break;
+                    } else {
+                        self::not_found();
                     }
-                    $recipe_model = new RecipeSchema($json_handler);
-                    $user_model = new UserSchema(
-                        $json_handler,
-                        "guest",
-                        "guest@example.com"
-                    );
-                    $recipe_controller = new RecipeController(
-                        $recipe_model,
-                        $user_model
-                    );
-                    $recipe_controller->dispatch($method, $sliced_path);
-                    break;
-                case "users":
-                    $user_controller = new UserController($user_model);
-                    $user_controller->dispatch($method, $sliced_path);
-                    break;
-                case "auth":
-                    $auth_model = new AuthSchema();
-                    $user_model = new UserSchema(
-                        $json_handler,
-                        "guest",
-                        "guest@example.com"
-                    );
-                    $auth_controller = new AuthController(
-                        $auth_model,
-                        $user_model
-                    );
-                    $auth_controller->dispatch($method, $sliced_path);
-                    break;
-                default:
-                    self::not_found();
-                    break;
-            }
+                }
+                $recipe_model = new RecipeSchema($json_handler);
+                $user_model = new UserSchema(
+                    $json_handler,
+                    "guest",
+                    "guest@example.com"
+                );
+                $recipe_controller = new RecipeController(
+                    $recipe_model,
+                    $user_model
+                );
+                $recipe_controller->dispatch($method, $sliced_path);
+                break;
+            case "users":
+                $user_controller = new UserController($user_model);
+                $user_controller->dispatch($method, $sliced_path);
+                break;
+            case "auth":
+                $auth_model = new AuthSchema();
+                $user_model = new UserSchema(
+                    $json_handler,
+                    "guest",
+                    "guest@example.com"
+                );
+                $auth_controller = new AuthController($auth_model, $user_model);
+                $auth_controller->dispatch($method, $sliced_path);
+                break;
+            default:
+                self::not_found();
+                break;
         }
     }
 }

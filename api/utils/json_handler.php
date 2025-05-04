@@ -19,12 +19,14 @@ class JSONHandler
         }
         $fp = fopen($filePath, "r");
         if ($fp === false) {
+            error_log("Failed to open file");
             throw new ErrorException("Failed to open file");
         }
         try {
             if (flock($fp, LOCK_SH)) {
                 $json = json_decode(file_get_contents($filePath), true);
                 if (json_last_error() !== JSON_ERROR_NONE) {
+                    error_log("Failed to decode JSON");
                     throw new ErrorException(
                         json_last_error_msg() . " in file " . $filePath
                     );
@@ -40,6 +42,7 @@ class JSONHandler
             error_log("Error reading file");
             throw $e;
         } finally {
+            error_log("readData finished");
             fclose($fp);
         }
     }

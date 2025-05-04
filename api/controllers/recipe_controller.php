@@ -29,6 +29,7 @@
         try {
             $recipes = $this->recipe_schema->search($_GET["search"]);
             if (empty($recipes)) {
+                error_log("empty recipes.json");
                 http_response_code(204);
             } else {
                 http_response_code(200);
@@ -45,9 +46,10 @@
     public function getById(string $id): void
     {
         try {
-            if ($this->handleUnauthorized()) {
-                return;
-            }
+            // if ($this->handleUnauthorized()) {
+            //     error_log("GET BY ID ERROR: Unauthorized");
+            //     return;
+            // }
             $recipe = $this->recipe_schema->getById($id);
             if (empty($recipe)) {
                 http_response_code(404);
@@ -441,6 +443,7 @@
     public function dispatch($method, array $path): void
     {
         if (empty($method)) {
+            error_log("RECIPES dispatch: empty method");
             http_response_code(400);
             header("Content-Type: application/json");
             echo json_encode(["error" => "Invalid method or path"]);
@@ -449,21 +452,28 @@
 
         switch ($method) {
             case "GET":
+                error_log("RECIPES DISPATCH: GET CASE");
                 // search case
                 if (empty($path) && isset($_GET["search"])) {
+                    error_log("SEARCH METHOD CALLED");
                     $this->search();
                     return;
                 }
                 // getAll case
                 if (empty($path)) {
+                    error_log("SEARCH GETALL CALLED");
                     $this->getAll();
                     return;
                 }
                 // getById case
                 if ($path[0] !== "" && count((array) $path) === 1) {
+                    error_log("SEARCH GETBYID CALLED");
                     $this->getById($path[0]);
                     return;
                 }
+                error_log(
+                    "FAILED TO PARSE GET CASES IN RECIPECONTROLLER DISPATCH"
+                );
                 http_response_code(400);
                 header("Content-Type: application/json");
                 echo json_encode(["error" => $path]);
