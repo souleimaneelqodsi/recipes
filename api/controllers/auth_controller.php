@@ -237,7 +237,7 @@
             Session::set("user_id", $this->user_schema->getId());
             Session::set("username", $this->user_schema->getUsername());
             Session::set("email", $this->user_schema->getEmail());
-            Session::set("role", "Administrateur");
+            Session::set("role", $this->user_schema->getRole());
             http_response_code(200);
             header("Content-Type: application/json");
             echo json_encode([

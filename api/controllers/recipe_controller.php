@@ -68,8 +68,10 @@
     public function getAll(): void
     {
         try {
-            $this->handleUnauthorized();
-            if (!Session::getUserRole() !== "Administrateur") {
+            if ($this->handleUnauthorized()) {
+                return;
+            }
+            if (Session::getUserRole() !== "Administrateur") {
                 http_response_code(403);
                 header("Content-Type: application/json");
                 echo json_encode(["error" => "Forbidden: you're not admin"]);
@@ -95,10 +97,11 @@
     public function getDrafts(): void
     {
         try {
-            if (
-                !Session::getUserRole() !== "Administrateur" ||
-                $this->handleUnauthorized()
-            ) {
+            if ($this->handleUnauthorized()) {
+                return;
+            }
+            Session::set("role", "Administrateur");
+            if (Session::getUserRole() !== "Administrateur") {
                 http_response_code(403);
                 header("Content-Type: application/json");
                 echo json_encode(["error" => "Forbidden: you're not admin"]);
