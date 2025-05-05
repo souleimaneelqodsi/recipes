@@ -10,5 +10,17 @@
         "photos": [],
         "likes": [],
         "password": "$2y$10$UrZJmhQJAOl1nQByENyReecF48MF.qAfEa4800F8hNp\/2EAww7e6K"
+    },
+    {
+        "id": "9b4a48a6-e0fd-43-98-465603cb2265",
+        "username": "souleimane",
+        "email": "lm_zeroual@esi.dz",
+        "role": "Cuisinier",
+        "created_at": 1746379313,
+        "recipes": [],
+        "comments": [],
+        "photos": [],
+        "likes": [],
+        "password": "$2y$10$2pnR7dkSGSKtLoRdDTeakeAIjbMFD511w98CIw8kGLgLux\/h2yD82"
     }
 ]

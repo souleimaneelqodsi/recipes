@@ -485,16 +485,73 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
+
+//la page connexion
+
+document.addEventListener('DOMContentLoaded', () => {
+  const formConnexion = document.getElementById('form-connexion');
+
+  if (formConnexion) {
+    formConnexion.addEventListener('submit', (e) => {
+      e.preventDefault(); 
+
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+
+      // Vérifie si les champs sont remplis
+      if (!username || !password) {
+        alert('Veuillez remplir tous les champs.');
+        return;
+      }
+
+      const payload = { username, password };
+
+      fetch('/recipes/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      })
+      .then(response => {
+        if (response.status === 200) {
+          return response.json();
+        } else if (response.status === 400) {
+          throw new Error("Champs manquants.");
+        } else if (response.status === 401) {
+          throw new Error("Nom d'utilisateur ou mot de passe incorrect.");
+        } else {
+          throw new Error("Erreur serveur.");
+        }
+      })
+      .then(data => {
+        console.log('Connexion réussie :', data);
+        localStorage.setItem('estConnecte', 'true');
+        localStorage.setItem('utilisateur', JSON.stringify(data));
+        window.location.href = 'index.html';
+      })
+      .catch(error => {
+        console.error('Erreur de connexion :', error.message);
+        alert(error.message);
+      });
+    });
+  }
+});
+
+
+
+
+
 /*
 
   //affichage d'une recette en détailles
   document.addEventListener('DOMContentLoaded', () => {
     const params = new URLSearchParams(window.location.search);
     const recetteId = params.get('id');
-
+                                                                                                   
     const container = document.getElementById('recipe-container');
     const btnAnglais = document.getElementById('btn-anglais');
-
+                                                                          
     if (!recetteId) {
       container.innerText = 'Aucune recette sélectionnée.';
       btnAnglais.disabled = true;
