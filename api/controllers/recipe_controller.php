@@ -381,6 +381,15 @@
             if ($this->handleUnauthorized()) {
                 return;
             }
+            if (Session::getUserRole() !== "Traducteur") {
+                http_response_code(403);
+                header("Content-Type: application/json");
+                echo json_encode([
+                    "error" =>
+                        "Forbidden: You are not authorized to translate recipes because you're not a translator.",
+                ]);
+                return;
+            }
             $recipe = $this->recipe_schema->translate($recipe_id, $translation);
             if (empty($recipe)) {
                 http_response_code(404);
