@@ -67,6 +67,37 @@
         }
     }
 
+    public function askRole(string $requested_role): void
+    {
+        try {
+            if (!Session::isLoggedIn()) {
+                http_response_code(401);
+                header("Content-Type: application/json");
+                echo json_encode([
+                    "error" => "You must be logged in to request a role",
+                ]);
+                return;
+            }
+
+            $updated_usr = $this->user_schema->askRole($requested_role);
+
+            if (empty($updated_usr)) {
+                http_response_code(400);
+                header("Content-Type: application/json");
+                echo json_encode(["error" => "Failed to request role"]);
+                return;
+            }
+
+            http_response_code(200);
+            header("Content-Type: application/json");
+            echo json_encode(["message" => "Role request submitted"]);
+        } catch (Exception $e) {
+            http_response_code(500);
+            header("Content-Type: application/json");
+            echo json_encode(["error" => $e->getMessage()]);
+        }
+    }
+
     #[\Override]
     public function dispatch($method, array $path): void
     {
@@ -103,6 +134,14 @@
                 $path[1] === "role"
             ) {
                 $this->updateRole($path[0], $data["role"]);
+                return;
+            }
+            if (
+                $path[0] !== "" &&
+                count((array) $path) == 2 &&
+                $path[1] === "askrole"
+            ) {
+                $this->askRole($data["requested_role"]);
                 return;
             }
             http_response_code(400);

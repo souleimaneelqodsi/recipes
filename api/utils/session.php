@@ -119,13 +119,24 @@
         }
     }
 
-    public static function getUserRole(): string
+    public static function getUserRoles(): array
     {
         if (session_status() !== PHP_SESSION_ACTIVE) {
             throw new Exception("Session is not active");
         }
-        $role = self::get("role");
-        error_log("Role returned by getUseRole : " . $role ?? "null");
-        return $role;
+        $roles = self::get("roles");
+        return $roles ?? ["Cuisinier"];
+    }
+
+    public static function hasRole(string $role): bool
+    {
+        $roles = self::getUserRoles();
+        return in_array($role, $roles);
+    }
+
+    public static function getUserRole(): string
+    {
+        $roles = self::getUserRoles();
+        return $roles[0] ?? "Cuisinier";
     }
 }

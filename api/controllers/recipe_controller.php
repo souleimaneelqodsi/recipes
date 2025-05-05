@@ -147,8 +147,8 @@
                 return;
             }
             if (
-                Session::getUserRole() !== "Chef" &&
-                Session::getUserRole() !== "Administrateur"
+                !Session::hasRole("Chef") &&
+                !Session::hasRole("Administrateur")
             ) {
                 http_response_code(403);
                 header("Content-Type: application/json");
@@ -201,11 +201,12 @@
                 return;
             }
             if (
-                Session::getUserRole() !== "Administrateur" &&
-                !$this->recipe_schema->isAuthor(
-                    Session::getCurrentUser()->getId(),
-                    $id
-                )
+                Session::getUserRole() !== "Administrateur" ||
+                (Session::getUserRole() !== "Chef" &&
+                    !$this->recipe_schema->isAuthor(
+                        Session::getCurrentUser()->getId(),
+                        $id
+                    ))
             ) {
                 http_response_code(403);
                 header("Content-Type: application/json");
@@ -381,7 +382,7 @@
             if ($this->handleUnauthorized()) {
                 return;
             }
-            if (Session::getUserRole() !== "Traducteur") {
+            if (!Session::hasRole("Traducteur")) {
                 http_response_code(403);
                 header("Content-Type: application/json");
                 echo json_encode([
