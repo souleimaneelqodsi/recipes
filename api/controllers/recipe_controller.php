@@ -201,11 +201,12 @@
                 return;
             }
             if (
-                Session::getUserRole() !== "Administrateur" &&
-                !$this->recipe_schema->isAuthor(
-                    Session::getCurrentUser()->getId(),
-                    $id
-                )
+                Session::getUserRole() !== "Administrateur" ||
+                (Session::getUserRole() !== "Chef" &&
+                    !$this->recipe_schema->isAuthor(
+                        Session::getCurrentUser()->getId(),
+                        $id
+                    ))
             ) {
                 http_response_code(403);
                 header("Content-Type: application/json");
