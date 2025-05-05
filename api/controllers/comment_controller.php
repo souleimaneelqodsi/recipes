@@ -14,6 +14,14 @@
     public function create(string $recipe_id): void
     {
         try {
+            if (!Session::isLoggedIn()) {
+                http_response_code(401);
+                header("Content-Type: application/json");
+                echo json_encode([
+                    "error" => "You must be logged in to create a comment",
+                ]);
+                return;
+            }
             if (empty($recipe_id)) {
                 http_response_code(400);
                 header("Content-Type: application/json");
