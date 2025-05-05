@@ -49,7 +49,7 @@
             if (empty($comment_usr)) {
                 http_response_code(404);
                 header("Content-Type: application/json");
-                echo json_encode(["error" => "User not found"]);
+                echo json_encode(["error" => "User not foundddd"]);
                 return;
             }
             http_response_code(201);
