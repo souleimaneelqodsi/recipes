@@ -3,7 +3,7 @@
         "id": "af14c8e8-a1bf-4e-91-f475a2695abd",
         "name": "Tarte aux pommes 388",
         "nameFR": "",
-        "Author": "user-uuid-placeholder",
+        "Author": "MIDOU DZ",
         "Without": [
             "NoMilk"
         ],
@@ -35,7 +35,7 @@
         "imageURL": "http://img.sndimg.com/food/image/upload/w_266/v1/img/recipes/27/20/8/picVfzLZo.jpg",
         "originalURL": "recipes\/tarte-aux-pommes-388",
         "likes": 0,
-        "status": "draft",
+        "status": "published",
         "comments": [],
         "photos": [],
         "total_time": 1200,
