@@ -37,8 +37,14 @@ class Router
                             $json_handler,
                             $recipe_schema
                         );
+                        $user_model = new UserSchema(
+                            $json_handler,
+                            "guest",
+                            "guest@example.com"
+                        );
                         $comments_controller = new CommentController(
-                            $comments_model
+                            $comments_model,
+                            $user_model
                         );
                         $comments_controller->dispatch($method, $sliced_path);
                         break;
