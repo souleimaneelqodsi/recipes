@@ -1,9 +1,14 @@
 # Recipe Management Web Application 
 
-[![Build Passing](https://img.shields.io/badge/Build-Passing-brightgreen.svg)](https://github.com/yourusername/recipe-management/actions)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Build Passing](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/yourusername/recipe-management/actions)
+[![Version: 1.0](https://img.shields.io/badge/version-1.0-blue.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-orange.svg)](https://opensource.org/licenses/MIT)
 
-![Tech Stack](https://skillicons.dev/icons?i=html,css,js,jquery,php)
+
+![Tech Stack](https://skillicons.dev/icons?i=html,css,js,php)
+
+TODO: add installation/running tutorial
+
 
 ## Overview
 This web application enables users to manage cooking recipes in French and English. It supports multiple user roles—cooks, chefs, translators, and administrators—each with distinct permissions to create, edit, translate, and oversee recipes. The platform offers a modern, responsive interface with features like searching, filtering, commenting, and photo uploads.
