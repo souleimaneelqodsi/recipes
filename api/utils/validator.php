@@ -267,8 +267,8 @@ class Validator
         $is_valid =
             is_array($comment) &&
             isset($comment["id"]) &&
-            isset($comment["recipe_id"]) &&
-            isset($comment["recipe_name"]) &&
+            isset($comment["user_id"]) &&
+            isset($comment["username"]) &&
             isset($comment["content"]) &&
             isset($comment["created_at"]);
         if ($is_valid) {

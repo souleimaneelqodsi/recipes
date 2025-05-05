@@ -4,9 +4,7 @@
         "name": "Tarte aux pommes 388",
         "nameFR": "",
         "Author": "bfcda119-6e54-45-84-cdd4c1e43726",
-        "Without": [
-            "NoMilk"
-        ],
+        "Without": ["NoMilk"],
         "ingredients": [
             {
                 "quantity": "100g",
@@ -68,9 +66,7 @@
         "name": "Tarte aux pommes 319",
         "nameFR": "",
         "Author": "user-uuid-placeholder",
-        "Without": [
-            "NoMilk"
-        ],
+        "Without": ["NoMilk"],
         "ingredients": [
             {
                 "quantity": "100g",
@@ -110,9 +106,7 @@
         "name": "G\u00e2teau au chocolat 837",
         "nameFR": "",
         "Author": "user-uuid-placeholder",
-        "Without": [
-            "NoMilk"
-        ],
+        "Without": ["NoMilk"],
         "ingredients": [
             {
                 "quantity": "100g",
