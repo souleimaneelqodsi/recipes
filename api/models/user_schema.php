@@ -6,7 +6,7 @@ class UserSchema
     private $username;
     private $email;
     private $password;
-    private $role;
+    private array $roles;
     private $created_at;
     private array $recipes;
     private array $comments;
@@ -24,7 +24,7 @@ class UserSchema
         $this->id = Utils::uuid4();
         $this->username = $username;
         $this->email = strtolower($email);
-        $this->role = "Cuisinier";
+        $this->roles = ["Cuisinier"];
         $this->created_at = time();
         $this->recipes = [];
         $this->comments = [];
@@ -37,10 +37,19 @@ class UserSchema
     {
         return $this->id;
     }
+    public function getRoles(): array
+    {
+        return $this->roles;
+    }
 
     public function getRole(): string
     {
-        return $this->role;
+        return $this->roles[0] ?? "Cuisinier";
+    }
+
+    public function hasRole(string $role): bool
+    {
+        return in_array($role, $this->roles);
     }
 
     public function getUsername(): string
@@ -76,7 +85,7 @@ class UserSchema
             "id" => $this->id,
             "username" => $this->username,
             "email" => strtolower($this->email),
-            "role" => $this->role,
+            "roles" => $this->roles,
             "created_at" => $this->created_at,
             "recipes" => $this->recipes,
             "comments" => $this->comments,
@@ -101,7 +110,7 @@ class UserSchema
         $this->username = $data["username"];
         $this->email = strtolower($data["email"]);
         $this->password = $data["password"];
-        $this->role = $data["role"];
+        $this->roles = $data["roles"]; // Changed from "role" to "roles"
         $this->created_at = $data["created_at"];
         $this->recipes = $data["recipes"];
         $this->comments = $data["comments"];
@@ -562,14 +571,18 @@ class UserSchema
     /**
      * @return array
      */
-    public function updateRole(string $user_id, string $role): array
-    {
+    public function updateRole(
+        string $user_id,
+        string $role,
+        bool $remove = false
+    ): array {
         if (
             !Session::isLoggedIn() ||
-            Session::getUserRole() !== "Administrateur"
+            !in_array("Administrateur", Session::getCurrentUser()->getRoles())
         ) {
             throw new Exception("User not logged in or not an administrator");
         }
+
         try {
             $all_users = $this->getAll();
             $usr_index = array_search(
@@ -577,19 +590,128 @@ class UserSchema
                 array_column($all_users, "id"),
                 true
             );
+
             if ($usr_index === false) {
                 throw new Exception("User not found");
             }
-            $all_users[$usr_index]["role"] = $role;
-            if (!Validator::validateUser($all_users[$usr_index])) {
-                error_log("Invalid role");
-                throw new Exception("Invalid role");
+
+            $current_roles = $all_users[$usr_index]["roles"];
+
+            if ($remove) {
+                $key = array_search($role, $current_roles);
+                if ($key !== false) {
+                    unset($current_roles[$key]);
+                    $current_roles = array_values($current_roles); // Reindex array
+                }
+
+                if (empty($current_roles)) {
+                    $current_roles = ["Cuisinier"];
+                }
+            } else {
+                if ($role === "Chef") {
+                    $key = array_search("DemandeChef", $current_roles);
+                    if ($key !== false) {
+                        unset($current_roles[$key]);
+                        $current_roles = array_values($current_roles);
+                    }
+
+                    $key = array_search("Cuisinier", $current_roles);
+                    if ($key !== false) {
+                        unset($current_roles[$key]);
+                        $current_roles = array_values($current_roles);
+                    }
+                } elseif ($role === "Traducteur") {
+                    $key = array_search("DemandeTraducteur", $current_roles);
+                    if ($key !== false) {
+                        unset($current_roles[$key]);
+                        $current_roles = array_values($current_roles);
+                    }
+                } elseif ($role === "Administrateur") {
+                    $key = array_search("Cuisinier", $current_roles);
+                    if ($key !== false) {
+                        unset($current_roles[$key]);
+                        $current_roles = array_values($current_roles);
+                    }
+                }
+
+                if (!in_array($role, $current_roles)) {
+                    $current_roles[] = $role;
+                }
             }
-            $all_users[$usr_index]["role"] = $role;
+
+            $all_users[$usr_index]["roles"] = $current_roles;
+
+            if (!Validator::validateUser($all_users[$usr_index])) {
+                error_log("Invalid roles");
+                throw new Exception("Invalid roles");
+            }
+
             $this->json_handler->writeData(self::DATA_FILE, $all_users);
             return $all_users[$usr_index];
         } catch (Exception $e) {
-            error_log("User role update failed");
+            error_log("User role update failed: " . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    /**
+     * Request a new role for the user
+     * @return array
+     */
+    public function askRole(string $requested_role): array
+    {
+        if (!Session::isLoggedIn()) {
+            throw new Exception("User not logged in");
+        }
+
+        try {
+            $user_id = Session::getCurrentUser()->id;
+            $all_users = $this->getAll();
+            $user_index = array_search(
+                $user_id,
+                array_column($all_users, "id"),
+                true
+            );
+
+            if ($user_index === false) {
+                throw new Exception("User not found");
+            }
+
+            $user = $all_users[$user_index];
+            $current_roles = $user["roles"];
+
+            if ($requested_role === "DemandeTraducteur") {
+                if (!in_array("DemandeTraducteur", $current_roles)) {
+                    $current_roles[] = "DemandeTraducteur";
+                } else {
+                    throw new Exception(
+                        "User already requested Traducteur role"
+                    );
+                }
+            } elseif ($requested_role === "DemandeChef") {
+                if (
+                    in_array("Cuisinier", $current_roles) &&
+                    !in_array("Chef", $current_roles) &&
+                    !in_array("DemandeChef", $current_roles)
+                ) {
+                    $current_roles[] = "DemandeChef";
+                } else {
+                    throw new Exception(
+                        "User is not eligible to request Chef role"
+                    );
+                }
+            } else {
+                throw new Exception("Invalid role request");
+            }
+
+            $user["roles"] = $current_roles;
+            $all_users[$user_index] = $user;
+            $this->json_handler->writeData(self::DATA_FILE, $all_users);
+            $this->roles = $current_roles;
+
+            return $user;
+        } catch (Exception $e) {
+            error_log("Role request failed: " . $e->getMessage());
             throw $e;
         }
     }

@@ -147,8 +147,8 @@
                 return;
             }
             if (
-                Session::getUserRole() !== "Chef" &&
-                Session::getUserRole() !== "Administrateur"
+                !Session::hasRole("Chef") &&
+                !Session::hasRole("Administrateur")
             ) {
                 http_response_code(403);
                 header("Content-Type: application/json");
@@ -381,7 +381,7 @@
             if ($this->handleUnauthorized()) {
                 return;
             }
-            if (Session::getUserRole() !== "Traducteur") {
+            if (!Session::hasRole("Traducteur")) {
                 http_response_code(403);
                 header("Content-Type: application/json");
                 echo json_encode([

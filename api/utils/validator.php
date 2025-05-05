@@ -306,8 +306,44 @@ class Validator
     /**
      * @param mixed $user
      */
+    /**
+     * @param mixed $user
+     */
     public static function validateUser($user): bool
     {
+        if (
+            !isset($user["roles"]) ||
+            !is_array($user["roles"]) ||
+            empty($user["roles"])
+        ) {
+            return false;
+        }
+        $validRoles = [
+            "Cuisinier",
+            "Chef",
+            "Traducteur",
+            "Administrateur",
+            "DemandeChef",
+            "DemandeTraducteur",
+        ];
+        foreach ($user["roles"] as $role) {
+            if (!in_array($role, $validRoles)) {
+                return false;
+            }
+        }
+        if (
+            in_array("Cuisinier", $user["roles"]) &&
+            in_array("Administrateur", $user["roles"])
+        ) {
+            return false;
+        }
+        if (
+            in_array("Cuisinier", $user["roles"]) &&
+            in_array("Chef", $user["roles"])
+        ) {
+            return false;
+        }
+
         return isset($user["email"]) &&
             isset($user["username"]) &&
             self::validateEmail($user["email"]) &&
@@ -315,15 +351,6 @@ class Validator
             isset($user["password"]) &&
             isset($user["likes"]) &&
             is_array($user["likes"]) &&
-            isset($user["role"]) &&
-            in_array($user["role"], [
-                "Cuisinier",
-                "Chef",
-                "Traducteur",
-                "Administrateur",
-                "DemandeChef",
-                "DemandeTraducteur",
-            ]) &&
             isset($user["created_at"]) &&
             self::validateRecipesUser($user["recipes"]) &&
             self::validateCommentsUser($user["comments"]) &&
