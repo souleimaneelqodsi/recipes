@@ -3,7 +3,7 @@
         "id": "af14c8e8-a1bf-4e-91-f475a2695abd",
         "name": "Tarte aux pommes 388",
         "nameFR": "",
-        "Author": "MIDOU DZ",
+        "Author": "bfcda119-6e54-45-84-cdd4c1e43726",
         "Without": [
             "NoMilk"
         ],
@@ -32,12 +32,34 @@
         ],
         "stepsFR": [],
         "timers": [],
-        "imageURL": "http://img.sndimg.com/food/image/upload/w_266/v1/img/recipes/27/20/8/picVfzLZo.jpg",
+        "imageURL": "http:\/\/img.sndimg.com\/food\/image\/upload\/w_266\/v1\/img\/recipes\/27\/20\/8\/picVfzLZo.jpg",
         "originalURL": "recipes\/tarte-aux-pommes-388",
         "likes": 0,
         "status": "published",
         "comments": [],
-        "photos": [],
+        "photos": [
+            {
+                "id": "32e0975b-e0e9-4f-a5-483157e6a592",
+                "url": "https:\/\/example.com\/images\/recipe-photo-123.jpg",
+                "user_id": "5176637e-7697-40-b9-a66fc04e4113",
+                "is_main": true,
+                "created_at": 1746475785
+            },
+            {
+                "id": "bb984d7f-b03d-49-98-9570492aa406",
+                "url": "https:\/\/example.com\/images\/recipe-photo-123.jpg",
+                "user_id": "5176637e-7697-40-b9-a66fc04e4113",
+                "is_main": false,
+                "created_at": 1746476260
+            },
+            {
+                "id": "85bf74f7-5ac1-4e-bd-81d55974924d",
+                "url": "https:\/\/example.com\/images\/recipe-photo-123.jpg",
+                "user_id": "bfcda119-6e54-45-84-cdd4c1e43726",
+                "is_main": false,
+                "created_at": 1746476470
+            }
+        ],
         "total_time": 1200,
         "created_at": 1745685983
     },
@@ -123,5 +145,6 @@
         "comments": [],
         "photos": [],
         "total_time": 1200,
-        "created_at": 1745686032}
+        "created_at": 1745686032
+    }
 ]

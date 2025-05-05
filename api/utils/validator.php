@@ -232,9 +232,8 @@ class Validator
     {
         return is_array($photo) &&
             isset($photo["id"]) &&
-            isset($photo["recipe_id"]) &&
-            isset($photo["recipe_name"]) &&
             isset($photo["url"]) &&
+            isset($photo["user_id"]) &&
             isset($photo["is_main"]) &&
             isset($photo["created_at"]);
     }
