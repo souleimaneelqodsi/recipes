@@ -426,7 +426,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <li class="has-dropdown" id="cont-nom">
                                     <a href="services.html">${utilisateur.username}</a>
                                     <ul class="dropdown">
-                                        <li><a href="#">Se Connecter</a></li>
+                                        <li><a href="profil.html" id="profil">Mon Profil</a></li>
                                         <li><a href="deconnexion.html" id="lien-deconnexion">Se deconnecter</a></li>
                                     </ul>
                                 </li>
@@ -538,7 +538,33 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+//la page profil
 
+document.addEventListener('DOMContentLoaded', () => {
+    if (window.location.pathname.includes('profil.html')) {
+      const utilisateurJSON = localStorage.getItem('utilisateur');
+      const estConnecte = localStorage.getItem('estConnecte');
+  
+      if (!estConnecte || estConnecte !== 'true' || !utilisateurJSON) {
+        alert("Vous devez être connecté pour accéder à votre profil.");
+        window.location.href = 'connexion.html';
+        return;
+      }
+  
+      const utilisateur = JSON.parse(utilisateurJSON);
+      const profilContainer = document.getElementById('profil-container');
+  
+      profilContainer.innerHTML = `
+        <div class="profil-card">
+          <h2>Mon Profil</h2>
+          <p><strong>Nom d'utilisateur :</strong> ${utilisateur.username || 'Inconnu'}</p>
+          <p><strong>Email :</strong> ${utilisateur.email || 'Inconnu'}</p>
+          <p><strong>Rôle :</strong> ${utilisateur.role || 'Utilisateur'}</p>
+        </div>
+      `;
+    }
+  });
+  
 
 
 

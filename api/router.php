@@ -27,6 +27,12 @@ class Router
                 Session::get("username"),
                 Session::get("email")
             );
+        } else {
+            $user_model = new UserSchema(
+                $json_handler,
+                "guest",
+                "guest@example.com"
+            );
         }
         switch ($path[0]) {
             case "recipes":
@@ -37,22 +43,31 @@ class Router
                             $json_handler,
                             $recipe_schema
                         );
-                        $comments_controller = new CommentController(
-                            $comments_model
-                        );
-                        $comments_controller->dispatch($method, $sliced_path);
-                        break;
-                    } elseif ($path[2] === "photos" && $method === "POST") {
-                        $photos_model = new PhotoSchema($json_handler);
-                        $photos_controller = new PhotoController($photos_model);
-                        $photos_controller->dispatch($method, $sliced_path);
-                        break;
-                    } elseif ($path[2] === "photos" && $method === "PATCH") {
                         $user_model = new UserSchema(
                             $json_handler,
                             "guest",
                             "guest@example.com"
                         );
+                        $comments_controller = new CommentController(
+                            $comments_model,
+                            $user_model
+                        );
+                        $comments_controller->dispatch($method, $sliced_path);
+                        break;
+                    } elseif ($path[2] === "photos" && $method === "POST") {
+                        $recipe_schema = new RecipeSchema($json_handler);
+                        $photos_model = new PhotoSchema(
+                            $json_handler,
+                            $recipe_schema
+                        );
+                        $photos_controller = new PhotoController(
+                            $photos_model,
+                            $user_model,
+                            $recipe_schema
+                        );
+                        $photos_controller->dispatch($method, $sliced_path);
+                        break;
+                    } elseif ($path[2] === "photos" && $method === "PATCH") {
                         $recipe_model = new RecipeSchema($json_handler);
                         $photos_controller = new RecipeController(
                             $recipe_model,
@@ -65,11 +80,6 @@ class Router
                     }
                 }
                 $recipe_model = new RecipeSchema($json_handler);
-                $user_model = new UserSchema(
-                    $json_handler,
-                    "guest",
-                    "guest@example.com"
-                );
                 $recipe_controller = new RecipeController(
                     $recipe_model,
                     $user_model

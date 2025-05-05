@@ -512,6 +512,16 @@ class RecipeSchema
                 array_column($all_recipes, "id"),
                 true
             );
+            if ($recipe_index === false) {
+                error_log("Recipe not found for liking");
+                return [];
+            }
+            $all_recipes = $this->getAll();
+            $recipe_index = array_search(
+                $recipe_id,
+                array_column($all_recipes, "id"),
+                true
+            );
             if ($recipe_index !== false) {
                 $current_likes = $all_recipes[$recipe_index]["likes"];
                 $all_recipes[$recipe_index]["likes"] = $current_likes + 1;
@@ -533,6 +543,16 @@ class RecipeSchema
     {
         try {
             $all_recipes = $this->getPublished();
+            $recipe_index = array_search(
+                $recipe_id,
+                array_column($all_recipes, "id"),
+                true
+            );
+            if ($recipe_index === false) {
+                error_log("Recipe not found for liking");
+                return [];
+            }
+            $all_recipes = $this->getAll();
             $recipe_index = array_search(
                 $recipe_id,
                 array_column($all_recipes, "id"),
@@ -563,6 +583,16 @@ class RecipeSchema
     {
         try {
             $all_recipes = $this->getPublished();
+            $recipe_index = array_search(
+                $recipe_id,
+                array_column($all_recipes, "id"),
+                true
+            );
+            if ($recipe_index === false) {
+                error_log("Recipe not found for liking");
+                return [];
+            }
+            $all_recipes = $this->getAll();
             $recipe_index = array_search(
                 $recipe_id,
                 array_column($all_recipes, "id"),
@@ -640,7 +670,8 @@ class RecipeSchema
         }
     }
     /**
-     * @return array     */
+     * @return array     * @param mixed $final_url
+     */
     public function setPhoto(
         string $recipe_id,
         string $photo_id,
@@ -650,12 +681,22 @@ class RecipeSchema
             if (empty($photo_id)) {
                 throw new Exception("Photo ID is empty");
             }
+            $all_recipes = $this->getPublished();
+            $recipe_index = array_search(
+                $recipe_id,
+                array_column($all_recipes, "id"),
+                true
+            );
+            if ($recipe_index === false) {
+                throw new Exception("Recipe not found");
+            }
             $all_recipes = $this->getAll();
             $recipe_index = array_search(
                 $recipe_id,
                 array_column($all_recipes, "id"),
                 true
             );
+            //you never know...
             if ($recipe_index === false) {
                 throw new Exception("Recipe not found");
             }
