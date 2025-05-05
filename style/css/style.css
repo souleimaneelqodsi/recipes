@@ -2150,7 +2150,7 @@ form label {
 
 
 /* style du boutton d'affichage de recette traduit */
-<style>
+
   #btn-anglais {
     background-color: black;
     color: white;
@@ -2170,5 +2170,38 @@ form label {
     background-color: #aaa;
     cursor: not-allowed;
   }
-</style>
 
+
+/*la page profil*/
+.profil-card {
+  background-color: #ffffff;
+  border: 2px solid #a0522d; /* marron clair */
+  border-radius: 12px;
+  padding: 40px 50px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
+  margin: auto;
+  margin-top: 10vh;
+  transition: transform 0.3s ease;
+}
+
+.profil-card:hover {
+  transform: translateY(-5px);
+}
+
+.profil-card h2 {
+  color: #ff6600; /* orange vif */
+  margin-bottom: 25px;
+}
+
+.profil-card p {
+  font-size: 18px;
+  margin-bottom: 15px;
+  color: #2c2c2c;
+}
+
+.profil-card strong {
+  color: #a0522d; /* marron clair */
+}
