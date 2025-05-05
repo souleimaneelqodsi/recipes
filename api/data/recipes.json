@@ -3,10 +3,8 @@
         "id": "af14c8e8-a1bf-4e-91-f475a2695abd",
         "name": "Tarte aux pommes 388",
         "nameFR": "",
-        "Author": "MIDOU DZ",
-        "Without": [
-            "NoMilk"
-        ],
+        "Author": "bfcda119-6e54-45-84-cdd4c1e43726",
+        "Without": ["NoMilk"],
         "ingredients": [
             {
                 "quantity": "100g",
@@ -37,8 +35,110 @@
         "likes": 0,
         "status": "published",
         "comments": [],
-        "photos": [],
+        "photos": [
+            {
+                "id": "32e0975b-e0e9-4f-a5-483157e6a592",
+                "url": "https:\/\/example.com\/images\/recipe-photo-123.jpg",
+                "user_id": "5176637e-7697-40-b9-a66fc04e4113",
+                "is_main": true,
+                "created_at": 1746475785
+            },
+            {
+                "id": "bb984d7f-b03d-49-98-9570492aa406",
+                "url": "https:\/\/example.com\/images\/recipe-photo-123.jpg",
+                "user_id": "5176637e-7697-40-b9-a66fc04e4113",
+                "is_main": false,
+                "created_at": 1746476260
+            },
+            {
+                "id": "85bf74f7-5ac1-4e-bd-81d55974924d",
+                "url": "https:\/\/example.com\/images\/recipe-photo-123.jpg",
+                "user_id": "bfcda119-6e54-45-84-cdd4c1e43726",
+                "is_main": false,
+                "created_at": 1746476470
+            }
+        ],
         "total_time": 1200,
         "created_at": 1745685983
+    },
+    {
+        "id": "3180657a-24c6-4b-8e-7ad573323b5a",
+        "name": "Tarte aux pommes 319",
+        "nameFR": "",
+        "Author": "user-uuid-placeholder",
+        "Without": ["NoMilk"],
+        "ingredients": [
+            {
+                "quantity": "100g",
+                "name": "Farine",
+                "type": "Base"
+            },
+            {
+                "quantity": "2",
+                "name": "\u0152ufs",
+                "type": "Liant"
+            },
+            {
+                "quantity": "50g",
+                "name": "Beurre",
+                "type": "Mati\u00e8re grasse"
+            }
+        ],
+        "ingredientsFR": [],
+        "steps": [
+            "M\u00e9langer tous les ingr\u00e9dients",
+            "Cuire \u00e0 feu moyen pendant 20 minutes",
+            "Laisser refroidir avant de servir"
+        ],
+        "stepsFR": [],
+        "timers": [],
+        "imageURL": "https:\/\/via.placeholder.com\/300",
+        "originalURL": "recipes\/tarte-aux-pommes-319",
+        "likes": 0,
+        "status": "draft",
+        "comments": [],
+        "photos": [],
+        "total_time": 1200,
+        "created_at": 1745686032
+    },
+    {
+        "id": "6706720f-a40b-45-9b-0aec95e35e85",
+        "name": "G\u00e2teau au chocolat 837",
+        "nameFR": "",
+        "Author": "user-uuid-placeholder",
+        "Without": ["NoMilk"],
+        "ingredients": [
+            {
+                "quantity": "100g",
+                "name": "Farine",
+                "type": "Base"
+            },
+            {
+                "quantity": "2",
+                "name": "\u0152ufs",
+                "type": "Liant"
+            },
+            {
+                "quantity": "50g",
+                "name": "Beurre",
+                "type": "Mati\u00e8re grasse"
+            }
+        ],
+        "ingredientsFR": [],
+        "steps": [
+            "M\u00e9langer tous les ingr\u00e9dients",
+            "Cuire \u00e0 feu moyen pendant 20 minutes",
+            "Laisser refroidir avant de servir"
+        ],
+        "stepsFR": [],
+        "timers": [],
+        "imageURL": "https:\/\/via.placeholder.com\/300",
+        "originalURL": "recipes\/g-ateau-au-chocolat-837",
+        "likes": 0,
+        "status": "draft",
+        "comments": [],
+        "photos": [],
+        "total_time": 1200,
+        "created_at": 1745686032
     }
 ]

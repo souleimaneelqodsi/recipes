@@ -495,8 +495,9 @@ class UserSchema
                 throw new Exception("Invalid input data");
             }
             $all_users = $this->getAll();
+            $user_id = Session::getCurrentUser()->id;
             $usr_index = array_search(
-                $this->id,
+                $user_id,
                 array_column($all_users, "id"),
                 true
             );

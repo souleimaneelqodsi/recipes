@@ -1,23 +1,23 @@
 [
     {
-        "id": "5575ac05-8f7c-47-a7-ba983074c794",
+        "id": "bfcda119-6e54-45-84-cdd4c1e43726",
         "username": "newuser_test",
         "email": "newuser@example.com",
         "role": "Cuisinier",
-        "created_at": 1746474340,
+        "created_at": 1746476419,
         "recipes": [],
-        "comments": [
+        "comments": [],
+        "photos": [
             {
-                "id": "8b815510-523e-49-93-6924f2e0f907",
-                "user_id": "5575ac05-8f7c-47-a7-ba983074c794",
-                "username": "newuser_test",
-                "content": "Ceci est un excellent commentaire de test !",
-                "created_at": 1746474556
+                "id": "85bf74f7-5ac1-4e-bd-81d55974924d",
+                "url": "https:\/\/example.com\/images\/recipe-photo-123.jpg",
+                "user_id": "bfcda119-6e54-45-84-cdd4c1e43726",
+                "is_main": false,
+                "created_at": 1746476470
             }
         ],
-        "photos": [],
         "likes": [],
-        "password": "$2y$10$8typpLL\/SEHVYrFPBP0V7e9Xo4x9Z7GvICh\/tXcmIVZ9.vgcaJ0mK"
+        "password": "$2y$10$vccGbTEAgg02FXTqryF\/q.URl7RAGLD4rrDnPxXPjNC9nSd1UiYdK"
     },
     {
         "id": "9b4a48a6-e0fd-43-98-465603cb2265",
