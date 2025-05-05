@@ -1,10 +1,10 @@
 [
     {
-        "id": "52490eb1-e7b6-4b-82-1517dd554406",
-        "username": "misou",
-        "email": "em_lakehal@esi.dz",
+        "id": "63830c5e-cda2-49-a5-ee3f8ba24049",
+        "username": "newuser_test",
+        "email": "newuser@example.com",
         "role": "Cuisinier",
-        "created_at": 1746366580,
+        "created_at": 1746454510,
         "recipes": [],
         "comments": [],
         "photos": [],
