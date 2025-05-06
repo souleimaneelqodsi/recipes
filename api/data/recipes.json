@@ -1,144 +1,611 @@
 [
     {
-        "id": "af14c8e8-a1bf-4e-91-f475a2695abd",
-        "name": "Tarte aux pommes 388",
-        "nameFR": "",
-        "Author": "bfcda119-6e54-45-84-cdd4c1e43726",
-        "Without": ["NoMilk"],
+        "id": "b1a2c3d4-e5f6-7890-abcd-ef1234567890",
+        "name": "Burgundy Snails",
+        "nameFR": "Escargots de Bourgogne",
+        "Author": "1e170a30-535c-4f-a5-9ca0960bd11e",
+        "Without": [],
         "ingredients": [
+            { "quantity": "12", "name": "Large snails", "type": "Main" },
+            { "quantity": "100g", "name": "Butter (softened)", "type": "Fat" },
+            {
+                "quantity": "3 cloves",
+                "name": "Garlic (minced)",
+                "type": "Aromatic"
+            },
+            {
+                "quantity": "2 tbsp",
+                "name": "Parsley (chopped)",
+                "type": "Herb"
+            },
+            { "quantity": "1", "name": "Shallot (minced)", "type": "Aromatic" },
+            {
+                "quantity": "Pinch",
+                "name": "Salt and Pepper",
+                "type": "Seasoning"
+            }
+        ],
+        "ingredientsFR": [
+            {
+                "quantity": "12",
+                "name": "Gros escargots (en conserve ou préparés)",
+                "type": "Principal"
+            },
             {
                 "quantity": "100g",
-                "name": "Farine",
+                "name": "Beurre pommade",
+                "type": "Matière grasse"
+            },
+            { "quantity": "3 gousses", "name": "Ail haché", "type": "Aromate" },
+            { "quantity": "2 c.à.s", "name": "Persil haché", "type": "Herbe" },
+            { "quantity": "1", "name": "Échalote hachée", "type": "Aromate" },
+            {
+                "quantity": "Pincée",
+                "name": "Sel et Poivre",
+                "type": "Assaisonnement"
+            }
+        ],
+        "steps": [
+            "Preheat oven to 200°C (400°F).",
+            "In a bowl, mix softened butter, minced garlic, chopped parsley, minced shallot, salt, and pepper.",
+            "Place each snail back into its shell (or use special snail dishes).",
+            "Top each snail generously with the garlic butter mixture.",
+            "Arrange snails on a baking tray.",
+            "Bake for 8-10 minutes, until butter is bubbling and lightly golden.",
+            "Serve immediately with fresh bread."
+        ],
+        "stepsFR": [
+            "Préchauffer le four à 200°C (Thermostat 6-7).",
+            "Dans un bol, mélanger le beurre pommade, l'ail haché, le persil, l'échalote, le sel et le poivre.",
+            "Remettre chaque escargot dans sa coquille (ou utiliser des plats à escargots).",
+            "Garnir généreusement chaque escargot avec le beurre persillé.",
+            "Disposer les escargots sur une plaque de cuisson.",
+            "Enfourner pour 8-10 minutes, jusqu'à ce que le beurre bouillonne et soit légèrement doré.",
+            "Servir très chaud avec du pain frais."
+        ],
+        "timers": [],
+        "imageURL": "https://img.freepik.com/photos-gratuite/escargots-four-beurre-ail-herbes-fraiches_114579-14961.jpg",
+        "originalURL": "recipes/escargots-de-bourgogne",
+        "likes": 28,
+        "status": "published",
+        "comments": [
+            {
+                "id": "c1a2b3c4-d5e6-f7g8-h9i0-j1k2l3m4n5o6",
+                "user_id": "3b45899c-b9b5-46-b1-bd838c32031d",
+                "username": "souleimaneelqodsis",
+                "content": "Un classique indémodable !",
+                "created_at": 1746510000
+            }
+        ],
+        "photos": [
+            {
+                "id": "p1a2b3c4-d5e6-f7g8-h9i0-j1k2l3m4n5o6",
+                "url": "https://img.freepik.com/photos-gratuite/escargots-four-beurre-ail-herbes-fraiches_114579-14961.jpg",
+                "user_id": "1e170a30-535c-4f-a5-9ca0960bd11e",
+                "username": "souleimaneelqodsi",
+                "is_main": true,
+                "created_at": 1746500000
+            }
+        ],
+        "total_time": 1200,
+        "created_at": 1746499000
+    },
+    {
+        "id": "f0e9d8c7-b6a5-4321-fedc-ba9876543210",
+        "name": "Margherita Pizza",
+        "nameFR": "Pizza Margherita",
+        "Author": "3b45899c-b9b5-46-b1-bd838c32031d",
+        "Without": ["Vegetarian"],
+        "ingredients": [
+            { "quantity": "1", "name": "Pizza dough", "type": "Base" },
+            { "quantity": "100ml", "name": "Tomato sauce", "type": "Sauce" },
+            {
+                "quantity": "125g",
+                "name": "Mozzarella cheese (sliced or grated)",
+                "type": "Cheese"
+            },
+            { "quantity": "Few leaves", "name": "Fresh basil", "type": "Herb" },
+            { "quantity": "Drizzle", "name": "Olive oil", "type": "Fat" },
+            { "quantity": "Pinch", "name": "Salt", "type": "Seasoning" }
+        ],
+        "ingredientsFR": [
+            { "quantity": "1", "name": "Pâte à pizza", "type": "Base" },
+            { "quantity": "100ml", "name": "Sauce tomate", "type": "Sauce" },
+            {
+                "quantity": "125g",
+                "name": "Mozzarella (tranchée ou râpée)",
+                "type": "Fromage"
+            },
+            {
+                "quantity": "Quelques feuilles",
+                "name": "Basilic frais",
+                "type": "Herbe"
+            },
+            {
+                "quantity": "Filet",
+                "name": "Huile d'olive",
+                "type": "Matière grasse"
+            },
+            { "quantity": "Pincée", "name": "Sel", "type": "Assaisonnement" }
+        ],
+        "steps": [
+            "Preheat oven to the highest temperature (usually 250°C/480°F), preferably with a pizza stone inside.",
+            "Roll out the pizza dough on a lightly floured surface.",
+            "Spread the tomato sauce evenly over the dough, leaving a small border.",
+            "Arrange the mozzarella slices or sprinkle the grated mozzarella over the sauce.",
+            "Drizzle with olive oil and add a pinch of salt.",
+            "Carefully transfer the pizza to the preheated oven (onto the pizza stone if using).",
+            "Bake for 10-15 minutes, or until the crust is golden and the cheese is bubbly and melted.",
+            "Remove from oven, top with fresh basil leaves, and serve immediately."
+        ],
+        "stepsFR": [
+            "Préchauffer le four à la température la plus élevée (généralement 250°C), si possible avec une pierre à pizza à l'intérieur.",
+            "Étaler la pâte à pizza sur un plan de travail légèrement fariné.",
+            "Répartir uniformément la sauce tomate sur la pâte, en laissant une petite bordure.",
+            "Disposer les tranches de mozzarella ou parsemer la mozzarella râpée sur la sauce.",
+            "Arroser d'un filet d'huile d'olive et ajouter une pincée de sel.",
+            "Transférer délicatement la pizza dans le four préchauffé (sur la pierre à pizza si utilisée).",
+            "Cuire pendant 10-15 minutes, ou jusqu'à ce que la croûte soit dorée et le fromage bouillonnant et fondu.",
+            "Sortir du four, garnir de feuilles de basilic frais et servir immédiatement."
+        ],
+        "timers": [],
+        "imageURL": "https://cdn.pixabay.com/photo/2017/12/09/08/18/pizza-3007395_1280.jpg",
+        "originalURL": "recipes/pizza-margherita",
+        "likes": 45,
+        "status": "published",
+        "comments": [
+            {
+                "id": "c2b3c4d5-e6f7-g8h9-i0j1-k2l3m4n5o6p7",
+                "user_id": "a914298b-6d10-41-99-731d6e0a88d4",
+                "username": "sousou",
+                "content": "Simple et efficace !",
+                "created_at": 1746511000
+            },
+            {
+                "id": "c3c4d5e6-f7g8-h9i0-j1k2-l3m4n5o6p7q8",
+                "user_id": "1e170a30-535c-4f-a5-9ca0960bd11e",
+                "username": "souleimaneelqodsi",
+                "content": "Ma préférée !",
+                "created_at": 1746512000
+            }
+        ],
+        "photos": [
+            {
+                "id": "p2b3c4d5-e6f7-g8h9-i0j1-k2l3m4n5o6p7",
+                "url": "https://cdn.pixabay.com/photo/2017/12/09/08/18/pizza-3007395_1280.jpg",
+                "user_id": "3b45899c-b9b5-46-b1-bd838c32031d",
+                "username": "souleimaneelqodsis",
+                "is_main": true,
+                "created_at": 1746501000
+            }
+        ],
+        "total_time": 1800,
+        "created_at": 1746500000
+    },
+    {
+        "id": "10293847-56ab-cdef-1234-567890abcdef",
+        "name": "Salmon Sushi Rolls (Maki)",
+        "nameFR": "Sushi Rolls au Saumon (Maki)",
+        "Author": "1e170a30-535c-4f-a5-9ca0960bd11e",
+        "Without": ["NoGluten"],
+        "ingredients": [
+            {
+                "quantity": "2 cups",
+                "name": "Sushi rice (cooked and seasoned)",
                 "type": "Base"
             },
             {
-                "quantity": "2",
-                "name": "\u0152ufs",
-                "type": "Liant"
+                "quantity": "4 sheets",
+                "name": "Nori (seaweed sheets)",
+                "type": "Wrapper"
             },
             {
-                "quantity": "50g",
-                "name": "Beurre",
-                "type": "Mati\u00e8re grasse"
+                "quantity": "200g",
+                "name": "Sushi-grade salmon (thinly sliced)",
+                "type": "Protein"
+            },
+            {
+                "quantity": "1/2",
+                "name": "Cucumber (julienned)",
+                "type": "Vegetable"
+            },
+            {
+                "quantity": "1/2",
+                "name": "Avocado (sliced)",
+                "type": "Vegetable"
+            },
+            {
+                "quantity": "To serve",
+                "name": "Soy sauce, wasabi, pickled ginger",
+                "type": "Condiment"
             }
         ],
-        "ingredientsFR": [],
-        "steps": [
-            "M\u00e9langer tous les ingr\u00e9dients",
-            "Cuire \u00e0 feu moyen pendant 20 minutes",
-            "Laisser refroidir avant de servir"
+        "ingredientsFR": [
+            {
+                "quantity": "2 tasses",
+                "name": "Riz à sushi (cuit et assaisonné)",
+                "type": "Base"
+            },
+            {
+                "quantity": "4 feuilles",
+                "name": "Nori (feuilles d'algue)",
+                "type": "Enveloppe"
+            },
+            {
+                "quantity": "200g",
+                "name": "Saumon qualité sushi (tranché finement)",
+                "type": "Protéine"
+            },
+            {
+                "quantity": "1/2",
+                "name": "Concombre (en julienne)",
+                "type": "Légume"
+            },
+            { "quantity": "1/2", "name": "Avocat (tranché)", "type": "Légume" },
+            {
+                "quantity": "Pour servir",
+                "name": "Sauce soja, wasabi, gingembre mariné",
+                "type": "Condiment"
+            }
         ],
-        "stepsFR": [],
+        "steps": [
+            "Place a sheet of nori shiny-side down on a bamboo rolling mat.",
+            "Wet your hands slightly and spread a thin layer of sushi rice evenly over the nori, leaving a small border at the top edge.",
+            "Arrange slices of salmon, cucumber, and avocado in a line across the rice, near the bottom edge.",
+            "Carefully lift the edge of the bamboo mat closest to you, fold it over the filling, and start rolling tightly.",
+            "Use the mat to press and shape the roll as you go.",
+            "Wet the top border of the nori slightly with water to seal the roll.",
+            "Remove the roll from the mat. Wet a sharp knife and slice the roll into 6-8 pieces.",
+            "Repeat with the remaining ingredients.",
+            "Serve with soy sauce, wasabi, and pickled ginger."
+        ],
+        "stepsFR": [
+            "Placer une feuille de nori, côté brillant vers le bas, sur une natte de bambou.",
+            "Mouiller légèrement les mains et étaler une fine couche de riz à sushi uniformément sur le nori, en laissant une petite bordure en haut.",
+            "Disposer les tranches de saumon, le concombre et l'avocat en ligne sur le riz, près du bord inférieur.",
+            "Soulever délicatement le bord de la natte le plus proche de vous, le rabattre sur la garniture et commencer à rouler fermement.",
+            "Utiliser la natte pour presser et former le rouleau au fur et à mesure.",
+            "Mouiller légèrement la bordure supérieure du nori avec de l'eau pour sceller le rouleau.",
+            "Retirer le rouleau de la natte. Mouiller un couteau bien aiguisé et trancher le rouleau en 6-8 morceaux.",
+            "Répéter avec le reste des ingrédients.",
+            "Servir avec de la sauce soja, du wasabi et du gingembre mariné."
+        ],
         "timers": [],
-        "imageURL": "http:\/\/img.sndimg.com\/food\/image\/upload\/w_266\/v1\/img\/recipes\/27\/20\/8\/picVfzLZo.jpg",
-        "originalURL": "recipes\/tarte-aux-pommes-388",
-        "likes": 0,
+        "imageURL": "https://cdn.pixabay.com/photo/2016/03/05/19/02/salmon-1238248_1280.jpg",
+        "originalURL": "recipes/sushi-rolls-saumon",
+        "likes": 55,
         "status": "published",
         "comments": [],
         "photos": [
             {
-                "id": "32e0975b-e0e9-4f-a5-483157e6a592",
-                "url": "https:\/\/example.com\/images\/recipe-photo-123.jpg",
-                "user_id": "5176637e-7697-40-b9-a66fc04e4113",
+                "id": "p3c4d5e6-f7g8-h9i0-j1k2-l3m4n5o6p7q8",
+                "url": "https://cdn.pixabay.com/photo/2016/03/05/19/02/salmon-1238248_1280.jpg",
+                "user_id": "a914298b-6d10-41-99-731d6e0a88d4",
+                "username": "sousou",
                 "is_main": true,
-                "created_at": 1746475785
+                "created_at": 1746502000
+            }
+        ],
+        "total_time": 3000,
+        "created_at": 1746501000
+    },
+    {
+        "id": "abcdef12-3456-7890-fedc-ba9876543210",
+        "name": "Classic Pancakes",
+        "nameFR": "Pancakes Classiques",
+        "Author": "1e170a30-535c-4f-a5-9ca0960bd11e",
+        "Without": [],
+        "ingredients": [
+            { "quantity": "150g", "name": "All-purpose flour", "type": "Base" },
+            {
+                "quantity": "1 tsp",
+                "name": "Baking powder",
+                "type": "Leavening"
+            },
+            { "quantity": "1/2 tsp", "name": "Salt", "type": "Seasoning" },
+            { "quantity": "1 tbsp", "name": "Sugar", "type": "Sweetener" },
+            { "quantity": "1", "name": "Egg", "type": "Binder" },
+            { "quantity": "250ml", "name": "Milk", "type": "Liquid" },
+            {
+                "quantity": "2 tbsp",
+                "name": "Melted butter (or oil)",
+                "type": "Fat"
             },
             {
-                "id": "bb984d7f-b03d-49-98-9570492aa406",
-                "url": "https:\/\/example.com\/images\/recipe-photo-123.jpg",
-                "user_id": "5176637e-7697-40-b9-a66fc04e4113",
-                "is_main": false,
-                "created_at": 1746476260
+                "quantity": "For cooking",
+                "name": "Butter or oil",
+                "type": "Fat"
+            }
+        ],
+        "ingredientsFR": [
+            { "quantity": "150g", "name": "Farine tout usage", "type": "Base" },
+            {
+                "quantity": "1 c.à.c",
+                "name": "Levure chimique",
+                "type": "Levant"
             },
             {
-                "id": "85bf74f7-5ac1-4e-bd-81d55974924d",
-                "url": "https:\/\/example.com\/images\/recipe-photo-123.jpg",
-                "user_id": "bfcda119-6e54-45-84-cdd4c1e43726",
-                "is_main": false,
-                "created_at": 1746476470
+                "quantity": "1/2 c.à.c",
+                "name": "Sel",
+                "type": "Assaisonnement"
+            },
+            { "quantity": "1 c.à.s", "name": "Sucre", "type": "Sucrant" },
+            { "quantity": "1", "name": "Œuf", "type": "Liant" },
+            { "quantity": "250ml", "name": "Lait", "type": "Liquide" },
+            {
+                "quantity": "2 c.à.s",
+                "name": "Beurre fondu (ou huile)",
+                "type": "Matière grasse"
+            },
+            {
+                "quantity": "Pour la cuisson",
+                "name": "Beurre ou huile",
+                "type": "Matière grasse"
+            }
+        ],
+        "steps": [
+            "In a large bowl, whisk together flour, baking powder, salt, and sugar.",
+            "In a separate bowl, whisk the egg and milk together.",
+            "Pour the wet ingredients into the dry ingredients and whisk until just combined (a few lumps are okay).",
+            "Stir in the melted butter.",
+            "Heat a lightly oiled or buttered griddle or frying pan over medium heat.",
+            "Pour or scoop the batter onto the griddle (about 60ml or 1/4 cup per pancake).",
+            "Cook for about 2-3 minutes per side, or until golden brown and bubbles appear on the surface before flipping.",
+            "Serve warm with your favorite toppings (maple syrup, fruit, etc.)."
+        ],
+        "stepsFR": [
+            "Dans un grand saladier, mélanger la farine, la levure chimique, le sel et le sucre.",
+            "Dans un autre bol, fouetter l'œuf et le lait.",
+            "Verser les ingrédients liquides sur les ingrédients secs et mélanger juste assez pour combiner (quelques grumeaux ne sont pas graves).",
+            "Incorporer le beurre fondu.",
+            "Chauffer une poêle ou une crêpière légèrement huilée ou beurrée à feu moyen.",
+            "Verser la pâte sur la poêle chaude (environ 60ml ou 1/4 tasse par pancake).",
+            "Cuire environ 2-3 minutes de chaque côté, ou jusqu'à ce qu'ils soient dorés et que des bulles apparaissent à la surface avant de retourner.",
+            "Servir chaud avec vos garnitures préférées (sirop d'érable, fruits, etc.)."
+        ],
+        "timers": [],
+        "imageURL": "https://cdn.pixabay.com/photo/2017/05/07/08/56/pancakes-2291908_1280.jpg",
+        "originalURL": "recipes/pancakes-classiques",
+        "likes": 35,
+        "status": "published",
+        "comments": [
+            {
+                "id": "c4d5e6f7-g8h9-i0j1-k2l3-m4n5o6p7q8r9",
+                "user_id": "3b45899c-b9b5-46-b1-bd838c32031d",
+                "username": "souleimaneelqodsis",
+                "content": "Parfait pour le petit déjeuner !",
+                "created_at": 1746513000
+            }
+        ],
+        "photos": [
+            {
+                "id": "p4d5e6f7-g8h9-i0j1-k2l3-m4n5o6p7q8r9",
+                "url": "https://cdn.pixabay.com/photo/2017/05/07/08/56/pancakes-2291908_1280.jpg",
+                "user_id": "1e170a30-535c-4f-a5-9ca0960bd11e",
+                "username": "souleimaneelqodsi",
+                "is_main": true,
+                "created_at": 1746503000
+            }
+        ],
+        "total_time": 1500,
+        "created_at": 1746502000
+    },
+    {
+        "id": "fedcba98-7654-3210-abcd-ef1234567890",
+        "name": "Classic Beef Burger",
+        "nameFR": "Burger Classique au Boeuf",
+        "Author": "3b45899c-b9b5-46-b1-bd838c32031d",
+        "Without": [],
+        "ingredients": [
+            { "quantity": "150g", "name": "Ground beef", "type": "Protein" },
+            { "quantity": "1", "name": "Burger bun", "type": "Bread" },
+            {
+                "quantity": "1 slice",
+                "name": "Cheddar cheese (optional)",
+                "type": "Cheese"
+            },
+            { "quantity": "2 slices", "name": "Tomato", "type": "Vegetable" },
+            { "quantity": "1 leaf", "name": "Lettuce", "type": "Vegetable" },
+            { "quantity": "Few slices", "name": "Onion", "type": "Vegetable" },
+            {
+                "quantity": "To taste",
+                "name": "Ketchup, mustard, mayonnaise",
+                "type": "Condiment"
+            },
+            {
+                "quantity": "Pinch",
+                "name": "Salt and Pepper",
+                "type": "Seasoning"
+            }
+        ],
+        "ingredientsFR": [
+            { "quantity": "150g", "name": "Boeuf haché", "type": "Protéine" },
+            { "quantity": "1", "name": "Pain à burger", "type": "Pain" },
+            {
+                "quantity": "1 tranche",
+                "name": "Cheddar (optionnel)",
+                "type": "Fromage"
+            },
+            { "quantity": "2 tranches", "name": "Tomate", "type": "Légume" },
+            { "quantity": "1 feuille", "name": "Laitue", "type": "Légume" },
+            {
+                "quantity": "Quelques rondelles",
+                "name": "Oignon",
+                "type": "Légume"
+            },
+            {
+                "quantity": "Au goût",
+                "name": "Ketchup, moutarde, mayonnaise",
+                "type": "Condiment"
+            },
+            {
+                "quantity": "Pincée",
+                "name": "Sel et Poivre",
+                "type": "Assaisonnement"
+            }
+        ],
+        "steps": [
+            "Season the ground beef with salt and pepper, then form into a patty slightly larger than the bun.",
+            "Heat a grill or frying pan over medium-high heat.",
+            "Cook the patty for 3-5 minutes per side for medium-rare, or longer depending on desired doneness.",
+            "If using cheese, place a slice on the patty during the last minute of cooking.",
+            "Lightly toast the burger bun.",
+            "Assemble the burger: spread condiments on the bun, add lettuce, tomato, onion, the cooked patty, and the top bun.",
+            "Serve immediately, optionally with fries."
+        ],
+        "stepsFR": [
+            "Assaisonner le boeuf haché avec sel et poivre, puis former un steak légèrement plus grand que le pain.",
+            "Chauffer un grill ou une poêle à feu moyen-vif.",
+            "Cuire le steak 3-5 minutes de chaque côté pour une cuisson saignante, ou plus longtemps selon la cuisson désirée.",
+            "Si vous utilisez du fromage, placer une tranche sur le steak pendant la dernière minute de cuisson.",
+            "Griller légèrement le pain à burger.",
+            "Assembler le burger : étaler les condiments sur le pain, ajouter la laitue, la tomate, l'oignon, le steak cuit, et le chapeau du pain.",
+            "Servir immédiatement, éventuellement avec des frites."
+        ],
+        "timers": [],
+        "imageURL": "https://cdn.pixabay.com/photo/2014/10/23/18/05/burger-500054_1280.jpg",
+        "originalURL": "recipes/burger-classique-boeuf",
+        "likes": 60,
+        "status": "published",
+        "comments": [
+            {
+                "id": "c5e6f7g8-h9i0-j1k2-l3m4-n5o6p7q8r9s0",
+                "user_id": "1e170a30-535c-4f-a5-9ca0960bd11e",
+                "username": "souleimaneelqodsi",
+                "content": "Un vrai régal !",
+                "created_at": 1746514000
+            }
+        ],
+        "photos": [
+            {
+                "id": "p5e6f7g8-h9i0-j1k2-l3m4-n5o6p7q8r9s0",
+                "url": "https://cdn.pixabay.com/photo/2014/10/23/18/05/burger-500054_1280.jpg",
+                "user_id": "3b45899c-b9b5-46-b1-bd838c32031d",
+                "username": "souleimaneelqodsis",
+                "is_main": true,
+                "created_at": 1746504000
             }
         ],
         "total_time": 1200,
-        "created_at": 1745685983
+        "created_at": 1746503000
     },
     {
-        "id": "3180657a-24c6-4b-8e-7ad573323b5a",
-        "name": "Tarte aux pommes 319",
-        "nameFR": "",
-        "Author": "user-uuid-placeholder",
-        "Without": ["NoMilk"],
+        "id": "98765432-10fe-dcba-0987-654321fedcba",
+        "name": "Mixed Green Salad with Vinaigrette",
+        "nameFR": "Salade Verte Mixte à la Vinaigrette",
+        "Author": "a914298b-6d10-41-99-731d6e0a88d4",
+        "Without": ["Vegetarian", "Vegan", "NoGluten", "NoMilk"],
         "ingredients": [
             {
-                "quantity": "100g",
-                "name": "Farine",
+                "quantity": "1 bag",
+                "name": "Mixed salad greens",
                 "type": "Base"
             },
             {
-                "quantity": "2",
-                "name": "\u0152ufs",
-                "type": "Liant"
+                "quantity": "1/2",
+                "name": "Cucumber (sliced)",
+                "type": "Vegetable"
+            },
+            { "quantity": "1", "name": "Tomato (wedged)", "type": "Vegetable" },
+            {
+                "quantity": "1/4",
+                "name": "Red onion (thinly sliced)",
+                "type": "Vegetable"
             },
             {
-                "quantity": "50g",
-                "name": "Beurre",
-                "type": "Mati\u00e8re grasse"
+                "quantity": "3 tbsp",
+                "name": "Olive oil",
+                "type": "Vinaigrette"
+            },
+            {
+                "quantity": "1 tbsp",
+                "name": "Red wine vinegar",
+                "type": "Vinaigrette"
+            },
+            {
+                "quantity": "1 tsp",
+                "name": "Dijon mustard",
+                "type": "Vinaigrette"
+            },
+            {
+                "quantity": "Pinch",
+                "name": "Salt and Pepper",
+                "type": "Seasoning"
             }
         ],
-        "ingredientsFR": [],
-        "steps": [
-            "M\u00e9langer tous les ingr\u00e9dients",
-            "Cuire \u00e0 feu moyen pendant 20 minutes",
-            "Laisser refroidir avant de servir"
-        ],
-        "stepsFR": [],
-        "timers": [],
-        "imageURL": "https:\/\/via.placeholder.com\/300",
-        "originalURL": "recipes\/tarte-aux-pommes-319",
-        "likes": 0,
-        "status": "draft",
-        "comments": [],
-        "photos": [],
-        "total_time": 1200,
-        "created_at": 1745686032
-    },
-    {
-        "id": "6706720f-a40b-45-9b-0aec95e35e85",
-        "name": "G\u00e2teau au chocolat 837",
-        "nameFR": "",
-        "Author": "user-uuid-placeholder",
-        "Without": ["NoMilk"],
-        "ingredients": [
+        "ingredientsFR": [
             {
-                "quantity": "100g",
-                "name": "Farine",
+                "quantity": "1 sachet",
+                "name": "Mélange de salades vertes",
                 "type": "Base"
             },
             {
-                "quantity": "2",
-                "name": "\u0152ufs",
-                "type": "Liant"
+                "quantity": "1/2",
+                "name": "Concombre (en rondelles)",
+                "type": "Légume"
             },
             {
-                "quantity": "50g",
-                "name": "Beurre",
-                "type": "Mati\u00e8re grasse"
+                "quantity": "1",
+                "name": "Tomate (en quartiers)",
+                "type": "Légume"
+            },
+            {
+                "quantity": "1/4",
+                "name": "Oignon rouge (émincé)",
+                "type": "Légume"
+            },
+            {
+                "quantity": "3 c.à.s",
+                "name": "Huile d'olive",
+                "type": "Vinaigrette"
+            },
+            {
+                "quantity": "1 c.à.s",
+                "name": "Vinaigre de vin rouge",
+                "type": "Vinaigrette"
+            },
+            {
+                "quantity": "1 c.à.c",
+                "name": "Moutarde de Dijon",
+                "type": "Vinaigrette"
+            },
+            {
+                "quantity": "Pincée",
+                "name": "Sel et Poivre",
+                "type": "Assaisonnement"
             }
         ],
-        "ingredientsFR": [],
         "steps": [
-            "M\u00e9langer tous les ingr\u00e9dients",
-            "Cuire \u00e0 feu moyen pendant 20 minutes",
-            "Laisser refroidir avant de servir"
+            "Wash and dry the salad greens thoroughly.",
+            "In a large bowl, combine the salad greens, cucumber, tomato, and red onion.",
+            "In a small jar or bowl, whisk together the olive oil, red wine vinegar, Dijon mustard, salt, and pepper to make the vinaigrette.",
+            "Just before serving, pour the vinaigrette over the salad and toss gently to coat.",
+            "Serve immediately."
         ],
-        "stepsFR": [],
+        "stepsFR": [
+            "Laver et sécher soigneusement les feuilles de salade.",
+            "Dans un grand saladier, combiner la salade verte, le concombre, la tomate et l'oignon rouge.",
+            "Dans un petit bocal ou bol, fouetter ensemble l'huile d'olive, le vinaigre de vin rouge, la moutarde de Dijon, le sel et le poivre pour faire la vinaigrette.",
+            "Juste avant de servir, verser la vinaigrette sur la salade et mélanger délicatement pour enrober.",
+            "Servir immédiatement."
+        ],
         "timers": [],
-        "imageURL": "https:\/\/via.placeholder.com\/300",
-        "originalURL": "recipes\/g-ateau-au-chocolat-837",
-        "likes": 0,
-        "status": "draft",
+        "imageURL": "https://cdn.pixabay.com/photo/2015/04/08/13/13/food-712665_1280.jpg",
+        "originalURL": "recipes/salade-verte-mixte",
+        "likes": 15,
+        "status": "published",
         "comments": [],
-        "photos": [],
-        "total_time": 1200,
-        "created_at": 1745686032
+        "photos": [
+            {
+                "id": "p6f7g8h9-i0j1-k2l3-m4n5-o6p7q8r9s0t1",
+                "url": "https://cdn.pixabay.com/photo/2015/04/08/13/13/food-712665_1280.jpg",
+                "user_id": "a914298b-6d10-41-99-731d6e0a88d4",
+                "username": "sousou",
+                "is_main": true,
+                "created_at": 1746505000
+            }
+        ],
+        "total_time": 600,
+        "created_at": 1746504000
     }
 ]

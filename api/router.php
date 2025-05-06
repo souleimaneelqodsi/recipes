@@ -75,8 +75,6 @@ class Router
                         );
                         $photos_controller->dispatch($method, $sliced_path);
                         break;
-                    } else {
-                        self::not_found();
                     }
                 }
                 $recipe_model = new RecipeSchema($json_handler);
