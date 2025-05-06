@@ -3,14 +3,157 @@
         "id": "1e170a30-535c-4f-a5-9ca0960bd11e",
         "username": "souleimaneelqodsi",
         "email": "souleimanelqodss@gmail.com",
-        "roles": [
-            "Cuisinier"
-        ],
+        "roles": ["Administrateur"],
         "created_at": 1746494397,
-        "recipes": [],
-        "comments": [],
-        "photos": [],
-        "likes": [],
-        "password": "$2y$10$O00GQkPBQh3fhbxO3sJevOQ2YIpoaxS\/znQLL8nacPxiHnfdFhFqO"
+        "recipes": [
+            {
+                "id": "b1a2c3d4-e5f6-7890-abcd-ef1234567890",
+                "name": "Burgundy Snails",
+                "nameFR": "Escargots de Bourgogne",
+                "imageURL": "https://img.freepik.com/photos-gratuite/escargots-four-beurre-ail-herbes-fraiches_114579-14961.jpg",
+                "likes": 28
+            },
+            {
+                "id": "10293847-56ab-cdef-1234-567890abcdef",
+                "name": "Salmon Sushi Rolls (Maki)",
+                "nameFR": "Sushi Rolls au Saumon (Maki)",
+                "imageURL": "https://cdn.pixabay.com/photo/2016/03/05/19/02/salmon-1238248_1280.jpg",
+                "likes": 55
+            },
+            {
+                "id": "abcdef12-3456-7890-fedc-ba9876543210",
+                "name": "Classic Pancakes",
+                "nameFR": "Pancakes Classiques",
+                "imageURL": "https://cdn.pixabay.com/photo/2017/05/07/08/56/pancakes-2291908_1280.jpg",
+                "likes": 35
+            }
+        ],
+        "comments": [
+            {
+                "id": "c3c4d5e6-f7g8-h9i0-j1k2-l3m4n5o6p7q8",
+                "content": "Ma préférée !",
+                "created_at": 1746512000
+            },
+            {
+                "id": "c5e6f7g8-h9i0-j1k2-l3m4-n5o6p7q8r9s0",
+                "content": "Un vrai régal !",
+                "created_at": 1746514000
+            }
+        ],
+        "photos": [
+            {
+                "id": "p1a2b3c4-d5e6-f7g8-h9i0-j1k2l3m4n5o6",
+                "url": "https://img.freepik.com/photos-gratuite/escargots-four-beurre-ail-herbes-fraiches_114579-14961.jpg",
+                "is_main": true,
+                "created_at": 1746500000
+            },
+            {
+                "id": "p4d5e6f7-g8h9-i0j1-k2l3-m4n5o6p7q8r9",
+                "url": "https://cdn.pixabay.com/photo/2017/05/07/08/56/pancakes-2291908_1280.jpg",
+                "is_main": true,
+                "created_at": 1746503000
+            }
+        ],
+        "likes": [
+            "f0e9d8c7-b6a5-4321-fedc-ba9876543210",
+            "fedcba98-7654-3210-abcd-ef1234567890"
+        ],
+        "password": "$2y$10$O00GQkPBQh3fhbxO3sJevOQ2YIpoaxS/znQLL8nacPxiHnfdFhFqO"
+    },
+    {
+        "id": "3b45899c-b9b5-46-b1-bd838c32031d",
+        "username": "souleimaneelqodsis",
+        "email": "souleimaneelqodss@gmail.com",
+        "roles": ["Cuisinier"],
+        "created_at": 1746496943,
+        "recipes": [
+            {
+                "id": "f0e9d8c7-b6a5-4321-fedc-ba9876543210",
+                "name": "Margherita Pizza",
+                "nameFR": "Pizza Margherita",
+                "imageURL": "https://cdn.pixabay.com/photo/2017/12/09/08/18/pizza-3007395_1280.jpg",
+                "likes": 45
+            },
+            {
+                "id": "fedcba98-7654-3210-abcd-ef1234567890",
+                "name": "Classic Beef Burger",
+                "nameFR": "Burger Classique au Boeuf",
+                "imageURL": "https://cdn.pixabay.com/photo/2014/10/23/18/05/burger-500054_1280.jpg",
+                "likes": 60
+            }
+        ],
+        "comments": [
+            {
+                "id": "c1a2b3c4-d5e6-f7g8-h9i0-j1k2l3m4n5o6",
+                "content": "Un classique indémodable !",
+                "created_at": 1746510000
+            },
+            {
+                "id": "c4d5e6f7-g8h9-i0j1-k2l3-m4n5o6p7q8r9",
+                "content": "Parfait pour le petit déjeuner !",
+                "created_at": 1746513000
+            }
+        ],
+        "photos": [
+            {
+                "id": "p2b3c4d5-e6f7-g8h9-i0j1-k2l3m4n5o6p7",
+                "url": "https://cdn.pixabay.com/photo/2017/12/09/08/18/pizza-3007395_1280.jpg",
+                "is_main": true,
+                "created_at": 1746501000
+            },
+            {
+                "id": "p5e6f7g8-h9i0-j1k2-l3m4-n5o6p7q8r9s0",
+                "url": "https://cdn.pixabay.com/photo/2014/10/23/18/05/burger-500054_1280.jpg",
+                "is_main": true,
+                "created_at": 1746504000
+            }
+        ],
+        "likes": [
+            "b1a2c3d4-e5f6-7890-abcd-ef1234567890",
+            "abcdef12-3456-7890-fedc-ba9876543210"
+        ],
+        "password": "$2y$10$Fjzc8rM2ol6S.a.d4VqdA.RL6l3MT8sYZ1AlWrUfL81DsupHQWDzG"
+    },
+    {
+        "id": "a914298b-6d10-41-99-731d6e0a88d4",
+        "username": "sousou",
+        "email": "souleimane@gmail.com",
+        "roles": ["Chef"],
+        "created_at": 1746497583,
+        "recipes": [
+            {
+                "id": "98765432-10fe-dcba-0987-654321fedcba",
+                "name": "Mixed Green Salad with Vinaigrette",
+                "nameFR": "Salade Verte Mixte à la Vinaigrette",
+                "imageURL": "https://cdn.pixabay.com/photo/2015/04/08/13/13/food-712665_1280.jpg",
+                "likes": 15
+            }
+        ],
+        "comments": [
+            {
+                "id": "c2b3c4d5-e6f7-g8h9-i0j1-k2l3m4n5o6p7",
+                "content": "Simple et efficace !",
+                "created_at": 1746511000
+            }
+        ],
+        "photos": [
+            {
+                "id": "p3c4d5e6-f7g8-h9i0-j1k2-l3m4n5o6p7q8",
+                "url": "https://cdn.pixabay.com/photo/2016/03/05/19/02/salmon-1238248_1280.jpg",
+                "is_main": true,
+                "created_at": 1746502000
+            },
+            {
+                "id": "p6f7g8h9-i0j1-k2l3-m4n5-o6p7q8r9s0t1",
+                "url": "https://cdn.pixabay.com/photo/2015/04/08/13/13/food-712665_1280.jpg",
+                "is_main": true,
+                "created_at": 1746505000
+            }
+        ],
+        "likes": [
+            "10293847-56ab-cdef-1234-567890abcdef",
+            "98765432-10fe-dcba-0987-654321fedcba"
+        ],
+        "password": "$2y$10$pRrdlfO9CEcVEbpgiEociu9tceM7UEupqBxip7cHxFiUXu99v3.xm"
     }
 ]

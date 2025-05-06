@@ -13,6 +13,7 @@
     public function register(): void
     {
         try {
+            // $this->logout();
             if (Session::isLoggedIn()) {
                 http_response_code(400);
                 header("Content-Type: application/json");

@@ -10,10 +10,8 @@ document.addEventListener("DOMContentLoaded", () => {
     function fetchRecipes() {
         fetch("/recipes/api/recipes/published")
             .then((response) => {
-                // Log de la réponse pour analyser le contenu
                 console.log("Réponse de l'API:", response);
 
-                // Vérifier si la réponse est vide ou n'a pas de corps JSON
                 if (response.status === 204) {
                     console.log("Aucune recette disponible (204)");
                     return []; // Retourner un tableau vide
@@ -354,7 +352,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const confirmPassword =
             document.getElementById("confirm_password").value;
         const messageContainer = document.getElementById("message");
-        alert("misou");
+
+        // Remove this debug alert
+        // alert("misou");
 
         messageContainer.innerHTML = "";
 
@@ -372,6 +372,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const payload = { username, email, password };
 
+        // Remove the unnecessary logout request
         fetch("/recipes/api/auth/register", {
             method: "POST",
             headers: {
@@ -380,20 +381,26 @@ document.addEventListener("DOMContentLoaded", () => {
             body: JSON.stringify(payload),
         })
             .then((response) => {
-                console.log("Payload envoyé:", payload);
-                console.log(response);
+                console.log("Registration response status:", response.status);
+                // Clone the response before using it
+                return response
+                    .clone()
+                    .text()
+                    .then((text) => {
+                        console.log("Raw response:", text);
+                        return response;
+                    });
+            })
+            .then((response) => {
                 if (response.status === 201) {
                     return response.json();
-                } else if (response.status === 400) {
-                    throw new Error("Champs manquants ou invalides.");
-                } else if (response.status === 409) {
-                    throw new Error(
-                        "Nom d’utilisateur ou e-mail déjà utilisé.",
-                    );
                 } else {
-                    throw new Error(
-                        "Erreur serveur. Veuillez réessayer plus tard.",
-                    );
+                    return response.json().then((errorData) => {
+                        console.error("Server error:", errorData);
+                        throw new Error(
+                            errorData.error || "Registration failed",
+                        );
+                    });
                 }
             })
             .then((user) => {
@@ -485,88 +492,86 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-
 //la page connexion
 
-document.addEventListener('DOMContentLoaded', () => {
-  const formConnexion = document.getElementById('form-connexion');
+document.addEventListener("DOMContentLoaded", () => {
+    const formConnexion = document.getElementById("form-connexion");
 
-  if (formConnexion) {
-    formConnexion.addEventListener('submit', (e) => {
-      e.preventDefault(); 
+    if (formConnexion) {
+        formConnexion.addEventListener("submit", (e) => {
+            e.preventDefault();
 
-      const username = document.getElementById('username').value.trim();
-      const password = document.getElementById('password').value;
+            const username = document.getElementById("username").value.trim();
+            const password = document.getElementById("password").value;
 
-      // Vérifie si les champs sont remplis
-      if (!username || !password) {
-        alert('Veuillez remplir tous les champs.');
-        return;
-      }
+            // Vérifie si les champs sont remplis
+            if (!username || !password) {
+                alert("Veuillez remplir tous les champs.");
+                return;
+            }
 
-      const payload = { username, password };
+            const payload = { username, password };
 
-      fetch('/recipes/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-      })
-      .then(response => {
-        if (response.status === 200) {
-          return response.json();
-        } else if (response.status === 400) {
-          throw new Error("Champs manquants.");
-        } else if (response.status === 401) {
-          throw new Error("Nom d'utilisateur ou mot de passe incorrect.");
-        } else {
-          throw new Error("Erreur serveur.");
-        }
-      })
-      .then(data => {
-        console.log('Connexion réussie :', data);
-        localStorage.setItem('estConnecte', 'true');
-        localStorage.setItem('utilisateur', JSON.stringify(data));
-        window.location.href = 'index.html';
-      })
-      .catch(error => {
-        console.error('Erreur de connexion :', error.message);
-        alert(error.message);
-      });
-    });
-  }
+            fetch("/recipes/api/auth/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(payload),
+            })
+                .then((response) => {
+                    if (response.status === 200) {
+                        return response.json();
+                    } else if (response.status === 400) {
+                        throw new Error("Champs manquants.");
+                    } else if (response.status === 401) {
+                        throw new Error(
+                            "Nom d'utilisateur ou mot de passe incorrect.",
+                        );
+                    } else {
+                        throw new Error("Erreur serveur.");
+                    }
+                })
+                .then((data) => {
+                    console.log("Connexion réussie :", data);
+                    localStorage.setItem("estConnecte", "true");
+                    localStorage.setItem("utilisateur", JSON.stringify(data));
+                    window.location.href = "index.html";
+                })
+                .catch((error) => {
+                    console.error("Erreur de connexion :", error.message);
+                    alert(error.message);
+                });
+        });
+    }
 });
 
 //la page profil
 
-document.addEventListener('DOMContentLoaded', () => {
-    if (window.location.pathname.includes('profil.html')) {
-      const utilisateurJSON = localStorage.getItem('utilisateur');
-      const estConnecte = localStorage.getItem('estConnecte');
-  
-      if (!estConnecte || estConnecte !== 'true' || !utilisateurJSON) {
-        alert("Vous devez être connecté pour accéder à votre profil.");
-        window.location.href = 'connexion.html';
-        return;
-      }
-  
-      const utilisateur = JSON.parse(utilisateurJSON);
-      const profilContainer = document.getElementById('profil-container');
-  
-      profilContainer.innerHTML = `
+document.addEventListener("DOMContentLoaded", () => {
+    if (window.location.pathname.includes("profil.html")) {
+        const utilisateurJSON = localStorage.getItem("utilisateur");
+        const estConnecte = localStorage.getItem("estConnecte");
+
+        if (!estConnecte || estConnecte !== "true" || !utilisateurJSON) {
+            alert("Vous devez être connecté pour accéder à votre profil.");
+            window.location.href = "connexion.html";
+            return;
+        }
+
+        const utilisateur = JSON.parse(utilisateurJSON);
+        const profilContainer = document.getElementById("profil-container");
+
+        profilContainer.innerHTML = `
         <div class="profil-card">
           <h2>Mon Profil</h2>
-          <p><strong>Nom d'utilisateur :</strong> ${utilisateur.username || 'Inconnu'}</p>
-          <p><strong>Email :</strong> ${utilisateur.email || 'Inconnu'}</p>
-          <p><strong>Rôle :</strong> ${utilisateur.role || 'Utilisateur'}</p>
+          <p><strong>Nom d'utilisateur :</strong> ${utilisateur.username || "Inconnu"}</p>
+          <p><strong>Email :</strong> ${utilisateur.email || "Inconnu"}</p>
+          <p><strong>Rôle :</strong> ${utilisateur.role || "Utilisateur"}</p>
         </div>
       `;
     }
-  });
-  
-
-
+});
 
 /*
 
@@ -574,10 +579,10 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('DOMContentLoaded', () => {
     const params = new URLSearchParams(window.location.search);
     const recetteId = params.get('id');
-                                                                                                   
+
     const container = document.getElementById('recipe-container');
     const btnAnglais = document.getElementById('btn-anglais');
-                                                                          
+
     if (!recetteId) {
       container.innerText = 'Aucune recette sélectionnée.';
       btnAnglais.disabled = true;
