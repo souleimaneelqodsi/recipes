@@ -1,1 +1,16 @@
-[]
+[
+    {
+        "id": "1e170a30-535c-4f-a5-9ca0960bd11e",
+        "username": "souleimaneelqodsi",
+        "email": "souleimanelqodss@gmail.com",
+        "roles": [
+            "Cuisinier"
+        ],
+        "created_at": 1746494397,
+        "recipes": [],
+        "comments": [],
+        "photos": [],
+        "likes": [],
+        "password": "$2y$10$O00GQkPBQh3fhbxO3sJevOQ2YIpoaxS\/znQLL8nacPxiHnfdFhFqO"
+    }
+]
