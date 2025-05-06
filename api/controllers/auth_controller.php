@@ -13,6 +13,7 @@
     public function register(): void
     {
         try {
+            // $this->logout();
             if (Session::isLoggedIn()) {
                 http_response_code(400);
                 header("Content-Type: application/json");
@@ -65,7 +66,7 @@
             Session::set("user_id", $newUserId);
             Session::set("username", $createdUserData["username"]);
             Session::set("email", $createdUserData["email"]);
-            Session::set("role", $createdUserData["role"]);
+            Session::set("roles", $createdUserData["roles"]);
 
             http_response_code(201);
             header("Content-Type: application/json");

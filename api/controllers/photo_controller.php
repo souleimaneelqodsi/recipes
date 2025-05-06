@@ -25,13 +25,25 @@
                 return;
             }
             if (
-                !$this->recipe_schema->isAuthor(
-                    Session::getCurrentUser()->getId(),
-                    $recipe_id
-                ) &&
-                Session::getUserRole() !== "Administrateur" &&
-                Session::getUserRole() !== "Chef"
+                !(
+                    $this->recipe_schema->isAuthor(
+                        Session::getCurrentUser()->getId(),
+                        $recipe_id
+                    ) ||
+                    Session::getUserRole() === "Administrateur" ||
+                    Session::getUserRole() === "Chef"
+                )
             ) {
+                error_log(
+                    "user " .
+                        Session::getCurrentUser()->getId() .
+                        "with role : " .
+                        Session::getUserRole() .
+                        " tries to upload photo to recipe " .
+                        $recipe_id .
+                        " whose author is " .
+                        $this->recipe_schema->getById($recipe_id)["Author"]
+                );
                 http_response_code(403);
                 header("Content-Type: application/json");
                 echo json_encode([
@@ -73,7 +85,9 @@
             );
             http_response_code(500);
             header("Content-Type: application/json");
-            echo json_encode(["error" => "Internal server error"]);
+            echo json_encode([
+                "error" => "Internal server error : " . $e->getMessage(),
+            ]);
         }
     }
 

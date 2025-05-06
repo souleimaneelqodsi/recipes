@@ -726,8 +726,9 @@ class UserSchema
         }
         try {
             $all_users = $this->getAll();
+            $user_id = Session::getCurrentUser()->id;
             $user_index = array_search(
-                $this->id,
+                $user_id,
                 array_column($all_users, "id"),
                 true
             );
@@ -759,8 +760,9 @@ class UserSchema
         }
         try {
             $all_users = $this->getAll();
+            $user_id = Session::getCurrentUser()->id;
             $user_index = array_search(
-                $this->id,
+                $user_id,
                 array_column($all_users, "id"),
                 true
             );
